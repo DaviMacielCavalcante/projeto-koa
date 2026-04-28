@@ -1,0 +1,342 @@
+# TODO — MVP Aplicativo Facilitador para Agricultores Familiares de Jutaí
+
+**Prazo de entrega**: 18 de maio de 2026
+**Data de início**: 27 de abril de 2026
+**Dias úteis disponíveis**: ~15 dias
+
+**Stack definida**:
+- Plataforma: React Native + TypeScript + Expo (managed workflow com development builds)
+- Backend: Firebase (Firestore + Auth + Storage)
+- Banco local: expo-sqlite
+- Autenticação: Firebase Auth — phone OTP via SMS
+- Câmera: expo-camera
+- Áudio: expo-av
+- Notificações locais: expo-notifications
+- Compressão de imagem: expo-image-manipulator
+- Navegação: React Navigation (ou Expo Router)
+- Build e distribuição: EAS Build + EAS Submit
+- Monitoramento: Firebase Crashlytics + Analytics (via @react-native-firebase)
+- Testes: Jest + Detox
+- Atualizações OTA: expo-updates (correções sem redistribuir APK)
+
+**Observações importantes**:
+- Expo Go NÃO pode ser usado neste projeto. O @react-native-firebase exige módulos nativos que não estão no Expo Go. Usar development builds (expo-dev-client) desde o início.
+- O banco local SQLite (expo-sqlite) não tem limite de operações pendentes. A sync com Firestore é customizada: gravar localmente primeiro, depois subir para o Firestore quando houver conexão.
+- O APK universal (compartilhado via WhatsApp) pode ultrapassar 20 MB. O download via Play Store será menor graças a App Bundles.
+
+---
+
+## Fase 0 — Preparação (27/04 – 29/04)
+
+- [x] Definir stack tecnológica com a equipe
+- [x] Criar projeto Expo com TypeScript: npx create-expo-app@latest --template blank-typescript
+- [x] Configurar repositório (README, .gitignore, estrutura de pastas)
+- [x] Instalar expo-dev-client: npx expo install expo-dev-client
+- [x] Configurar ESLint + Prettier com regras do projeto
+- [x] Definir convenções do projeto (branching, commits, code review)
+- [x] Configurar ambiente de desenvolvimento local de cada membro da equipe
+- [x] Criar projeto Firebase (console.firebase.google.com)
+- [x] Ativar Firebase Auth com provider Phone (SMS OTP)
+- [x] Criar banco Firestore com regras de segurança iniciais
+- [x] Ativar Firebase Storage (para fotos de documentos sincronizadas)
+- [x] Ativar Firebase Crashlytics
+- [x] Baixar google-services.json e configurar em app.json (expo.android.googleServicesFile)
+- [x] Instalar módulos Firebase:
+  - npx expo install @react-native-firebase/app
+  - npx expo install @react-native-firebase/auth
+  - npx expo install @react-native-firebase/firestore
+  - npx expo install @react-native-firebase/storage
+  - npx expo install @react-native-firebase/crashlytics
+- [x] Configurar config plugins no app.json para cada módulo Firebase
+- [x] Instalar expo-build-properties e configurar useFrameworks se necessário
+- [x] Gerar primeiro development build via EAS Build: eas build --profile development --platform android
+- [x] Instalar development build em dispositivo de teste e validar que o app abre
+- [x] Instalar módulos Expo do MVP:
+  - npx expo install expo-camera
+  - npx expo install expo-av
+  - npx expo install expo-notifications
+  - npx expo install expo-image-manipulator
+  - npx expo install expo-sqlite
+  - npx expo install expo-file-system
+  - npx expo install expo-linking
+  - npx expo install expo-secure-store
+- [x] Configurar EAS Build (eas.json com profiles: development, preview, production)
+- [ ] Levantar e organizar os arquivos de áudio conforme necessário durante a implementação de cada tela
+- [x] Decidir sobre RF08 no MVP: botão "Falar com a cooperativa" NÃO entra no MVP — UC02 terá apenas "Ligar pra EMATER"
+
+---
+
+## Fase 1 — Infraestrutura base (30/04 – 03/05)
+
+### SQLite e armazenamento
+
+- [ ] Inicializar banco SQLite com expo-sqlite (SQLite.openDatabaseAsync('agricultores.db'))
+- [ ] Criar e migrar tabelas SQLite:
+  - Tabela "agricultores": id (text PK), nome, avatar, telefone, criado_em, consentimento_lgpd
+  - Tabela "documentos": id (text PK), agricultor_id (FK), tipo (CAF/CAR/CCIR/ITR/NFA-e), status (verde/amarelo/vermelho/cinza), data_validade, foto_local_uri, foto_storage_url, criado_em, sincronizado (integer 0/1)
+  - Tabela "prazos": id (text PK), agricultor_id (FK), tipo_documento, data_vencimento, dias_antecedencia
+  - Tabela "sync_queue": id (text PK), tabela, operacao (insert/update/delete), payload (JSON), criado_em
+- [ ] Configurar regras de segurança do Firestore (agricultor só acessa seus próprios dados — ainda usado para auth e storage)
+- [ ] Configurar Firebase Storage com regras de segurança (agricultor só acessa suas próprias fotos)
+- [ ] Implementar pipeline de foto:
+  - Captura via expo-camera
+  - Compressão via expo-image-manipulator (resize + compress)
+  - Remoção de metadados de localização via expo-image-manipulator
+  - Salvamento do URI local na tabela "documentos" do SQLite com sincronizado = 0
+  - Upload ao Firebase Storage quando houver conexão; atualizar foto_storage_url e sincronizado = 1
+- [ ] Implementar auto-salvamento de progresso parcial via SQLite (RF14)
+
+### Autenticação (Firebase Auth — SMS OTP)
+
+- [ ] Implementar tela de autenticação por número de telefone (campo numérico grande, máscara de telefone BR)
+- [ ] Implementar envio de código OTP via SMS (@react-native-firebase/auth verifyPhoneNumber)
+- [ ] Implementar tela de inserção do código recebido (campo numérico grande, 6 dígitos)
+- [ ] Implementar confirmação e criação de sessão
+- [ ] Implementar tratamento de erros com áudio (número inválido, código expirado, sem sinal para receber SMS)
+- [ ] Implementar timeout de sessão com auto-lock usando expo-secure-store para armazenar token (RNF18)
+- [ ] Testar fluxo completo de auth em dispositivo real via development build
+
+### Sincronização (SQLite local + Firestore remoto)
+
+- [ ] Implementar SyncService: ao reconectar, percorrer sync_queue do SQLite e aplicar operações no Firestore
+- [ ] Implementar listener de estado de conexão (NetInfo ou firebase.database().ref('.info/connected'))
+- [ ] Garantir que todas as escritas gravam no SQLite primeiro e enfileiram na sync_queue com sincronizado = 0
+- [ ] Implementar lógica de retry com backoff exponencial para itens da sync_queue que falharem
+- [ ] Implementar indicador visual discreto de status de conexão (opcional para o MVP)
+- [ ] Testar cenário: criar dados offline → reconectar → verificar sync no console Firebase
+
+---
+
+## Fase 2 — Telas e navegação (04/05 – 08/05)
+
+### Navegação geral
+
+- [ ] Instalar e configurar navegação (opções: React Navigation ou Expo Router)
+  - Se React Navigation: npx expo install @react-navigation/native @react-navigation/bottom-tabs @react-navigation/stack react-native-screens react-native-safe-area-context
+  - Se Expo Router: já incluído no Expo, configurar app directory
+- [ ] Implementar barra de navegação inferior fixa (4 ícones: início, documentos, avisos, ajuda)
+- [ ] Implementar botão "Voltar" fixo no canto superior esquerdo em todas as telas
+- [ ] Garantir que todos os alvos de toque tenham no mínimo 56dp (RNF05)
+- [ ] Garantir que nenhuma tela exija gestos além de toque simples (RNF06) — desativar swipe-back: screenOptions={{ gestureEnabled: false }}
+- [ ] Implementar navegação wizard (uma ação por tela → próximo)
+
+### Componente reutilizável de áudio (usado em todas as telas)
+
+- [ ] Criar componente AudioPlayer com expo-av:
+  - Props: source (arquivo de áudio), autoPlay (boolean), onFinish (callback)
+  - Estado: playing, paused, stopped
+  - Botão de play (alto-falante) — posição fixa na tela, mesmo lugar em todas as telas
+  - Botão de pular/parar (ícone avançar)
+  - Carregamento do áudio via Audio.Sound.createAsync()
+  - Liberação de recursos via sound.unloadAsync() no cleanup
+- [ ] Testar reprodução em dispositivo de entrada (volume, latência)
+
+### UC07 — Onboarding inicial (RF13, RF13.1, RF13.2, RF12)
+
+- [ ] Implementar tela de boas-vindas com narração via componente AudioPlayer (autoPlay: true)
+- [ ] Implementar criação de avatar/identificação (nome por voz ou digitação)
+- [ ] Implementar apresentação de funcionalidades uma a uma com narração e ilustrações
+- [ ] Implementar convite para modo prática ao final do onboarding
+- [ ] Implementar solicitação de consentimento LGPD em áudio (RNF08)
+- [ ] Implementar botão "Avançar" para pular etapa individual (RF13.1)
+- [ ] Implementar botão "Pular tudo" para encerrar onboarding (RF13.1)
+- [ ] Implementar auto-salvamento se o agricultor for interrompido durante o onboarding (RF14)
+- [ ] Implementar re-acesso ao onboarding via botão de ajuda na tela inicial (RF13.2)
+- [ ] Implementar seleção de etapa específica para re-assistir (RF13.2)
+- [ ] Salvar flag de onboarding concluído no SQLite local
+
+### UC08 parcial — Modo prática (RF12)
+
+- [ ] Implementar modo prática com dados fictícios (estado em memória via React state, sem tocar no Firestore)
+- [ ] Implementar identidade visual diferenciada (borda ou fundo indicando modo prática)
+- [ ] Implementar áudio explicando que nada será salvo de verdade
+- [ ] Implementar botão "Voltar pro app de verdade"
+- [ ] Garantir que nenhum dado real é afetado pelo modo prática
+
+### UC01 — Painel de regularização (RF01, RF02, RF02.1, RF02.2)
+
+- [ ] Implementar tela inicial com saudação e avatar do agricultor (dados do Firestore)
+- [ ] Implementar cinco indicadores visuais (círculos) para CAF, CAR, CCIR, ITR, NFA-e
+- [ ] Implementar lógica de cores dos indicadores (verde, amarelo, vermelho, cinza) baseada nos dados do Firestore
+- [ ] Implementar navegação do indicador para tela de detalhe do documento ao toque
+- [ ] Implementar tela de detalhe do documento com ilustração e status
+- [ ] Implementar AudioPlayer para explicação em áudio (RF02)
+- [ ] Implementar reprodução automática do áudio apenas na primeira visita — salvar flag no SQLite local (RF02)
+- [ ] Implementar botão de pular/interromper áudio via AudioPlayer (RF02.1)
+- [ ] Implementar botão de play permanente e na mesma posição via AudioPlayer (RF02.2)
+- [ ] Implementar três botões na tela de detalhe: "Como consigo?", "Tenho dúvida", "Já tenho, quero guardar"
+
+### UC02 — Guia passo a passo (RF03, RF15)
+
+- [ ] Implementar tela do guia com imagem estática do escritório da EMATER em Moju
+- [ ] Implementar exibição de horário de funcionamento
+- [ ] Implementar lista visual do que levar (ícones + rótulo curto para RG, CPF, conta de luz)
+- [ ] Implementar botão "Ligar pra EMATER" com Linking.openURL('tel:NUMERO') via expo-linking (RF15)
+- [ ] Implementar AudioPlayer para instruções narradas
+
+### UC03 — Fotografar e armazenar documento (RF04, RF05, RF14)
+
+- [ ] Implementar botão "Já tenho, quero guardar" na tela de detalhe do documento
+- [ ] Implementar abertura da câmera via expo-camera com instrução simples no topo ("Tire uma foto do seu documento")
+- [ ] Implementar botão de captura grande e circular (CameraCapturedPicture via takePictureAsync())
+- [ ] Implementar tela de pré-visualização com botões "Ficou bom" e "Tirar de novo"
+- [ ] Implementar pipeline pós-captura:
+  - Compressão via ImageManipulator.manipulateAsync() (resize + compress 0.75)
+  - Remoção de EXIF/GPS via ImageManipulator
+  - Salvamento local do URI no SQLite
+  - Upload ao Firebase Storage quando houver conexão (reference.putFile())
+- [ ] Implementar atualização do status do documento no Firestore para "verde" após salvar
+- [ ] Implementar confirmação em áudio via AudioPlayer ("Pronto, seu [documento] tá guardado")
+- [ ] Implementar organização por categoria: agricultor acessa documento em no máximo 2 toques (RF05)
+- [ ] Implementar auto-salvamento se interrompido durante captura (RF14)
+- [ ] Implementar aviso em áudio se armazenamento estiver cheio (FileSystem.getFreeDiskStorageAsync() via expo-file-system)
+
+### UC05 — Alertas de prazo (RF06)
+
+- [ ] Configurar expo-notifications:
+  - Solicitar permissão: Notifications.requestPermissionsAsync()
+  - Configurar canal de notificação Android: Notifications.setNotificationChannelAsync()
+- [ ] Implementar agendamento de notificações locais baseado nos prazos no Firestore:
+  - Notifications.scheduleNotificationAsync() com trigger de data
+  - Reagendar quando o agricultor abrir o app (recalcular prazos)
+- [ ] Implementar mudança automática de cor do indicador (verde → amarelo → vermelho) baseada na data atual vs. data de vencimento
+- [ ] Implementar conteúdo da notificação com nome do agricultor + nome do documento
+- [ ] Implementar deep linking: toque na notificação abre tela de detalhe do documento correspondente
+- [ ] Implementar reemissão diária do alerta enquanto o documento permanecer vencido
+- [ ] Implementar antecedência padrão de 30 dias
+
+---
+
+## Fase 3 — LGPD e segurança (09/05 – 10/05)
+
+### UC10 — Excluir dados pessoais (RNF08)
+
+- [ ] Implementar botão "Apagar meus dados" na tela de ajuda (ícone de lixeira)
+- [ ] Implementar explicação em áudio via AudioPlayer sobre o que será apagado
+- [ ] Implementar confirmação com botões "Sim, apagar tudo" e "Não, voltar"
+- [ ] Implementar exclusão de dados no Firestore (document delete por batch)
+- [ ] Implementar exclusão de fotos no Firebase Storage
+- [ ] Implementar exclusão de conta no Firebase Auth (user.delete())
+- [ ] Implementar exclusão do banco SQLite local (SQLite.deleteDatabaseAsync('agricultores.db'))
+- [ ] Implementar cancelamento de todas as notificações agendadas (Notifications.cancelAllScheduledNotificationsAsync())
+- [ ] Implementar limpeza de dados locais no expo-secure-store
+- [ ] Implementar retorno ao estado inicial (tela de autenticação) após exclusão
+
+### Revisão de segurança
+
+- [ ] Revisar regras de segurança do Firestore (agricultor só lê/escreve seus próprios dados)
+- [ ] Revisar regras de segurança do Firebase Storage (agricultor só acessa suas próprias fotos)
+- [ ] Verificar que toda comunicação usa HTTPS (Firebase SDK faz isso por padrão) (RNF09)
+- [ ] Verificar que metadados GPS são removidos de todas as fotos via expo-image-manipulator (RNF08)
+- [ ] Verificar que o consentimento LGPD é solicitado em áudio e registrado no Firestore
+- [ ] Verificar que o timeout de sessão está funcionando via expo-secure-store (RNF18)
+
+---
+
+## Fase 4 — Áudio e conteúdo (07/05 – 12/05, paralelo às fases 2-3)
+
+### Produção de áudio
+
+- [ ] Escrever roteiro de todos os áudios do MVP:
+  - Onboarding: boas-vindas, explicação de cada funcionalidade, convite pro modo prática, consentimento LGPD
+  - Documentos: explicação do CAF, CAR, CCIR, ITR, NFA-e (5 áudios de ~30s cada)
+  - Guias: instruções de como obter cada documento (5 áudios)
+  - Confirmações: "Pronto, seu [documento] tá guardado" (5 variações)
+  - Alertas: "[Nome], seu [documento] precisa ser renovado em [X] dias"
+  - Modo prática: "Você está no modo prática, nada será salvo de verdade"
+  - Exclusão: "Todos os seus dados serão apagados permanentemente"
+  - Auth: "Digite seu número de telefone", "Digite o código que você recebeu por mensagem"
+- [ ] Gravar áudios em português com sotaque regional paraense (RNF16)
+- [ ] Comprimir áudios para formato leve (MP3 64kbps, ~240 KB por áudio de 30s)
+- [ ] Colocar áudios na pasta assets/ do projeto (embutidos no bundle)
+- [ ] Testar carregamento e reprodução via expo-av em dispositivo de entrada
+
+### Conteúdo dos guias
+
+- [ ] Pesquisar e confirmar endereço e horário do escritório da EMATER em Moju
+- [ ] Pesquisar e confirmar telefone da EMATER em Moju
+- [ ] Criar imagem estática da localização do escritório
+- [ ] Documentar lista correta do que levar para cada documento (CAF, CAR, CCIR, ITR, NFA-e)
+- [ ] Definir prazos de vencimento padrão para cada documento
+
+### Ícones e ilustrações
+
+- [ ] Criar ou selecionar ícones semi-realistas para os 5 documentos
+- [ ] Criar ou selecionar ícones de navegação (casa, caderno, sino, interrogação)
+- [ ] Criar ou selecionar ilustrações para as telas de detalhe de cada documento
+- [ ] Criar ou selecionar ícones para a lista do que levar (RG, CPF, conta de luz)
+- [ ] Validar ícones com pelo menos 2-3 pessoas fora da equipe para testar compreensão
+
+---
+
+## Fase 5 — Testes (13/05 – 15/05)
+
+### Testes funcionais
+
+- [ ] Gerar build de preview via EAS: eas build --profile preview --platform android
+- [ ] Testar fluxo completo: auth SMS → onboarding → painel → detalhe → guia → fotografar → confirmar → indicador verde
+- [ ] Testar pular onboarding e verificar que todas as funcionalidades estão acessíveis
+- [ ] Testar re-acesso ao onboarding via botão de ajuda
+- [ ] Testar todos os áudios (play, pular, reprodução sob demanda) via componente AudioPlayer
+- [ ] Testar fotografar documento, confirmar e verificar armazenamento
+- [ ] Testar tirar foto de novo (fluxo "Tirar de novo")
+- [ ] Testar alertas de prazo (simular documento com vencimento próximo e vencido)
+- [ ] Testar exclusão de dados pessoais e retorno à tela de autenticação
+- [ ] Testar modo prática (nenhum dado real afetado)
+- [ ] Testar auto-salvamento (forçar interrupção durante captura de foto e durante onboarding)
+
+### Testes de sincronização (SQLite + Firestore)
+
+- [ ] Testar criação de dados em modo avião → verificar gravação no SQLite → reconectar → verificar sync_queue processada e dados no console Firebase
+- [ ] Testar edição de dados offline → reconectar → verificar atualização no Firestore
+- [ ] Testar captura de foto offline → verificar URI salvo no SQLite → reconectar → verificar upload no Firebase Storage e foto_storage_url atualizada
+- [ ] Testar exclusão de dados offline → reconectar → verificar exclusão no Firestore
+- [ ] Testar autenticação com SMS em área com sinal fraco
+
+### Testes em dispositivo real
+
+- [ ] Testar em smartphone de entrada (2 GB RAM, 32 GB armazenamento, tela 6")
+- [ ] Verificar que o app carrega em menos de 3 segundos
+- [ ] Verificar que nenhuma interação tem latência superior a 300ms (RNF13)
+- [ ] Verificar tamanho do APK universal e do download via Play Store (meta: 20 MB ou menos) (RNF02)
+- [ ] Testar com alguém fora da equipe de desenvolvimento (teste de usabilidade básico)
+
+### Testes de acessibilidade
+
+- [ ] Verificar que todas as telas são navegáveis apenas com toque simples
+- [ ] Verificar que todos os botões têm pelo menos 56dp
+- [ ] Verificar que os áudios são audíveis em ambiente externo (volume)
+- [ ] Verificar contraste de cores (indicadores verde/amarelo/vermelho sobre fundo claro)
+
+---
+
+## Fase 6 — Ajustes finais e entrega (16/05 – 18/05)
+
+- [ ] Corrigir bugs identificados nos testes
+- [ ] Revisar todos os textos e áudios (ortografia, clareza)
+- [ ] Gerar build de produção via EAS: eas build --profile production --platform android
+- [ ] Testar build de produção em dispositivo real
+- [ ] Configurar expo-updates para OTA updates pós-entrega
+- [ ] Preparar documentação de entrega (README atualizado, instruções de instalação)
+- [ ] Preparar apresentação do MVP para os colegas
+- [ ] Disponibilizar pacote de instalação para download (link compartilhável via EAS ou direto)
+- [ ] Entregar MVP
+
+---
+
+## Fora do MVP (backlog para versões futuras)
+
+- [ ] RF07 — Caderneta digital de vendas e compras (UC04)
+- [ ] RF08 — Contato direto com a cooperativa (UC11)
+- [ ] RF09 — Módulo "Caminho da Cooperativa" (UC06)
+- [ ] RF10 — Painel comunitário agregado (UC06)
+- [ ] Autenticação via WhatsApp OTP (requer Twilio ou MessageBird + WhatsApp Business API)
+- [ ] Mapas interativos offline (substituir imagem estática)
+- [ ] Entrada por voz em campos de texto (expo-speech ou reconhecimento de fala)
+- [ ] OCR offline para leitura automática de dados de documentos fotografados
+- [ ] Criptografia local com SQLCipher (expo-sqlite não criptografa o banco local por padrão)
+- [ ] Suporte a múltiplos idiomas regionais
+- [ ] Co-design de ícones com agricultores reais de Jutaí
+- [ ] Testes de usabilidade presenciais na comunidade de Jutaí
+- [ ] Publicação na Google Play Store via EAS Submit
+- [ ] Migrar para Expo Router se estiver usando React Navigation (simplificação)
