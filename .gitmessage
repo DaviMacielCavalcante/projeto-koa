@@ -1,0 +1,8 @@
+# tipo: descrição curta no infinitivo
+#
+# Tipos: feat | fix | docs | refactor | chore
+#
+# Exemplos:
+#   feat: adicionar autenticação por telefone
+#   fix: corrigir erro ao salvar documento
+#   chore: ajustar configuração do EAS
