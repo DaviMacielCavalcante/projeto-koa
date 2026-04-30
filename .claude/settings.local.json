@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(Move-Item *)"
+      "PowerShell(Move-Item *)",
+      "Bash(pnpm --version)",
+      "Bash(bun --version)",
+      "Bash(git mv *)",
+      "Bash(git rm *)",
+      "Bash(bun init *)",
+      "Bash(pnpm install *)",
+      "Bash(pnpm list *)",
+      "Bash(pnpm dev *)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(echo \"--- exit code: $? ---\")",
+      "Bash(git reset *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
