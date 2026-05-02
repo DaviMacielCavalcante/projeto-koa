@@ -42,4 +42,4 @@ yarn-error.*
 
 # Drizzle migrations
 drizzle/
-src/db/migrations/
+/migrations
