@@ -36,7 +36,7 @@ const app = new Elysia()
   .use(appRoutes)
   .listen(port);
 
-console.log(`🔊 Listening on http://localhost:${app.server?.port}`);
-console.log(`📃 Docs:      http://localhost:${app.server?.port}/swagger`);
+console.log(`🔊 ... Listening: http://localhost:${app.server?.port}`);
+console.log(`📃 ... Docs: http://localhost:${app.server?.port}/docs`);
 
 export type App = typeof app;
