@@ -72,18 +72,20 @@
 
 - [ ] Inicializar banco SQLite com expo-sqlite (SQLite.openDatabaseAsync('agricultores.db'))
 - [ ] Criar e migrar tabelas SQLite:
-  - Tabela "agricultores": id (text PK), nome, avatar, telefone, criado_em, consentimento_lgpd
-  - Tabela "documentos": id (text PK), agricultor_id (FK), tipo (CAF/CAR/CCIR/ITR/NFA-e), status (verde/amarelo/vermelho/cinza), data_validade, foto_local_uri, foto_storage_url, criado_em, sincronizado (integer 0/1)
-  - Tabela "prazos": id (text PK), agricultor_id (FK), tipo_documento, data_vencimento, dias_antecedencia
-  - Tabela "sync_queue": id (text PK), tabela, operacao (insert/update/delete), payload (JSON), criado_em
+  - Tabela "users": id (UUID PK), name, phone (único), municipality, consentimento_lgpd (integer 0/1), onboarding_concluido (integer 0/1), created_at, updated_at
+  - Tabela "properties": id (UUID PK), user_id (FK → users), name, area_hectares, location, created_at, updated_at
+  - Tabela "documents": id (UUID PK), user_id (FK → users), property_id (FK → properties, nullable), type (ENUM: CAF/CAR/CCIR/ITR/NFA-e), number, issue_date, expiration_date, file_url (URI local), storage_url (URL Firebase Storage, nullable), status (active/expiring_soon/expired — renderizado como verde/amarelo/vermelho; cinza quando nulo), sincronizado (integer 0/1), created_at, updated_at
+  - Tabela "educational_contents": id (UUID PK), title, body (texto narrado), category (ex: documentos, onboarding), created_at, updated_at
+  - Tabela "user_content_progress": id (UUID PK), user_id (FK → users), content_id (FK → educational_contents), read_at, created_at, updated_at
+  - Tabela "sync_queue": id (UUID PK), tabela, operacao (insert/update/delete), payload (JSON), created_at
 - [ ] Configurar regras de segurança do Firestore (agricultor só acessa seus próprios dados — ainda usado para auth e storage)
 - [ ] Configurar Firebase Storage com regras de segurança (agricultor só acessa suas próprias fotos)
 - [ ] Implementar pipeline de foto:
   - Captura via expo-camera
   - Compressão via expo-image-manipulator (resize + compress)
   - Remoção de metadados de localização via expo-image-manipulator
-  - Salvamento do URI local na tabela "documentos" do SQLite com sincronizado = 0
-  - Upload ao Firebase Storage quando houver conexão; atualizar foto_storage_url e sincronizado = 1
+  - Salvamento do URI local na coluna file_url da tabela "documents" do SQLite com sincronizado = 0
+  - Upload ao Firebase Storage quando houver conexão; atualizar storage_url e sincronizado = 1
 - [ ] Implementar auto-salvamento de progresso parcial via SQLite (RF14)
 
 ### Autenticação (Firebase Auth — SMS OTP)
@@ -143,7 +145,7 @@
 - [ ] Implementar auto-salvamento se o agricultor for interrompido durante o onboarding (RF14)
 - [ ] Implementar re-acesso ao onboarding via botão de ajuda na tela inicial (RF13.2)
 - [ ] Implementar seleção de etapa específica para re-assistir (RF13.2)
-- [ ] Salvar flag de onboarding concluído no SQLite local
+- [ ] Salvar flag de onboarding concluído na coluna onboarding_concluido da tabela "users" no SQLite
 
 ### UC08 parcial — Modo prática (RF12)
 
@@ -155,13 +157,13 @@
 
 ### UC01 — Painel de regularização (RF01, RF02, RF02.1, RF02.2)
 
-- [ ] Implementar tela inicial com saudação e avatar do agricultor (dados do Firestore)
+- [ ] Implementar tela inicial com saudação e avatar do agricultor (dados da tabela "users" no SQLite)
 - [ ] Implementar cinco indicadores visuais (círculos) para CAF, CAR, CCIR, ITR, NFA-e
-- [ ] Implementar lógica de cores dos indicadores (verde, amarelo, vermelho, cinza) baseada nos dados do Firestore
+- [ ] Implementar lógica de cores dos indicadores baseada em documents.status e documents.expiration_date do SQLite (active→verde, expiring_soon→amarelo, expired→vermelho, nulo→cinza)
 - [ ] Implementar navegação do indicador para tela de detalhe do documento ao toque
 - [ ] Implementar tela de detalhe do documento com ilustração e status
 - [ ] Implementar AudioPlayer para explicação em áudio (RF02)
-- [ ] Implementar reprodução automática do áudio apenas na primeira visita — salvar flag no SQLite local (RF02)
+- [ ] Implementar reprodução automática do áudio apenas na primeira visita — registrar em user_content_progress (RF02)
 - [ ] Implementar botão de pular/interromper áudio via AudioPlayer (RF02.1)
 - [ ] Implementar botão de play permanente e na mesma posição via AudioPlayer (RF02.2)
 - [ ] Implementar três botões na tela de detalhe: "Como consigo?", "Tenho dúvida", "Já tenho, quero guardar"
@@ -183,8 +185,8 @@
 - [ ] Implementar pipeline pós-captura:
   - Compressão via ImageManipulator.manipulateAsync() (resize + compress 0.75)
   - Remoção de EXIF/GPS via ImageManipulator
-  - Salvamento local do URI no SQLite
-  - Upload ao Firebase Storage quando houver conexão (reference.putFile())
+  - Salvamento local do URI na coluna file_url da tabela "documents" no SQLite
+  - Upload ao Firebase Storage quando houver conexão (reference.putFile()); atualizar storage_url e sincronizado = 1
 - [ ] Implementar atualização do status do documento no Firestore para "verde" após salvar
 - [ ] Implementar confirmação em áudio via AudioPlayer ("Pronto, seu [documento] tá guardado")
 - [ ] Implementar organização por categoria: agricultor acessa documento em no máximo 2 toques (RF05)
@@ -196,7 +198,7 @@
 - [ ] Configurar expo-notifications:
   - Solicitar permissão: Notifications.requestPermissionsAsync()
   - Configurar canal de notificação Android: Notifications.setNotificationChannelAsync()
-- [ ] Implementar agendamento de notificações locais baseado nos prazos no Firestore:
+- [ ] Implementar agendamento de notificações locais baseado em documents.expiration_date do SQLite:
   - Notifications.scheduleNotificationAsync() com trigger de data
   - Reagendar quando o agricultor abrir o app (recalcular prazos)
 - [ ] Implementar mudança automática de cor do indicador (verde → amarelo → vermelho) baseada na data atual vs. data de vencimento
@@ -228,7 +230,7 @@
 - [ ] Revisar regras de segurança do Firebase Storage (agricultor só acessa suas próprias fotos)
 - [ ] Verificar que toda comunicação usa HTTPS (Firebase SDK faz isso por padrão) (RNF09)
 - [ ] Verificar que metadados GPS são removidos de todas as fotos via expo-image-manipulator (RNF08)
-- [ ] Verificar que o consentimento LGPD é solicitado em áudio e registrado no Firestore
+- [ ] Verificar que o consentimento LGPD é solicitado em áudio e registrado na coluna consentimento_lgpd da tabela "users" no SQLite
 - [ ] Verificar que o timeout de sessão está funcionando via expo-secure-store (RNF18)
 
 ---
@@ -250,6 +252,8 @@
 - [ ] Comprimir áudios para formato leve (MP3 64kbps, ~240 KB por áudio de 30s)
 - [ ] Colocar áudios na pasta assets/ do projeto (embutidos no bundle)
 - [ ] Testar carregamento e reprodução via expo-av em dispositivo de entrada
+- [ ] Popular tabela "educational_contents" no SQLite com os roteiros de cada áudio (title, body, category)
+- [ ] Garantir que user_content_progress é registrado ao concluir cada conteúdo (read_at preenchido no SQLite)
 
 ### Conteúdo dos guias
 
@@ -289,7 +293,7 @@
 
 - [ ] Testar criação de dados em modo avião → verificar gravação no SQLite → reconectar → verificar sync_queue processada e dados no console Firebase
 - [ ] Testar edição de dados offline → reconectar → verificar atualização no Firestore
-- [ ] Testar captura de foto offline → verificar URI salvo no SQLite → reconectar → verificar upload no Firebase Storage e foto_storage_url atualizada
+- [ ] Testar captura de foto offline → verificar file_url salvo na tabela documents do SQLite → reconectar → verificar upload no Firebase Storage e storage_url atualizada
 - [ ] Testar exclusão de dados offline → reconectar → verificar exclusão no Firestore
 - [ ] Testar autenticação com SMS em área com sinal fraco
 
