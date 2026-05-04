@@ -58,8 +58,13 @@ pnpm --filter mobile exec eas build --profile production --platform android
 pnpm --filter mobile lint
 pnpm --filter mobile format
 
-# Backend dev server (Bun, hot reload, http://localhost:3000)
+# Backend dev server (Bun, hot reload, http://localhost:3000, docs at /swagger)
 pnpm --filter backend dev
+
+# Backend local Postgres via Docker (apps/backend/docker-compose.yml)
+pnpm --filter backend db:up          # start postgres container (named volume agri_docs_pg_data)
+pnpm --filter backend db:down        # stop container
+pnpm --filter backend db:logs        # tail postgres logs
 
 # Backend Drizzle migrations (requires DATABASE_URL in apps/backend/.env)
 pnpm --filter backend db:generate    # generate SQL from schemas
@@ -114,6 +119,7 @@ Conventions:
 - Repositories return `*Public` types (without `password_hash` / sensitive fields). Never expose hashes in responses.
 - Use `Bun.password.hash(value, { algorithm: 'bcrypt', cost: 10 })` for password hashing — no `bcrypt` npm dep needed.
 - Drizzle migrations live in `apps/backend/drizzle/` (gitignored on first run; commit them once stable). Generate with `db:generate`, apply with `db:migrate`.
+- Local dev Postgres runs via `apps/backend/docker-compose.yml` (`db:up`/`db:down`). Defaults: user `agri`, password `agri`, db `agri_docs`, port `5434`. Data persisted in named volume `agri_docs_pg_data` — `docker compose down -v` wipes it. Replace with managed Postgres (Supabase/Neon/etc) by changing `DATABASE_URL` in `.env`.
 - Reference `apps/backend/DATABASE.md` for the canonical table schema (users, properties, documents, buyers, sales, educational_contents, user_content_progress).
 - Existing reference module: `src/modules/exemplo/` (template copied from another project; ignore the Redis bits — this stack is **not** using Redis).
 

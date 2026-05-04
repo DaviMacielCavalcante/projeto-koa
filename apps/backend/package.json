@@ -5,6 +5,9 @@
   "private": true,
   "scripts": {
     "dev": "bun run --hot src/app.ts",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
