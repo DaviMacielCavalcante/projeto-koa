@@ -92,6 +92,8 @@ pnpm --filter backend typecheck
 
 ## Backend Architecture (`apps/backend`)
 
+Entry chain: `index.ts` (root) → `src/app.ts` (Elysia setup + error mapper + listen) → `src/app.routes.ts` (Elysia with `prefix: '/v1'` registering each module's controller). Add new controllers via `.use(NewController)` in `src/app.routes.ts`. All app routes live under `/v1`.
+
 Modular clean architecture. Each domain lives in `src/modules/<name>/` split into:
 
 - `domain/` — Drizzle table schemas (`*.schema.ts`) and Elysia type schemas (`*.types.ts`).
@@ -103,7 +105,7 @@ Shared infrastructure in `src/shared/infra/`:
 - `databases/postgres.ts` — Drizzle `db` instance and `Transaction` type.
 - `generate-id.ts` — cuid2-based id generator (24 chars, see `ID_LENGHT`).
 - `import.schema.ts` — shared pgEnums (e.g. `userPlanEnum`) and constants.
-- `errors/{not-found,unauthorized,conflict}-error.ts` — typed exceptions mapped to HTTP codes by `index.ts` `onError`.
+- `errors/{not-found,unauthorized,conflict}-error.ts` — typed exceptions mapped to HTTP codes by `src/app.ts` `onError`.
 - `base.controller.ts` — `createController({ prefix, tags })` decorates each Elysia controller with `validateToken`. **Stub** today (always returns admin); replace once a real auth module exists.
 
 Conventions:
