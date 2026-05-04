@@ -1,3 +1,4 @@
+import { swagger } from '@elysiajs/swagger';
 import { Elysia } from 'elysia';
 import { appRoutes } from './app.routes';
 import { ConflictError } from './shared/infra/errors/conflict-error';
@@ -7,6 +8,7 @@ import { UnauthorizedError } from './shared/infra/errors/unauthorized-error';
 const port = Number(process.env.PORT ?? 3000);
 
 const app = new Elysia()
+  .use(swagger())
   .error({ ConflictError, NotFoundError, UnauthorizedError })
   .onError(({ code, error, set }) => {
     const message = error instanceof Error ? error.message : 'Erro interno do servidor.';
@@ -34,6 +36,7 @@ const app = new Elysia()
   .use(appRoutes)
   .listen(port);
 
-console.log(`Listening on http://localhost:${app.server?.port}`);
+console.log(`🔊Listening on http://localhost:${app.server?.port}`);
+console.log(`📃Docs:      http://localhost:${app.server?.port}/swagger`);
 
 export type App = typeof app;
