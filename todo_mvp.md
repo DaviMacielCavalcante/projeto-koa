@@ -94,16 +94,16 @@
 - [x] Implementar envio de código OTP via SMS (@react-native-firebase/auth verifyPhoneNumber)
 - [x] Implementar tela de inserção do código recebido (campo numérico grande, 6 dígitos)
 - [x] Implementar confirmação e criação de sessão
-- [ ] Implementar tratamento de erros com áudio (número inválido, código expirado, sem sinal para receber SMS)
-- [ ] Implementar timeout de sessão com auto-lock usando expo-secure-store para armazenar token (RNF18)
+- [ ] Implementar tratamento de erros com áudio (número inválido, código expirado, sem sinal para receber SMS) — Alert implementado, falta áudio
+- [x] Implementar timeout de sessão com auto-lock usando expo-secure-store para armazenar token (RNF18)
 - [ ] Testar fluxo completo de auth em dispositivo real via development build
 
 ### Sincronização (SQLite local + Firestore remoto)
 
-- [ ] Implementar SyncService: ao reconectar, percorrer sync_queue do SQLite e aplicar operações no Firestore
-- [ ] Implementar listener de estado de conexão (NetInfo ou firebase.database().ref('.info/connected'))
+- [x] Implementar SyncService: ao reconectar, percorrer sync_queue do SQLite e aplicar operações no Firestore
+- [x] Implementar listener de estado de conexão (NetInfo ou firebase.database().ref('.info/connected'))
 - [ ] Garantir que todas as escritas gravam no SQLite primeiro e enfileiram na sync_queue com sincronizado = 0
-- [ ] Implementar lógica de retry com backoff exponencial para itens da sync_queue que falharem
+- [ ] Implementar lógica de retry com backoff exponencial para itens da sync_queue que falharem — retry passivo implementado (itens ficam na fila), sem backoff real
 - [ ] Implementar indicador visual discreto de status de conexão (opcional para o MVP)
 - [ ] Testar cenário: criar dados offline → reconectar → verificar sync no console Firebase
 

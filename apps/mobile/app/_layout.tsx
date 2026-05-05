@@ -1,9 +1,11 @@
 import { router, Stack } from 'expo-router';
-import {useEffect, useState} from 'react';
+import { useEffect, useState} from 'react';
 import { ActivityIndicator } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { initDb } from '../src/db/index'
 import auth from '@react-native-firebase/auth';
+import { syncQueue } from '../src/services/sync';
+import * as NetInfo from '@react-native-community/netinfo';
 
 export default function RootLayout() {
 
@@ -22,6 +24,16 @@ export default function RootLayout() {
         }
     )
     }, [])
+
+    useEffect(
+        () => {
+            const unsubscribe = NetInfo.addEventListener(
+                (state) => {
+                    if (state.isConnected) syncQueue()
+                }
+            )
+            return () => unsubscribe()
+        }, [])
 
     if (!dbReady) {
         return <ActivityIndicator></ActivityIndicator>
