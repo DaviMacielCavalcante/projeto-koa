@@ -116,15 +116,15 @@
 - [x] Instalar e configurar navegação (opções: React Navigation ou Expo Router)
   - Se React Navigation: npx expo install @react-navigation/native @react-navigation/bottom-tabs @react-navigation/stack react-native-screens react-native-safe-area-context
   - Se Expo Router: já incluído no Expo, configurar app directory
-- [ ] Implementar barra de navegação inferior fixa (4 ícones: início, documentos, avisos, ajuda)
-- [ ] Implementar botão "Voltar" fixo no canto superior esquerdo em todas as telas
-- [ ] Garantir que todos os alvos de toque tenham no mínimo 56dp (RNF05)
-- [ ] Garantir que nenhuma tela exija gestos além de toque simples (RNF06) — desativar swipe-back: screenOptions={{ gestureEnabled: false }}
+- [x] Implementar barra de navegação inferior fixa (4 ícones: início, documentos, avisos, ajuda)
+- [x] Implementar botão "Voltar" fixo no canto superior esquerdo em todas as telas — componente BackButton com router.back() padrão
+- [x] Garantir que todos os alvos de toque tenham no mínimo 56dp (RNF05)
+- [x] Garantir que nenhuma tela exija gestos além de toque simples (RNF06) — desativar swipe-back: screenOptions={{ gestureEnabled: false }}
 - [ ] Implementar navegação wizard (uma ação por tela → próximo)
 
 ### Componente reutilizável de áudio (usado em todas as telas)
 
-- [ ] Criar componente AudioPlayer com expo-av:
+- [x] Criar componente AudioPlayer com expo-av:
   - Props: source (arquivo de áudio), autoPlay (boolean), onFinish (callback)
   - Estado: playing, paused, stopped
   - Botão de play (alto-falante) — posição fixa na tela, mesmo lugar em todas as telas
@@ -158,38 +158,38 @@
 ### UC01 — Painel de regularização (RF01, RF02, RF02.1, RF02.2)
 
 - [ ] Implementar tela inicial com saudação e avatar do agricultor (dados da tabela "users" no SQLite)
-- [ ] Implementar cinco indicadores visuais (círculos) para CAF, CAR, CCIR, ITR, NFA-e
-- [ ] Implementar lógica de cores dos indicadores baseada em documents.status e documents.expiration_date do SQLite (active→verde, expiring_soon→amarelo, expired→vermelho, nulo→cinza)
-- [ ] Implementar navegação do indicador para tela de detalhe do documento ao toque
-- [ ] Implementar tela de detalhe do documento com ilustração e status
+- [x] Implementar cinco indicadores visuais (círculos) para CAF, CAR, CCIR, ITR, NFA-e
+- [x] Implementar lógica de cores dos indicadores baseada em documents.status e documents.expiration_date do SQLite (active→verde, expiring_soon→amarelo, expired→vermelho, nulo→cinza)
+- [x] Implementar navegação do indicador para tela de detalhe do documento ao toque
+- [x] Implementar tela de detalhe do documento com ilustração e status
 - [ ] Implementar AudioPlayer para explicação em áudio (RF02)
 - [ ] Implementar reprodução automática do áudio apenas na primeira visita — registrar em user_content_progress (RF02)
 - [ ] Implementar botão de pular/interromper áudio via AudioPlayer (RF02.1)
 - [ ] Implementar botão de play permanente e na mesma posição via AudioPlayer (RF02.2)
-- [ ] Implementar três botões na tela de detalhe: "Como consigo?", "Tenho dúvida", "Já tenho, quero guardar"
+- [x] Implementar três botões na tela de detalhe: "Como consigo?", "Tenho dúvida", "Já tenho, quero guardar"
 
 ### UC02 — Guia passo a passo (RF03, RF15)
 
 - [ ] Implementar tela do guia com imagem estática do escritório da EMATER em Moju
-- [ ] Implementar exibição de horário de funcionamento
-- [ ] Implementar lista visual do que levar (ícones + rótulo curto para RG, CPF, conta de luz)
-- [ ] Implementar botão "Ligar pra EMATER" com Linking.openURL('tel:NUMERO') via expo-linking (RF15)
+- [x] Implementar exibição de horário de funcionamento
+- [x] Implementar lista visual do que levar (ícones + rótulo curto para RG, CPF, conta de luz)
+- [x] Implementar botão "Ligar pra EMATER" com Linking.openURL('tel:NUMERO') via expo-linking (RF15) — número pendente de confirmação
 - [ ] Implementar AudioPlayer para instruções narradas
 
 ### UC03 — Fotografar e armazenar documento (RF04, RF05, RF14)
 
-- [ ] Implementar botão "Já tenho, quero guardar" na tela de detalhe do documento
-- [ ] Implementar abertura da câmera via expo-camera com instrução simples no topo ("Tire uma foto do seu documento")
-- [ ] Implementar botão de captura grande e circular (CameraCapturedPicture via takePictureAsync())
-- [ ] Implementar tela de pré-visualização com botões "Ficou bom" e "Tirar de novo"
-- [ ] Implementar pipeline pós-captura:
+- [x] Implementar botão "Já tenho, quero guardar" na tela de detalhe do documento
+- [x] Implementar abertura da câmera via expo-camera com instrução simples no topo ("Tire uma foto do seu documento")
+- [x] Implementar botão de captura grande e circular (CameraCapturedPicture via takePictureAsync())
+- [x] Implementar tela de pré-visualização com botões "Ficou bom" e "Tirar de novo"
+- [x] Implementar pipeline pós-captura:
   - Compressão via ImageManipulator.manipulateAsync() (resize + compress 0.75)
   - Remoção de EXIF/GPS via ImageManipulator
   - Salvamento local do URI na coluna file_url da tabela "documents" no SQLite
   - Upload ao Firebase Storage quando houver conexão (reference.putFile()); atualizar storage_url e sincronizado = 1
 - [ ] Implementar atualização do status do documento no Firestore para "verde" após salvar
 - [ ] Implementar confirmação em áudio via AudioPlayer ("Pronto, seu [documento] tá guardado")
-- [ ] Implementar organização por categoria: agricultor acessa documento em no máximo 2 toques (RF05)
+- [x] Implementar organização por categoria: agricultor acessa documento em no máximo 2 toques (RF05)
 - [ ] Implementar auto-salvamento se interrompido durante captura (RF14)
 - [ ] Implementar aviso em áudio se armazenamento estiver cheio (FileSystem.getFreeDiskStorageAsync() via expo-file-system)
 
