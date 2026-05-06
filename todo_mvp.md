@@ -80,12 +80,12 @@
   - Tabela "sync_queue": id (UUID PK), tabela, operacao (insert/update/delete), payload (JSON), created_at
 - [x] Configurar regras de segurança do Firestore (agricultor só acessa seus próprios dados — ainda usado para auth e storage)
 - [x] Configurar Firebase Storage com regras de segurança (agricultor só acessa suas próprias fotos)
-- [ ] Implementar pipeline de foto:
+- [x] Implementar pipeline de foto:
   - Captura via expo-camera
   - Compressão via expo-image-manipulator (resize + compress) ✓ (serviço criado em src/services/photo.ts)
   - Remoção de metadados de localização via expo-image-manipulator ✓ (serviço criado em src/services/photo.ts)
   - Salvamento do URI local na coluna file_url da tabela "documents" do SQLite com sincronizado = 0 ✓ (serviço criado em src/services/photo.ts)
-  - Upload ao Firebase Storage quando houver conexão; atualizar storage_url e sincronizado = 1
+  - Upload ao Firebase Storage quando houver conexão; atualizar storage_url e sincronizado = 1 ✓ (implementado em src/services/sync.ts)
 - [ ] Implementar auto-salvamento de progresso parcial via SQLite (RF14)
 
 ### Autenticação (Firebase Auth — SMS OTP)
