@@ -70,40 +70,40 @@
 
 ### SQLite e armazenamento
 
-- [ ] Inicializar banco SQLite com expo-sqlite (SQLite.openDatabaseAsync('agricultores.db'))
-- [ ] Criar e migrar tabelas SQLite:
+- [x] Inicializar banco SQLite com expo-sqlite (SQLite.openDatabaseAsync('agricultores.db'))
+- [x] Criar e migrar tabelas SQLite:
   - Tabela "users": id (UUID PK), name, phone (único), municipality, consentimento_lgpd (integer 0/1), onboarding_concluido (integer 0/1), created_at, updated_at
   - Tabela "properties": id (UUID PK), user_id (FK → users), name, area_hectares, location, created_at, updated_at
   - Tabela "documents": id (UUID PK), user_id (FK → users), property_id (FK → properties, nullable), type (ENUM: CAF/CAR/CCIR/ITR/NFA-e), number, issue_date, expiration_date, file_url (URI local), storage_url (URL Firebase Storage, nullable), status (active/expiring_soon/expired — renderizado como verde/amarelo/vermelho; cinza quando nulo), sincronizado (integer 0/1), created_at, updated_at
   - Tabela "educational_contents": id (UUID PK), title, body (texto narrado), category (ex: documentos, onboarding), created_at, updated_at
   - Tabela "user_content_progress": id (UUID PK), user_id (FK → users), content_id (FK → educational_contents), read_at, created_at, updated_at
   - Tabela "sync_queue": id (UUID PK), tabela, operacao (insert/update/delete), payload (JSON), created_at
-- [ ] Configurar regras de segurança do Firestore (agricultor só acessa seus próprios dados — ainda usado para auth e storage)
-- [ ] Configurar Firebase Storage com regras de segurança (agricultor só acessa suas próprias fotos)
-- [ ] Implementar pipeline de foto:
+- [x] Configurar regras de segurança do Firestore (agricultor só acessa seus próprios dados — ainda usado para auth e storage)
+- [x] Configurar Firebase Storage com regras de segurança (agricultor só acessa suas próprias fotos)
+- [x] Implementar pipeline de foto:
   - Captura via expo-camera
-  - Compressão via expo-image-manipulator (resize + compress)
-  - Remoção de metadados de localização via expo-image-manipulator
-  - Salvamento do URI local na coluna file_url da tabela "documents" do SQLite com sincronizado = 0
-  - Upload ao Firebase Storage quando houver conexão; atualizar storage_url e sincronizado = 1
+  - Compressão via expo-image-manipulator (resize + compress) ✓ (serviço criado em src/services/photo.ts)
+  - Remoção de metadados de localização via expo-image-manipulator ✓ (serviço criado em src/services/photo.ts)
+  - Salvamento do URI local na coluna file_url da tabela "documents" do SQLite com sincronizado = 0 ✓ (serviço criado em src/services/photo.ts)
+  - Upload ao Firebase Storage quando houver conexão; atualizar storage_url e sincronizado = 1 ✓ (implementado em src/services/sync.ts)
 - [ ] Implementar auto-salvamento de progresso parcial via SQLite (RF14)
 
 ### Autenticação (Firebase Auth — SMS OTP)
 
-- [ ] Implementar tela de autenticação por número de telefone (campo numérico grande, máscara de telefone BR)
-- [ ] Implementar envio de código OTP via SMS (@react-native-firebase/auth verifyPhoneNumber)
-- [ ] Implementar tela de inserção do código recebido (campo numérico grande, 6 dígitos)
-- [ ] Implementar confirmação e criação de sessão
-- [ ] Implementar tratamento de erros com áudio (número inválido, código expirado, sem sinal para receber SMS)
-- [ ] Implementar timeout de sessão com auto-lock usando expo-secure-store para armazenar token (RNF18)
+- [x] Implementar tela de autenticação por número de telefone (campo numérico grande, máscara de telefone BR)
+- [x] Implementar envio de código OTP via SMS (@react-native-firebase/auth verifyPhoneNumber)
+- [x] Implementar tela de inserção do código recebido (campo numérico grande, 6 dígitos)
+- [x] Implementar confirmação e criação de sessão
+- [ ] Implementar tratamento de erros com áudio (número inválido, código expirado, sem sinal para receber SMS) — Alert implementado, falta áudio
+- [x] Implementar timeout de sessão com auto-lock usando expo-secure-store para armazenar token (RNF18)
 - [ ] Testar fluxo completo de auth em dispositivo real via development build
 
 ### Sincronização (SQLite local + Firestore remoto)
 
-- [ ] Implementar SyncService: ao reconectar, percorrer sync_queue do SQLite e aplicar operações no Firestore
-- [ ] Implementar listener de estado de conexão (NetInfo ou firebase.database().ref('.info/connected'))
+- [x] Implementar SyncService: ao reconectar, percorrer sync_queue do SQLite e aplicar operações no Firestore
+- [x] Implementar listener de estado de conexão (NetInfo ou firebase.database().ref('.info/connected'))
 - [ ] Garantir que todas as escritas gravam no SQLite primeiro e enfileiram na sync_queue com sincronizado = 0
-- [ ] Implementar lógica de retry com backoff exponencial para itens da sync_queue que falharem
+- [ ] Implementar lógica de retry com backoff exponencial para itens da sync_queue que falharem — retry passivo implementado (itens ficam na fila), sem backoff real
 - [ ] Implementar indicador visual discreto de status de conexão (opcional para o MVP)
 - [ ] Testar cenário: criar dados offline → reconectar → verificar sync no console Firebase
 
@@ -113,7 +113,7 @@
 
 ### Navegação geral
 
-- [ ] Instalar e configurar navegação (opções: React Navigation ou Expo Router)
+- [x] Instalar e configurar navegação (opções: React Navigation ou Expo Router)
   - Se React Navigation: npx expo install @react-navigation/native @react-navigation/bottom-tabs @react-navigation/stack react-native-screens react-native-safe-area-context
   - Se Expo Router: já incluído no Expo, configurar app directory
 - [ ] Implementar barra de navegação inferior fixa (4 ícones: início, documentos, avisos, ajuda)

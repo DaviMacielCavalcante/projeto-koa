@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "Facilitador Jutaí",
+    "scheme": "agri-docs",
     "slug": "facilitador-jutai",
     "version": "1.0.0",
     "orientation": "portrait",
