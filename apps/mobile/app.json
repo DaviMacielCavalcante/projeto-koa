@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "br.com.teste_ah"
+      "bundleIdentifier": "br.com.agridocs"
     },
     "android": {
       "package": "br.com.teste_ah",
@@ -41,7 +41,8 @@
           }
         }
       ],
-      "@react-native-firebase/auth"
+      "@react-native-firebase/auth",
+      "expo-router"
     ],
     "extra": {
       "eas": {

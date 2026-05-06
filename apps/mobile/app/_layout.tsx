@@ -40,7 +40,7 @@ export default function RootLayout() {
     }
 
     return (
-        <Stack>   
+        <Stack screenOptions={ { gestureEnabled: false, headerShown: false }}>   
             
             
         </Stack>
