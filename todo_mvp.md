@@ -164,10 +164,10 @@
 - [x] Implementar lógica de cores dos indicadores baseada em documents.status e documents.expiration_date do SQLite (active→verde, expiring_soon→amarelo, expired→vermelho, nulo→cinza)
 - [x] Implementar navegação do indicador para tela de detalhe do documento ao toque
 - [x] Implementar tela de detalhe do documento com ilustração e status
-- [ ] Implementar AudioPlayer para explicação em áudio (RF02)
+- [x] Implementar AudioPlayer para explicação em áudio (RF02)
 - [ ] Implementar reprodução automática do áudio apenas na primeira visita — registrar em user_content_progress (RF02)
-- [ ] Implementar botão de pular/interromper áudio via AudioPlayer (RF02.1)
-- [ ] Implementar botão de play permanente e na mesma posição via AudioPlayer (RF02.2)
+- [x] Implementar botão de pular/interromper áudio via AudioPlayer (RF02.1)
+- [x] Implementar botão de play permanente e na mesma posição via AudioPlayer (RF02.2)
 - [x] Implementar três botões na tela de detalhe: "Como consigo?", "Tenho dúvida", "Já tenho, quero guardar"
 
 ### UC02 — Guia passo a passo (RF03, RF15)
@@ -176,7 +176,7 @@
 - [x] Implementar exibição de horário de funcionamento
 - [x] Implementar lista visual do que levar (ícones + rótulo curto para RG, CPF, conta de luz)
 - [x] Implementar botão "Ligar pra EMATER" com Linking.openURL('tel:NUMERO') via expo-linking (RF15) — número pendente de confirmação
-- [ ] Implementar AudioPlayer para instruções narradas
+- [x] Implementar AudioPlayer para instruções narradas
 
 ### UC03 — Fotografar e armazenar documento (RF04, RF05, RF14)
 
@@ -190,12 +190,19 @@
     - Salvamento local do URI na coluna file_url da tabela "documents" no SQLite
     - Upload ao Firebase Storage quando houver conexão (reference.putFile()); atualizar storage_url e sincronizado = 1
 - [ ] Implementar atualização do status do documento no Firestore para "verde" após salvar
+    - Compressão via ImageManipulator.manipulateAsync() (resize + compress 0.75)
+    - Remoção de EXIF/GPS via ImageManipulator
+    - Salvamento local do URI na coluna file_url da tabela "documents" no SQLite
+    - Upload ao Firebase Storage quando houver conexão (reference.putFile()); atualizar storage_url e sincronizado = 1
+- [x] Implementar atualização do status do documento no Firestore para "verde" após salvar
 - [ ] Implementar confirmação em áudio via AudioPlayer ("Pronto, seu [documento] tá guardado")
 - [x] Implementar organização por categoria: agricultor acessa documento em no máximo 2 toques (RF05)
 - [ ] Implementar auto-salvamento se interrompido durante captura (RF14)
 - [ ] Implementar aviso em áudio se armazenamento estiver cheio (FileSystem.getFreeDiskStorageAsync() via expo-file-system)
 
 ### UC05 — Alertas de prazo (RF06)
+
+<<<<<<< HEAD
 
 - [ ] Configurar expo-notifications:
     - Solicitar permissão: Notifications.requestPermissionsAsync()
@@ -207,7 +214,20 @@
 - [ ] Implementar conteúdo da notificação com nome do agricultor + nome do documento
 - [ ] Implementar deep linking: toque na notificação abre tela de detalhe do documento correspondente
 - [ ] Implementar reemissão diária do alerta enquanto o documento permanecer vencido
-- [ ] Implementar antecedência padrão de 30 dias
+- [ ] # Implementar antecedência padrão de 30 dias
+- [x] Configurar expo-notifications:
+    - Solicitar permissão: Notifications.requestPermissionsAsync()
+    - Configurar canal de notificação Android: Notifications.setNotificationChannelAsync()
+- [x] Implementar agendamento de notificações locais baseado em documents.expiration_date do SQLite:
+    - Notifications.scheduleNotificationAsync() com trigger de data
+    - Reagendar quando o agricultor abrir o app (recalcular prazos)
+    - Reagendar ao salvar foto (câmera chama agendarAlertas após confirmar)
+- [x] Implementar mudança automática de cor do indicador (verde → amarelo → vermelho) baseada na data atual vs. data de vencimento
+- [x] Implementar conteúdo da notificação com nome do agricultor + nome do documento
+- [x] Implementar deep linking: toque na notificação abre tela de detalhe do documento correspondente
+- [x] Implementar reemissão diária do alerta enquanto o documento permanecer vencido
+- [x] Implementar antecedência padrão de 30 dias
+    > > > > > > > f712660a0fe98281bb51056d625f6d7036ba9560
 
 ---
 

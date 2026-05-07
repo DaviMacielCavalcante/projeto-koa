@@ -37,6 +37,9 @@ export const loginStyles = StyleSheet.create({
         ...typography.subtitle,
         color: colors.surface,
     },
+    botaoDesabilitado: {
+        backgroundColor: colors.border,
+    },
     botaoTeste: {
         marginTop: spacing.xl,
         alignItems: 'center',

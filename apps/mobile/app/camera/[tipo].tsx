@@ -7,6 +7,7 @@ import BackButton from '../../components/BackButton';
 import { processAndSavePhoto } from '../../src/services/photo';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import { agricultoresDb } from '../../src/db/index';
+import { agendarAlertas } from '../../src/services/notificacoes';
 import { cameraStyles as styles } from '../../styles/documentoStyles';
 
 export default function CameraDocumento() {
@@ -35,7 +36,7 @@ export default function CameraDocumento() {
             }
 
             // Fluxo normal: buscar ou criar documento no banco
-            let doc: { id: string };
+            let doc: { id: string } | null | undefined;
             doc = await agricultoresDb?.getFirstAsync<{ id: string }>(
                 'SELECT id FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
                 [tipo]
@@ -52,7 +53,8 @@ export default function CameraDocumento() {
                 doc = { id: novoId };
             }
 
-            await processAndSavePhoto(fotoUri, doc.id, false);
+            await processAndSavePhoto(fotoUri, doc.id);
+            await agendarAlertas();
             Alert.alert('Pronto!', `Seu ${tipo} tá guardado.`, [
                 { text: 'OK', onPress: () => router.back() },
             ]);

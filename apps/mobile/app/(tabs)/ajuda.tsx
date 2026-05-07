@@ -1,96 +1,135 @@
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import PracticeModeIndicator from '../../components/PracticeModeIndicator';
-import { colors } from '../../constants/theme';
+import uuid from 'react-native-uuid';
+import * as Notifications from 'expo-notifications';
+import { ajudaStyles as styles } from '../../styles/ajudaStyles';
+import { agricultoresDb } from '../../src/db/index';
+import { agendarAlertas } from '../../src/services/notificacoes';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: colors.primary,
-  },
-  button: {
-    backgroundColor: '#FF6B6B',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginVertical: 8,
-    alignItems: 'center',
-  },
-  practiceButton: {
-    backgroundColor: '#FF9800',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 24,
-    marginBottom: 8,
-    color: colors.textPrimary,
-  },
-});
+export default function Ajuda() {
+    const { isPracticeMode, exitPracticeMode } = usePracticeMode();
+    const [confirmando, setConfirmando] = useState(false);
+    const [contador, setContador] = useState(5);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-export default function ajuda() {
-  const router = useRouter();
-  const { isPracticeMode, exitPracticeMode } = usePracticeMode();
+    useEffect(() => {
+        if (confirmando) {
+            setContador(5);
+            intervalRef.current = setInterval(() => {
+                setContador((c) => {
+                    if (c <= 1) {
+                        clearInterval(intervalRef.current!);
+                        return 0;
+                    }
+                    return c - 1;
+                });
+            }, 1000);
+        } else {
+            clearInterval(intervalRef.current!);
+        }
+        return () => clearInterval(intervalRef.current!);
+    }, [confirmando]);
 
-  const handleExitPracticeMode = () => {
-    Alert.alert('Sair do Modo Prática', 'Tem certeza que deseja voltar ao app de verdade?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Sair',
-        style: 'destructive',
-        onPress: () => {
-          exitPracticeMode();
-          Alert.alert('Sucesso', 'Você saiu do modo prática. Seus dados reais estão intactos.');
-        },
-      },
-    ]);
-  };
+    function fecharModal() {
+        setConfirmando(false);
+        setContador(5);
+    }
 
-  const handleEnterPracticeMode = () => {
-    router.push('/practice');
-  };
+    async function testarNotificacaoDireta() {
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: 'Teste direto',
+                body: 'Se aparecer, notificações funcionam.',
+                data: { tipo: 'CAF' },
+            },
+            trigger: {
+                type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+                seconds: 5,
+                repeats: false,
+            },
+        });
+        Alert.alert('Aguarde', 'Notificação direta agendada para 5 segundos.');
+    }
 
-  return (
-    <View style={styles.container}>
-      <PracticeModeIndicator />
-      <Text style={styles.title}>Ajuda</Text>
+    async function inserirDocumentoTeste() {
+        const agora = new Date().toISOString();
+        const venceEm5Dias = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString();
+        await agricultoresDb?.runAsync(
+            `INSERT OR REPLACE INTO documents (id, type, status, expiration_date, sincronizado, created_at, updated_at)
+             VALUES (?, 'CAF', 'expiring_soon', ?, 0, ?, ?)`,
+            [uuid.v4() as string, venceEm5Dias, agora, agora]
+        );
+        await agendarAlertas();
+        Alert.alert('Teste', 'Documento CAF inserido (vence em 5 dias). Notificação agendada para 10s.');
+    }
 
-      {isPracticeMode ? (
-        <>
-          <Text style={styles.sectionTitle}>Modo Prática</Text>
-          <TouchableOpacity style={styles.button} onPress={handleExitPracticeMode}>
-            <Text style={styles.buttonText}>← Voltar pro App de Verdade</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <Text style={styles.sectionTitle}>Testar Aplicativo</Text>
-          <TouchableOpacity style={[styles.button, styles.practiceButton]} onPress={handleEnterPracticeMode}>
-            <Text style={styles.buttonText}>🔶 Entrar no Modo Prática</Text>
-          </TouchableOpacity>
-        </>
-      )}
+    return (
+        <View style={styles.container}>
+            <PracticeModeIndicator />
+            <Text style={styles.titulo}>Ajuda</Text>
 
-      <Text style={styles.sectionTitle}>Informações</Text>
-      <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 8 }}>
-        Este aplicativo ajuda você a organizar seus documentos e certificados agrícolas.
-      </Text>
-      <Text style={{ fontSize: 14, color: colors.textSecondary }}>
-        Para mais informações, entre em contato com a EMATER.
-      </Text>
-    </View>
-  );
+            {isPracticeMode ? (
+                <TouchableOpacity
+                    style={styles.botaoTeste}
+                    onPress={() =>
+                        Alert.alert('Sair do Modo Prática', 'Voltar ao app de verdade?', [
+                            { text: 'Cancelar', style: 'cancel' },
+                            { text: 'Sair', style: 'destructive', onPress: () => { exitPracticeMode(); router.replace('/(tabs)'); } },
+                        ])
+                    }
+                >
+                    <Text style={styles.botaoTesteTexto}>← Voltar pro App de Verdade</Text>
+                </TouchableOpacity>
+            ) : (
+                <TouchableOpacity style={styles.botaoTeste} onPress={() => router.push('/practice')}>
+                    <Text style={styles.botaoTesteTexto}>🔶 Entrar no Modo Prática</Text>
+                </TouchableOpacity>
+            )}
+
+            <TouchableOpacity style={styles.botaoDanger} onPress={() => setConfirmando(true)}>
+                <Ionicons name="trash" size={22} color="#fff" />
+                <Text style={styles.botaoDangerTexto}>Apagar todos os meus dados</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.botaoTeste} onPress={testarNotificacaoDireta}>
+                <Text style={styles.botaoTesteTexto}>[TESTE] Notificação direta (5s)</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.botaoTeste} onPress={inserirDocumentoTeste}>
+                <Text style={styles.botaoTesteTexto}>[TESTE] Inserir CAF vencendo + agendar notificação</Text>
+            </TouchableOpacity>
+
+            <Modal visible={confirmando} transparent animationType="fade">
+                <View style={styles.modalFundo}>
+                    <View style={styles.modalCaixa}>
+                        <Ionicons name="warning" size={40} color={styles.botaoDanger.backgroundColor} />
+                        <Text style={styles.modalTitulo}>Tem certeza?</Text>
+                        <Text style={styles.modalTexto}>
+                            Todos os seus dados, fotos e documentos serão apagados permanentemente.
+                            Você tem certeza?
+                        </Text>
+
+                        <TouchableOpacity
+                            style={[styles.botaoDanger, contador > 0 && styles.botaoDangerDesabilitado]}
+                            disabled={contador > 0}
+                            onPress={fecharModal}
+                        >
+                            <Ionicons name="trash" size={20} color="#fff" />
+                            <Text style={styles.botaoDangerTexto}>
+                                {contador > 0 ? `Apagar tudo (${contador})` : 'Apagar tudo'}
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.botaoVoltar} onPress={fecharModal}>
+                            <Text style={styles.botaoVoltarTexto}>Não, voltar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        </View>
+    );
 }

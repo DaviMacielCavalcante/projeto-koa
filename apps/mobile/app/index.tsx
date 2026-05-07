@@ -38,7 +38,11 @@ export default function PhoneScreen() {
                 placeholder="+5591999999999"
                 placeholderTextColor={colors.textSecondary}
             />
-            <TouchableOpacity style={styles.botao} onPress={handleSendCode}>
+            <TouchableOpacity
+                style={[styles.botao, inputState.trim().length === 0 && styles.botaoDesabilitado]}
+                onPress={handleSendCode}
+                disabled={inputState.trim().length === 0}
+            >
                 <Text style={styles.botaoTexto}>Enviar código</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.botaoTeste} onPress={() => router.push('/(tabs)')}>

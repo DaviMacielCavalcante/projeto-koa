@@ -1,11 +1,12 @@
-import { useLocalSearchParams, router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
+import { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { agricultoresDb } from '../../src/db/index';
 import { practiceDataAccess } from '../../src/db/practiceDataAccess';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import PracticeModeIndicator from '../../components/PracticeModeIndicator';
 import BackButton from '../../components/BackButton';
+import AudioPlayer from '../../components/AudioPlayer';
 import { colors } from '../../constants/theme';
 import { documentoStyles as styles } from '../../styles/documentoStyles';
 
@@ -47,22 +48,24 @@ export default function DetalheDocumento() {
     const [documento, setDocumento] = useState<Documento | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        async function buscarDocumento() {
-            try {
-                const result = isPracticeMode
-                    ? await practiceDataAccess.getDocumentByType(tipo ?? '', true)
-                    : await agricultoresDb?.getFirstAsync<Documento>(
-                        'SELECT * FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
-                        [tipo]
-                    );
-                setDocumento((result as Documento | null) ?? null);
-            } finally {
-                setLoading(false);
+    useFocusEffect(
+        useCallback(() => {
+            async function buscarDocumento() {
+                try {
+                    const result = isPracticeMode
+                        ? await practiceDataAccess.getDocumentByType(tipo ?? '', true)
+                        : await agricultoresDb?.getFirstAsync<Documento>(
+                            'SELECT * FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
+                            [tipo]
+                        );
+                    setDocumento((result as Documento | null) ?? null);
+                } finally {
+                    setLoading(false);
+                }
             }
-        }
-        buscarDocumento();
-    }, [tipo, isPracticeMode]);
+            buscarDocumento();
+        }, [tipo, isPracticeMode])
+    );
 
     const corStatus = documento?.status
         ? (STATUS_COLOR[documento.status] ?? colors.statusGray)
@@ -81,7 +84,7 @@ export default function DetalheDocumento() {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { flex: 1 }]}>
             <PracticeModeIndicator />
             <BackButton />
 
@@ -112,6 +115,12 @@ export default function DetalheDocumento() {
                     <Text style={[styles.botaoTexto, styles.botaoTextoSecundario]}>Já tenho, quero guardar</Text>
                 </TouchableOpacity>
             </View>
+
+            <AudioPlayer
+                source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
+                autoPlay={false}
+                style={{ position: 'absolute', bottom: 24, right: 24 }}
+            />
         </View>
     );
 }
