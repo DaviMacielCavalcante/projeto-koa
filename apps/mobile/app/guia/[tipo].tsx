@@ -1,12 +1,11 @@
 import { useLocalSearchParams, router } from 'expo-router';
-import { View, Text, TouchableOpacity, Linking, ScrollView } from 'react-native';
+import { View, Text, Linking, ScrollView } from 'react-native';
+import { guiaScreenStyles as styles } from '../../styles/guiaScreenStyles';
 import { Ionicons } from '@expo/vector-icons';
-import BackButton from '../../components/BackButton';
-import { colors } from '../../constants/theme';
-import { guiaStyles as styles } from '../../styles/documentoStyles';
+import { ScreenContainer, GradientButton, TopBar } from '../../design/components';
+import { colors } from '../../design/theme';
 
 const EMATER_TELEFONE = 'tel:+5591XXXXXXXX'; // TODO: confirmar número real da EMATER em Moju
-
 const HORARIO = 'Segunda a sexta, das 8h às 14h';
 
 type ItemLevar = { icone: keyof typeof Ionicons.glyphMap; label: string };
@@ -44,42 +43,44 @@ export default function GuiaDocumento() {
     const itens = O_QUE_LEVAR[tipo] ?? [];
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <BackButton />
+        <ScreenContainer variant="teal">
+            <TopBar leftIcon="arrow-back" rightIcon="volume-high" />
+            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-            <Text style={styles.titulo}>Como conseguir o {tipo}</Text>
+                <Text style={styles.titulo}>Como conseguir o {tipo}</Text>
 
-            <View style={styles.secao}>
-                <Text style={styles.secaoTitulo}>Onde ir</Text>
-                <Text style={styles.secaoTexto}>Escritório da EMATER em Moju</Text>
-                <Text style={styles.secaoTexto}>{HORARIO}</Text>
-            </View>
+                <View style={styles.card}>
+                    <Text style={styles.cardTitulo}>Onde ir</Text>
+                    <Text style={styles.cardTexto}>Escritório da EMATER em Moju</Text>
+                    <Text style={styles.cardTexto}>{HORARIO}</Text>
+                </View>
 
-            <View style={styles.secao}>
-                <Text style={styles.secaoTitulo}>O que levar</Text>
-                {itens.map((item) => (
-                    <View key={item.label} style={styles.itemLevar}>
-                        <Ionicons name={item.icone} size={28} color={colors.primary} />
-                        <Text style={styles.itemLevarTexto}>{item.label}</Text>
-                    </View>
-                ))}
-            </View>
+                <View style={styles.card}>
+                    <Text style={styles.cardTitulo}>O que levar</Text>
+                    {itens.map((item, i) => (
+                        <View key={item.label} style={[styles.item, i === itens.length - 1 && { borderBottomWidth: 0 }]}>
+                            <View style={styles.itemIcone}>
+                                <Ionicons name={item.icone} size={22} color={colors.tealDark} />
+                            </View>
+                            <Text style={styles.itemTexto}>{item.label}</Text>
+                        </View>
+                    ))}
+                </View>
 
-            <TouchableOpacity
-                style={styles.botaoLigar}
-                onPress={() => Linking.openURL(EMATER_TELEFONE)}
-            >
-                <Ionicons name="call" size={24} color={colors.surface} />
-                <Text style={styles.botaoLigarTexto}>Ligar pra EMATER</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-                style={styles.botaoGuardar}
-                onPress={() => router.push(`/camera/${tipo}`)}
-            >
-                <Text style={styles.botaoGuardarTexto}>Já tenho, quero guardar</Text>
-            </TouchableOpacity>
-        </ScrollView>
+                <GradientButton
+                    label="📞  Ligar pra EMATER"
+                    variant="teal"
+                    onPress={() => Linking.openURL(EMATER_TELEFONE)}
+                    style={styles.botao}
+                />
+                <GradientButton
+                    label="📷  Já tenho, quero guardar"
+                    variant="gold"
+                    onPress={() => router.push(`/camera/${tipo}`)}
+                    style={styles.botao}
+                />
+            </ScrollView>
+        </ScreenContainer>
     );
 }
 

@@ -1,6 +1,8 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState} from 'react';
 import { ActivityIndicator, BackHandler } from 'react-native';
+import { useFonts, PlayfairDisplay_700Bold, PlayfairDisplay_900Black, PlayfairDisplay_400Regular_Italic } from '@expo-google-fonts/playfair-display';
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SecureStore from 'expo-secure-store';
 import * as Notifications from 'expo-notifications';
 import { initDb } from '../src/db/index'
@@ -22,6 +24,15 @@ Notifications.setNotificationHandler({
 export default function RootLayout() {
 
     const [dbReady, setDbReady] = useState(false);
+    const [fontsLoaded] = useFonts({
+        PlayfairDisplay_700Bold,
+        PlayfairDisplay_900Black,
+        PlayfairDisplay_400Regular_Italic,
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
 
     useEffect(() => {
         initDb().then(async () => {
@@ -63,16 +74,13 @@ export default function RootLayout() {
             return () => unsubscribe()
         }, [])
 
-    if (!dbReady) {
-        return <ActivityIndicator></ActivityIndicator>
+    if (!dbReady || !fontsLoaded) {
+        return <ActivityIndicator />;
     }
 
     return (
         <PracticeModeProvider>
-            <Stack screenOptions={ { gestureEnabled: false, headerShown: false }}>   
-                
-                
-            </Stack>
+            <Stack screenOptions={{ gestureEnabled: false, headerShown: false }} />
         </PracticeModeProvider>
     )
 }

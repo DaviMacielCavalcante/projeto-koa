@@ -1,87 +1,120 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useState, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
+import { inicioStyles as styles } from '../../styles/inicioStyles';
+import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
-import { practiceDataAccess } from '../../src/db/practiceDataAccess';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
-import PracticeModeIndicator from '../../components/PracticeModeIndicator';
-import { colors } from '../../constants/theme';
+import { ScreenContainer, DocCircle, AudioCircle } from '../../design/components';
+import { DocStatus } from '../../design/components/DocCircle';
+import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
 
 const TIPOS = ['CAF', 'CAR', 'CCIR', 'ITR', 'NFA-e'];
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
 
+const STATUS_SUBTITLE: Record<DocStatus, string> = {
+    green: 'em dia',
+    yellow: 'vencendo',
+    red: 'vencido',
+    grey: 'faltando',
+};
+
 type DocRow = { type: string; status: string | null; expiration_date: string | null };
 
-function calcularCor(row: DocRow | null): string {
-    if (!row) return colors.statusGray;
-
+function calcularStatus(row: DocRow | null): DocStatus {
+    if (!row) return 'grey';
     if (row.expiration_date) {
         const vencimento = new Date(row.expiration_date).getTime();
         const hoje = Date.now();
-        if (hoje > vencimento) return colors.statusRed;
-        if (vencimento - hoje <= TRINTA_DIAS) return colors.statusYellow;
-        return colors.statusGreen;
+        if (hoje > vencimento) return 'red';
+        if (vencimento - hoje <= TRINTA_DIAS) return 'yellow';
+        return 'green';
     }
-
-    if (row.status === 'active') return colors.statusGreen;
-    if (row.status === 'expiring_soon') return colors.statusYellow;
-    if (row.status === 'expired') return colors.statusRed;
-
-    return colors.statusGray;
+    if (row.status === 'active') return 'green';
+    if (row.status === 'expiring_soon') return 'yellow';
+    if (row.status === 'expired') return 'red';
+    return 'grey';
 }
 
 export default function Inicio() {
     const { isPracticeMode } = usePracticeMode();
     const [docs, setDocs] = useState(
-        TIPOS.map((nome) => ({ nome, cor: colors.statusGray }))
+        TIPOS.map((nome) => ({ nome, status: 'grey' as DocStatus }))
     );
+    const [nomeUsuario, setNomeUsuario] = useState('Agricultor');
 
     useFocusEffect(
         useCallback(() => {
-            async function carregarCores() {
-                const rows = isPracticeMode
-                    ? await practiceDataAccess.getDocuments(true)
-                    : await agricultoresDb?.getAllAsync<DocRow>(
-                        `SELECT type, status, expiration_date FROM documents
-                         WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
-                         GROUP BY type
-                         HAVING created_at = MAX(created_at)`
-                    );
+            async function carregarStatus() {
+                if (isPracticeMode) {
+                    const { mockFarmer, mockDocuments } = await import('../../src/mocks/practiceData');
+                    setNomeUsuario(mockFarmer.name);
+                    const mapa: Record<string, DocRow> = {};
+                    mockDocuments.forEach(d => (mapa[d.type] = d as DocRow));
+                    setDocs(TIPOS.map((nome) => ({ nome, status: calcularStatus(mapa[nome] ?? null) })));
+                    return;
+                }
 
+                const userRow = await agricultoresDb?.getFirstAsync<{ name: string }>(
+                    'SELECT name FROM users ORDER BY created_at DESC LIMIT 1'
+                );
+                if (userRow?.name) setNomeUsuario(userRow.name);
+
+                const rows = await agricultoresDb?.getAllAsync<DocRow>(
+                    `SELECT type, status, expiration_date FROM documents
+                     WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
+                     GROUP BY type
+                     HAVING created_at = MAX(created_at)`
+                );
                 const mapa: Record<string, DocRow> = {};
-                rows?.forEach((r: any) => (mapa[r.type] = r));
-
+                rows?.forEach((r) => (mapa[r.type] = r));
                 setDocs(TIPOS.map((nome) => ({
                     nome,
-                    cor: calcularCor(mapa[nome] ?? null),
+                    status: calcularStatus(mapa[nome] ?? null),
                 })));
             }
-            carregarCores();
+            carregarStatus();
         }, [isPracticeMode])
     );
 
     return (
-        <View style={{ flex: 1 }}>
-            <PracticeModeIndicator />
-            <Text>Olá, João</Text>
-            <FlatList
-                data={docs}
-                keyExtractor={(item) => item.nome}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: item.cor, justifyContent: 'center', alignItems: 'center' }}
-                        onPress={() => router.push('/documento/' + item.nome)}
-                    >
-                        <Text>{item.nome}</Text>
-                    </TouchableOpacity>
-                )}
-            />
+        <ScreenContainer variant="cream">
+            <View style={styles.greetCard}>
+                <View style={styles.avatar}>
+                    <Ionicons name="person" size={22} color={colors.tealDark} />
+                </View>
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.greetLabel}>Bom dia,</Text>
+                    <Text style={styles.greetName}>{nomeUsuario}</Text>
+                </View>
+                <Ionicons name="volume-high" size={20} color={colors.white} style={{ opacity: 0.85 }} />
+            </View>
+
+            <Text style={styles.sectionTitle}>Seus Documentos</Text>
+
+            <View style={styles.grid}>
+                {docs.map((doc) => (
+                    <DocCircle
+                        key={doc.nome}
+                        name={doc.nome}
+                        subtitle={STATUS_SUBTITLE[doc.status]}
+                        status={doc.status}
+                        onPress={() => router.push('/documento/' + doc.nome)}
+                    />
+                ))}
+
+                <View style={styles.audioBtn}>
+                    <AudioCircle icon="volume-high" size={50} iconColor={colors.tealDark} />
+                </View>
+            </View>
+
             <AudioPlayer
                 source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
                 autoPlay={false}
-                style={{ position: 'absolute', bottom: 24, right: 24 }}
+                style={styles.playerFixed}
             />
-        </View>
+        </ScreenContainer>
     );
 }
+

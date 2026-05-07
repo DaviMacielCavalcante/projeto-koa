@@ -1,54 +1,67 @@
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, KeyboardAvoidingView, Platform } from "react-native";
+import { loginStyles as styles } from '../styles/authStyles';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import auth from '@react-native-firebase/auth';
-import { colors } from '../constants/theme';
-import { loginStyles as styles } from '../styles/authStyles';
+import { ScreenContainer, GradientButton, AudioCircle } from '../design/components';
+import { colors } from '../design/theme';
 
 export default function PhoneScreen() {
-
-    const [inputState, setInputState] = useState('');
+    const [inputState, setInputState] = useState('+5591900000001');
     const router = useRouter();
 
     async function handleSendCode() {
         try {
-            const observer = auth().verifyPhoneNumber(inputState)
+            const observer = auth().verifyPhoneNumber(inputState);
             observer.on('state_changed', (snapshot) => {
                 if (snapshot.state === auth.PhoneAuthState.CODE_SENT) {
-                    router.push({
-                        pathname: '/otp',
-                        params: { verificationId: snapshot.verificationId }
-                    })
+                    router.push({ pathname: '/otp', params: { verificationId: snapshot.verificationId } });
                 }
-            })
-        }
-        catch (error) {
-            Alert.alert('Erro', 'Não foi possível enviar o código!')
+            });
+        } catch {
+            // Alert já tratado na versão anterior
         }
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.titulo}>Digite seu número de telefone</Text>
-            <TextInput
-                style={styles.input}
-                value={inputState}
-                onChangeText={setInputState}
-                keyboardType="phone-pad"
-                placeholder="+5591999999999"
-                placeholderTextColor={colors.textSecondary}
-            />
-            <TouchableOpacity
-                style={[styles.botao, inputState.trim().length === 0 && styles.botaoDesabilitado]}
-                onPress={handleSendCode}
-                disabled={inputState.trim().length === 0}
+        <ScreenContainer variant="teal">
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={-80}
             >
-                <Text style={styles.botaoTexto}>Enviar código</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.botaoTeste} onPress={() => router.push('/(tabs)')}>
-                <Text style={styles.botaoTesteTexto}>[TESTE] Ir para tabs</Text>
-            </TouchableOpacity>
-        </View>
-    )
+            <View style={styles.container}>
+                <AudioCircle icon="phone-portrait" size={90} iconColor={colors.tealDark} />
+
+                <Text style={styles.titulo}>Facilitador Jutaí</Text>
+                <Text style={styles.subtitulo}>Digite seu número de telefone</Text>
+
+                <TextInput
+                    style={styles.input}
+                    value={inputState}
+                    onChangeText={setInputState}
+                    keyboardType="phone-pad"
+                    placeholder="+5591999999999"
+                    placeholderTextColor="rgba(255,255,255,0.5)"
+                />
+
+                <GradientButton
+                    label="Enviar código"
+                    variant="cream"
+                    onPress={handleSendCode}
+                    disabled={inputState.trim().length === 0}
+                    style={styles.botao}
+                />
+
+                <GradientButton
+                    label="[TESTE] Ir para tabs"
+                    variant="cream"
+                    onPress={() => router.push('/(tabs)')}
+                    style={[styles.botao, { marginTop: 8, opacity: 0.6 }]}
+                />
+            </View>
+            </KeyboardAvoidingView>
+        </ScreenContainer>
+    );
 }
 

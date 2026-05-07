@@ -1,26 +1,55 @@
 import { useLocalSearchParams, router } from 'expo-router';
-import { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Alert, Image } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, Animated, Alert, StyleSheet } from 'react-native';
+import { cameraScreenStyles as styles } from '../../styles/cameraScreenStyles';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { Ionicons } from '@expo/vector-icons';
 import uuid from 'react-native-uuid';
-import BackButton from '../../components/BackButton';
+import { ScreenContainer, GradientButton, TopBar } from '../../design/components';
+import { colors } from '../../design/theme';
 import { processAndSavePhoto } from '../../src/services/photo';
-import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import { agricultoresDb } from '../../src/db/index';
 import { agendarAlertas } from '../../src/services/notificacoes';
-import { cameraStyles as styles } from '../../styles/documentoStyles';
+import { usePracticeMode } from '../../src/hooks/usePracticeMode';
+import { mockDocuments } from '../../src/mocks/practiceData';
+
+type Etapa = 'preparo' | 'camera' | 'preview' | 'confirmacao';
+
+const INSTRUCOES = [
+    { icone: 'sunny-outline' as const, texto: 'Escolha um lugar bem iluminado' },
+    { icone: 'document-outline' as const, texto: 'Coloque o documento numa superfície plana' },
+    { icone: 'scan-outline' as const, texto: 'Enquadre o documento inteiro na foto' },
+];
 
 export default function CameraDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
-    const { isPracticeMode, setPracticePhoto } = usePracticeMode();
+    const [etapa, setEtapa] = useState<Etapa>('preparo');
     const [permission, requestPermission] = useCameraPermissions();
     const [fotoUri, setFotoUri] = useState<string | null>(null);
+    const { isPracticeMode, setPracticePhoto } = usePracticeMode();
     const [salvando, setSalvando] = useState(false);
     const cameraRef = useRef<CameraView>(null);
+    const scaleAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (etapa === 'confirmacao') {
+            Animated.spring(scaleAnim, {
+                toValue: 1,
+                tension: 40,
+                friction: 6,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            scaleAnim.setValue(0);
+        }
+    }, [etapa]);
 
     async function tirarFoto() {
         const foto = await cameraRef.current?.takePictureAsync();
-        if (foto) setFotoUri(foto.uri);
+        if (foto) {
+            setFotoUri(foto.uri);
+            setEtapa('preview');
+        }
     }
 
     async function confirmarFoto() {
@@ -28,36 +57,32 @@ export default function CameraDocumento() {
         setSalvando(true);
         try {
             if (isPracticeMode) {
-                setPracticePhoto(tipo ?? '', fotoUri);
-                Alert.alert('Pronto!', `Seu ${tipo} tá guardado (modo prática).`, [
-                    { text: 'OK', onPress: () => router.back() },
-                ]);
+                const doc = mockDocuments.find(d => d.type === tipo);
+                if (doc) {
+                    doc.file_url = fotoUri;
+                    doc.status = 'active';
+                }
+                setPracticePhoto(tipo, fotoUri);
+                setEtapa('confirmacao');
                 return;
             }
 
-            // Fluxo normal: buscar ou criar documento no banco
-            let doc: { id: string } | null | undefined;
-            doc = await agricultoresDb?.getFirstAsync<{ id: string }>(
+            let doc = await agricultoresDb?.getFirstAsync<{ id: string }>(
                 'SELECT id FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
                 [tipo]
             );
-
             if (!doc) {
                 const novoId = uuid.v4() as string;
                 const agora = new Date().toISOString();
                 await agricultoresDb?.runAsync(
-                    `INSERT INTO documents (id, type, status, sincronizado, created_at, updated_at)
-                     VALUES (?, ?, 'active', 0, ?, ?)`,
+                    `INSERT INTO documents (id, type, status, sincronizado, created_at, updated_at) VALUES (?, ?, 'active', 0, ?, ?)`,
                     [novoId, tipo, agora, agora]
                 );
                 doc = { id: novoId };
             }
-
             await processAndSavePhoto(fotoUri, doc.id);
             await agendarAlertas();
-            Alert.alert('Pronto!', `Seu ${tipo} tá guardado.`, [
-                { text: 'OK', onPress: () => router.back() },
-            ]);
+            setEtapa('confirmacao');
         } catch {
             Alert.alert('Erro', 'Não foi possível salvar a foto.');
         } finally {
@@ -65,66 +90,148 @@ export default function CameraDocumento() {
         }
     }
 
-    if (!permission) {
-        return <View style={styles.container} />;
-    }
-
-    if (!permission.granted) {
+    // --- ETAPA 1: PREPARO ---
+    if (etapa === 'preparo') {
         return (
-            <View style={styles.container}>
-                <BackButton />
-                <Text style={styles.permissaoTexto}>
-                    Precisamos de acesso à câmera para fotografar seu documento.
-                </Text>
-                <TouchableOpacity style={styles.botao} onPress={requestPermission}>
-                    <Text style={styles.botaoTexto}>Permitir câmera</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
+            <ScreenContainer variant="teal">
+                <TopBar leftIcon="arrow-back" />
+                <View style={styles.preparoContainer}>
+                    <Ionicons name="camera" size={64} color="rgba(255,255,255,0.9)" />
+                    <Text style={styles.preparoTitulo}>Fotografar {tipo}</Text>
+                    <Text style={styles.preparoSubtitulo}>Siga as dicas para uma boa foto</Text>
 
-    if (fotoUri) {
-        return (
-            <View style={styles.container}>
-                <Image source={{ uri: fotoUri }} style={styles.preview} resizeMode="contain" />
-                <View style={styles.acoes}>
-                    <TouchableOpacity
-                        style={[styles.botao, styles.botaoSecundario]}
-                        onPress={() => setFotoUri(null)}
-                        disabled={salvando}
-                    >
-                        <Text style={[styles.botaoTexto, styles.botaoTextoSecundario]}>
-                            Tirar de novo
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.botao}
-                        onPress={confirmarFoto}
-                        disabled={salvando}
-                    >
-                        <Text style={styles.botaoTexto}>
-                            {salvando ? 'Salvando...' : 'Ficou bom'}
-                        </Text>
-                    </TouchableOpacity>
+                    <View style={styles.instrucoesList}>
+                        {INSTRUCOES.map((item) => (
+                            <View key={item.texto} style={styles.instrucaoItem}>
+                                <View style={styles.instrucaoIcone}>
+                                    <Ionicons name={item.icone} size={22} color={colors.tealDark} />
+                                </View>
+                                <Text style={styles.instrucaoTexto}>{item.texto}</Text>
+                            </View>
+                        ))}
+                    </View>
                 </View>
-            </View>
+
+                <View style={styles.preparoBotao}>
+                    <GradientButton
+                        label="📷  Abrir câmera"
+                        variant="cream"
+                        onPress={() => {
+                            if (!permission?.granted) requestPermission().then((r) => { if (r.granted) setEtapa('camera'); });
+                            else setEtapa('camera');
+                        }}
+                        style={{ width: '100%' }}
+                    />
+                </View>
+            </ScreenContainer>
         );
     }
 
-    return (
-        <View style={styles.container}>
-            <CameraView ref={cameraRef} style={styles.camera} facing={'back' as CameraType}>
-                <View style={styles.instrucao}>
-                    <Text style={styles.instrucaoTexto}>
-                        Tire uma foto do seu {tipo}
+    // --- SEM PERMISSÃO ---
+    if (!permission?.granted) {
+        return (
+            <ScreenContainer variant="teal">
+                <TopBar leftIcon="arrow-back" />
+                <View style={styles.preparoContainer}>
+                    <Ionicons name="camera-off" size={64} color="rgba(255,255,255,0.7)" />
+                    <Text style={styles.preparoTitulo}>Permissão necessária</Text>
+                    <Text style={styles.preparoSubtitulo}>
+                        Precisamos acessar a câmera para fotografar seu documento.
                     </Text>
                 </View>
-                <View style={styles.capturaBotaoContainer}>
-                    <BackButton />
-                    <TouchableOpacity style={styles.capturaBotao} onPress={tirarFoto} />
+                <View style={styles.preparoBotao}>
+                    <GradientButton label="Permitir câmera" variant="cream" onPress={requestPermission} style={{ width: '100%' }} />
                 </View>
-            </CameraView>
-        </View>
+            </ScreenContainer>
+        );
+    }
+
+    // --- ETAPA 2: CÂMERA ---
+    if (etapa === 'camera') {
+        return (
+            <View style={styles.cameraRoot}>
+                <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={'back' as CameraType} mute>
+                    <View style={styles.cameraTopBar}>
+                        <TouchableOpacity onPress={() => setEtapa('preparo')} hitSlop={12}>
+                            <Ionicons name="arrow-back" size={26} color={colors.white} />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.cameraInstrucao}>
+                        <Text style={styles.cameraInstrucaoTexto}>Enquadre o {tipo} na moldura</Text>
+                    </View>
+
+                    <View style={styles.moldura}>
+                        <View style={[styles.canto, styles.cantoTL]} />
+                        <View style={[styles.canto, styles.cantoTR]} />
+                        <View style={[styles.canto, styles.cantoBL]} />
+                        <View style={[styles.canto, styles.cantoBR]} />
+                    </View>
+
+                    <View style={styles.shutterArea}>
+                        <TouchableOpacity style={styles.shutter} onPress={tirarFoto} />
+                    </View>
+                </CameraView>
+            </View>
+        );
+    }
+
+    // --- ETAPA 3: PREVIEW ---
+    if (etapa === 'preview') {
+        return (
+            <ScreenContainer variant="orange">
+                <TopBar leftIcon="arrow-back" onLeftPress={() => setEtapa('camera')} />
+                <View style={styles.previewContainer}>
+                    <Text style={styles.previewTitulo}>Como ficou?</Text>
+                    <Image source={{ uri: fotoUri ?? '' }} style={styles.previewFoto} resizeMode="contain" />
+                </View>
+                <View style={styles.previewBotoes}>
+                    <GradientButton
+                        label="↩  Tirar de novo"
+                        variant="cream"
+                        onPress={() => { setFotoUri(null); setEtapa('camera'); }}
+                        disabled={salvando}
+                        style={{ flex: 1 }}
+                    />
+                    <GradientButton
+                        label={salvando ? 'Salvando...' : '✓  Ficou bom!'}
+                        variant="teal"
+                        onPress={confirmarFoto}
+                        disabled={salvando}
+                        style={{ flex: 1 }}
+                    />
+                </View>
+            </ScreenContainer>
+        );
+    }
+
+    // --- ETAPA 4: CONFIRMAÇÃO ---
+    return (
+        <ScreenContainer variant="orange">
+            <View style={styles.confirmacaoCentro}>
+                <Animated.View style={[styles.selo, { transform: [{ scale: scaleAnim }] }]}>
+                    <View style={styles.seloInterno}>
+                        <Ionicons name="checkmark" size={72} color={colors.goldDark} />
+                    </View>
+                </Animated.View>
+            </View>
+
+            <View style={styles.confirmacaoCard}>
+                <Text style={styles.confirmacaoTitulo}>Tá guardado!</Text>
+                <Text style={styles.confirmacaoTexto}>
+                    Pronto, seu {tipo} tá guardado. Quando tiver internet eu mando pro servidor sozinho.
+                </Text>
+            </View>
+
+            <View style={styles.confirmacaoBotao}>
+                <GradientButton
+                    label="Voltar pro início"
+                    variant="red"
+                    onPress={() => router.replace('/(tabs)')}
+                    style={{ width: '100%' }}
+                />
+            </View>
+        </ScreenContainer>
     );
 }
 

@@ -2,22 +2,10 @@ import uuid from 'react-native-uuid'
 import { agricultoresDb } from '../db/index' 
 import * as ImageManipulator from 'expo-image-manipulator'
 
-async function processAndSavePhoto(
-  uri: string,
-  documentId: string,
-  isPracticeMode: boolean = false
-): Promise<void> {
-    if (isPracticeMode) {
-      return
-    }
+async function processAndSavePhoto(uri: string, documentId: string): Promise<void> {
+    
+    const result = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: 800}}], { format: ImageManipulator.SaveFormat.JPEG, compress: 0.75})
 
-    const result = await ImageManipulator.manipulateAsync(
-      uri,
-      [{ resize: { width: 800 } }],
-      { format: ImageManipulator.SaveFormat.JPEG, compress: 0.75 }
-    )
-
-    // Fluxo normal: salvar no SQLite
     const agora = new Date().toISOString();
     const novaValidade = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
 

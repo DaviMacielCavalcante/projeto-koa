@@ -1,18 +1,17 @@
 export const colors = {
-  primary: '#2E7D32',
-  background: '#F5F5F5',
+  primary: '#0E4F4F',
+  background: '#F2E8D2',
   surface: '#FFFFFF',
-  text: '#1A1A1A',
-  textSecondary: '#666666',
-  border: '#E0E0E0',
+  text: '#1a1a1a',
+  textSecondary: '#555555',
+  border: '#DCCDB0',
 
-  // status de documentos
-  statusGreen: '#2E7D32',
-  statusYellow: '#F9A825',
-  statusRed: '#C62828',
-  statusGray: '#9E9E9E',
+  statusGreen: '#1F7A7A',
+  statusYellow: '#D49B25',
+  statusRed: '#9B1B1B',
+  statusGray: '#888888',
 
-  danger: '#C62828',
+  danger: '#9B1B1B',
 };
 
 export const spacing = {
