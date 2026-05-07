@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, StyleProp, ViewStyle } from 'react-native';
 import { Audio } from 'expo-av';
 import { useEffect, useRef, useState } from 'react';
 
@@ -6,9 +6,10 @@ interface AudioPlayerProps {
     source: any;
     autoPlay?: boolean;
     onFinish?: () => void;
+    style?: StyleProp<ViewStyle>;
 }
 
-export default function AudioPlayer({ source, autoPlay = false, onFinish }: AudioPlayerProps) {
+export default function AudioPlayer({ source, autoPlay = false, onFinish, style }: AudioPlayerProps) {
 
     const soundRef = useRef<Audio.Sound | null>(null);
 
@@ -54,7 +55,7 @@ export default function AudioPlayer({ source, autoPlay = false, onFinish }: Audi
     }
 
     return (
-    <TouchableOpacity onPress={handlePlay}>
+    <TouchableOpacity onPress={handlePlay} style={style}>
         <Text>{isPlaying ? 'Pausar' : 'Tocar'}</Text>
     </TouchableOpacity>
     )

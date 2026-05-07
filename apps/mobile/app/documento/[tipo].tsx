@@ -5,6 +5,7 @@ import { agricultoresDb } from '../../src/db/index';
 import BackButton from '../../components/BackButton';
 import { colors } from '../../constants/theme';
 import { documentoStyles as styles } from '../../styles/documentoStyles';
+import AudioPlayer from '../../components/AudioPlayer';
 
 type DocumentoStatus = 'active' | 'expiring_soon' | 'expired' | null;
 
@@ -75,7 +76,7 @@ export default function DetalheDocumento() {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { flex: 1}]}>
             <BackButton />
 
             <View style={styles.header}>
@@ -105,6 +106,12 @@ export default function DetalheDocumento() {
                     <Text style={[styles.botaoTexto, styles.botaoTextoSecundario]}>Já tenho, quero guardar</Text>
                 </TouchableOpacity>
             </View>
+        
+        <AudioPlayer
+        source={require("../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3")}
+        autoPlay ={false}
+        style={{ position: 'absolute', bottom: 24, right: 24 }}
+        />
         </View>
     );
 }

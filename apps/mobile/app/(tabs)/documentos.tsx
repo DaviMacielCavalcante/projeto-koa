@@ -4,6 +4,7 @@ import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
 import { colors, spacing, typography, MIN_TOUCH_TARGET } from '../../constants/theme';
+import AudioPlayer from '../../components/AudioPlayer';
 
 type DocRow = { type: string; file_url: string | null; status: string | null };
 

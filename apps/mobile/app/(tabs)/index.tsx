@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { agricultoresDb } from '../../src/db/index';
 import { colors } from '../../constants/theme';
+import AudioPlayer from '../../components/AudioPlayer';
 
 const TIPOS = ['CAF', 'CAR', 'CCIR', 'ITR', 'NFA-e'];
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
@@ -55,7 +56,7 @@ export default function Inicio() {
     );
 
     return (
-        <View>
+        <View style={{ flex: 1 }}>
             <Text>Olá, João</Text>
             <FlatList
                 data={docs}
@@ -69,6 +70,11 @@ export default function Inicio() {
                     </TouchableOpacity>
                 )}
             />
+        <AudioPlayer
+        source={require("../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3")}
+        autoPlay={false}
+        style={{ position: 'absolute', bottom: 24, right: 24 }} 
+        />
         </View>
     );
 }
