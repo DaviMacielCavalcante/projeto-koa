@@ -187,7 +187,7 @@
   - Remoção de EXIF/GPS via ImageManipulator
   - Salvamento local do URI na coluna file_url da tabela "documents" no SQLite
   - Upload ao Firebase Storage quando houver conexão (reference.putFile()); atualizar storage_url e sincronizado = 1
-- [ ] Implementar atualização do status do documento no Firestore para "verde" após salvar
+- [x] Implementar atualização do status do documento no Firestore para "verde" após salvar
 - [ ] Implementar confirmação em áudio via AudioPlayer ("Pronto, seu [documento] tá guardado")
 - [x] Implementar organização por categoria: agricultor acessa documento em no máximo 2 toques (RF05)
 - [ ] Implementar auto-salvamento se interrompido durante captura (RF14)
@@ -195,17 +195,18 @@
 
 ### UC05 — Alertas de prazo (RF06)
 
-- [ ] Configurar expo-notifications:
+- [x] Configurar expo-notifications:
   - Solicitar permissão: Notifications.requestPermissionsAsync()
   - Configurar canal de notificação Android: Notifications.setNotificationChannelAsync()
-- [ ] Implementar agendamento de notificações locais baseado em documents.expiration_date do SQLite:
+- [x] Implementar agendamento de notificações locais baseado em documents.expiration_date do SQLite:
   - Notifications.scheduleNotificationAsync() com trigger de data
   - Reagendar quando o agricultor abrir o app (recalcular prazos)
-- [ ] Implementar mudança automática de cor do indicador (verde → amarelo → vermelho) baseada na data atual vs. data de vencimento
-- [ ] Implementar conteúdo da notificação com nome do agricultor + nome do documento
-- [ ] Implementar deep linking: toque na notificação abre tela de detalhe do documento correspondente
-- [ ] Implementar reemissão diária do alerta enquanto o documento permanecer vencido
-- [ ] Implementar antecedência padrão de 30 dias
+  - Reagendar ao salvar foto (câmera chama agendarAlertas após confirmar)
+- [x] Implementar mudança automática de cor do indicador (verde → amarelo → vermelho) baseada na data atual vs. data de vencimento
+- [x] Implementar conteúdo da notificação com nome do agricultor + nome do documento
+- [x] Implementar deep linking: toque na notificação abre tela de detalhe do documento correspondente
+- [x] Implementar reemissão diária do alerta enquanto o documento permanecer vencido
+- [x] Implementar antecedência padrão de 30 dias
 
 ---
 

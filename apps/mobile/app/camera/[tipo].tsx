@@ -6,6 +6,7 @@ import uuid from 'react-native-uuid';
 import BackButton from '../../components/BackButton';
 import { processAndSavePhoto } from '../../src/services/photo';
 import { agricultoresDb } from '../../src/db/index';
+import { agendarAlertas } from '../../src/services/notificacoes';
 import { cameraStyles as styles } from '../../styles/documentoStyles';
 
 export default function CameraDocumento() {
@@ -41,6 +42,7 @@ export default function CameraDocumento() {
             }
 
             await processAndSavePhoto(fotoUri, doc.id);
+            await agendarAlertas();
             Alert.alert('Pronto!', `Seu ${tipo} tá guardado.`, [
                 { text: 'OK', onPress: () => router.back() },
             ]);

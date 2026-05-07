@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Modal, Image, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, Image } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
-import { colors, spacing, typography, MIN_TOUCH_TARGET } from '../../constants/theme';
+import { colors } from '../../constants/theme';
+import { documentosStyles as styles } from '../../styles/documentosStyles';
 import AudioPlayer from '../../components/AudioPlayer';
 
 type DocRow = { type: string; file_url: string | null; status: string | null };
@@ -82,73 +83,13 @@ export default function Documentos() {
                     </TouchableOpacity>
                 </View>
             </Modal>
+
+            <AudioPlayer
+                source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
+                autoPlay={false}
+                style={{ position: 'absolute', bottom: 24, right: 24 }}
+            />
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-        padding: spacing.md,
-    },
-    titulo: {
-        ...typography.title,
-        color: colors.text,
-        marginBottom: spacing.lg,
-    },
-    item: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: colors.surface,
-        borderRadius: 8,
-        padding: spacing.md,
-        marginBottom: spacing.sm,
-        borderWidth: 1,
-        borderColor: colors.border,
-        minHeight: MIN_TOUCH_TARGET,
-    },
-    itemInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.sm,
-    },
-    itemTipo: {
-        ...typography.subtitle,
-        color: colors.text,
-    },
-    itemStatus: {
-        ...typography.caption,
-        color: colors.textSecondary,
-    },
-    botaoVer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.xs,
-        backgroundColor: colors.primary,
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
-        borderRadius: 6,
-    },
-    botaoVerTexto: {
-        ...typography.caption,
-        color: colors.surface,
-        fontWeight: '600',
-    },
-    modalFundo: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    modalFoto: {
-        width: '90%',
-        height: '80%',
-    },
-    modalFechar: {
-        position: 'absolute',
-        top: spacing.xl,
-        right: spacing.md,
-    },
-});

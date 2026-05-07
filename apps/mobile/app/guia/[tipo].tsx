@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import BackButton from '../../components/BackButton';
 import { colors } from '../../constants/theme';
 import { guiaStyles as styles } from '../../styles/documentoStyles';
-import AudioPlayer from '../../components/AudioPlayer';
 
 const EMATER_TELEFONE = 'tel:+5591XXXXXXXX'; // TODO: confirmar número real da EMATER em Moju
 
@@ -45,49 +44,42 @@ export default function GuiaDocumento() {
     const itens = O_QUE_LEVAR[tipo] ?? [];
 
     return (
-        <View  style={{ flex: 1}}>
-            <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-                <BackButton />
+        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+            <BackButton />
 
-                <Text style={styles.titulo}>Como conseguir o {tipo}</Text>
+            <Text style={styles.titulo}>Como conseguir o {tipo}</Text>
 
-                <View style={styles.secao}>
-                    <Text style={styles.secaoTitulo}>Onde ir</Text>
-                    <Text style={styles.secaoTexto}>Escritório da EMATER em Moju</Text>
-                    <Text style={styles.secaoTexto}>{HORARIO}</Text>
-                </View>
+            <View style={styles.secao}>
+                <Text style={styles.secaoTitulo}>Onde ir</Text>
+                <Text style={styles.secaoTexto}>Escritório da EMATER em Moju</Text>
+                <Text style={styles.secaoTexto}>{HORARIO}</Text>
+            </View>
 
-                <View style={styles.secao}>
-                    <Text style={styles.secaoTitulo}>O que levar</Text>
-                    {itens.map((item) => (
-                        <View key={item.label} style={styles.itemLevar}>
-                            <Ionicons name={item.icone} size={28} color={colors.primary} />
-                            <Text style={styles.itemLevarTexto}>{item.label}</Text>
-                        </View>
-                    ))}
-                </View>
+            <View style={styles.secao}>
+                <Text style={styles.secaoTitulo}>O que levar</Text>
+                {itens.map((item) => (
+                    <View key={item.label} style={styles.itemLevar}>
+                        <Ionicons name={item.icone} size={28} color={colors.primary} />
+                        <Text style={styles.itemLevarTexto}>{item.label}</Text>
+                    </View>
+                ))}
+            </View>
 
-                <TouchableOpacity
-                    style={styles.botaoLigar}
-                    onPress={() => Linking.openURL(EMATER_TELEFONE)}
-                >
-                    <Ionicons name="call" size={24} color={colors.surface} />
-                    <Text style={styles.botaoLigarTexto}>Ligar pra EMATER</Text>
-                </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.botaoLigar}
+                onPress={() => Linking.openURL(EMATER_TELEFONE)}
+            >
+                <Ionicons name="call" size={24} color={colors.surface} />
+                <Text style={styles.botaoLigarTexto}>Ligar pra EMATER</Text>
+            </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.botaoGuardar}
-                    onPress={() => router.push(`/camera/${tipo}`)}
-                >
-                    <Text style={styles.botaoGuardarTexto}>Já tenho, quero guardar</Text>
-                </TouchableOpacity>
-            </ScrollView>
-        <AudioPlayer
-                source={require("../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3")}
-                autoPlay ={false}
-                style={{ position: 'absolute', bottom: 24, right: 24 }}
-        />
-        </View>
+            <TouchableOpacity
+                style={styles.botaoGuardar}
+                onPress={() => router.push(`/camera/${tipo}`)}
+            >
+                <Text style={styles.botaoGuardarTexto}>Já tenho, quero guardar</Text>
+            </TouchableOpacity>
+        </ScrollView>
     );
 }
 
