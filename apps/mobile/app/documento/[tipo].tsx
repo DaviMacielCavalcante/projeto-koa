@@ -2,6 +2,9 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { agricultoresDb } from '../../src/db/index';
+import { practiceDataAccess } from '../../src/db/practiceDataAccess';
+import { usePracticeMode } from '../../src/hooks/usePracticeMode';
+import PracticeModeIndicator from '../../components/PracticeModeIndicator';
 import BackButton from '../../components/BackButton';
 import { colors } from '../../constants/theme';
 import { documentoStyles as styles } from '../../styles/documentoStyles';
@@ -40,23 +43,26 @@ const DESCRICAO: Record<string, string> = {
 
 export default function DetalheDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
+    const { isPracticeMode } = usePracticeMode();
     const [documento, setDocumento] = useState<Documento | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function buscarDocumento() {
             try {
-                const result = await agricultoresDb?.getFirstAsync<Documento>(
-                    'SELECT * FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
-                    [tipo]
-                );
-                setDocumento(result ?? null);
+                const result = isPracticeMode
+                    ? await practiceDataAccess.getDocumentByType(tipo ?? '', true)
+                    : await agricultoresDb?.getFirstAsync<Documento>(
+                        'SELECT * FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
+                        [tipo]
+                    );
+                setDocumento((result as Documento | null) ?? null);
             } finally {
                 setLoading(false);
             }
         }
         buscarDocumento();
-    }, [tipo]);
+    }, [tipo, isPracticeMode]);
 
     const corStatus = documento?.status
         ? (STATUS_COLOR[documento.status] ?? colors.statusGray)
@@ -76,6 +82,7 @@ export default function DetalheDocumento() {
 
     return (
         <View style={styles.container}>
+            <PracticeModeIndicator />
             <BackButton />
 
             <View style={styles.header}>

@@ -6,6 +6,7 @@ import { initDb } from '../src/db/index'
 import auth from '@react-native-firebase/auth';
 import { syncQueue } from '../src/services/sync';
 import * as NetInfo from '@react-native-community/netinfo';
+import { PracticeModeProvider } from '../src/contexts/PracticeMode';
 
 export default function RootLayout() {
 
@@ -40,9 +41,11 @@ export default function RootLayout() {
     }
 
     return (
-        <Stack screenOptions={ { gestureEnabled: false, headerShown: false }}>   
-            
-            
-        </Stack>
+        <PracticeModeProvider>
+            <Stack screenOptions={ { gestureEnabled: false, headerShown: false }}>   
+                
+                
+            </Stack>
+        </PracticeModeProvider>
     )
 }

@@ -5,11 +5,13 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import uuid from 'react-native-uuid';
 import BackButton from '../../components/BackButton';
 import { processAndSavePhoto } from '../../src/services/photo';
+import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import { agricultoresDb } from '../../src/db/index';
 import { cameraStyles as styles } from '../../styles/documentoStyles';
 
 export default function CameraDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
+    const { isPracticeMode, setPracticePhoto } = usePracticeMode();
     const [permission, requestPermission] = useCameraPermissions();
     const [fotoUri, setFotoUri] = useState<string | null>(null);
     const [salvando, setSalvando] = useState(false);
@@ -24,7 +26,17 @@ export default function CameraDocumento() {
         if (!fotoUri) return;
         setSalvando(true);
         try {
-            let doc = await agricultoresDb?.getFirstAsync<{ id: string }>(
+            if (isPracticeMode) {
+                setPracticePhoto(tipo ?? '', fotoUri);
+                Alert.alert('Pronto!', `Seu ${tipo} tá guardado (modo prática).`, [
+                    { text: 'OK', onPress: () => router.back() },
+                ]);
+                return;
+            }
+
+            // Fluxo normal: buscar ou criar documento no banco
+            let doc: { id: string };
+            doc = await agricultoresDb?.getFirstAsync<{ id: string }>(
                 'SELECT id FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
                 [tipo]
             );
@@ -40,7 +52,7 @@ export default function CameraDocumento() {
                 doc = { id: novoId };
             }
 
-            await processAndSavePhoto(fotoUri, doc.id);
+            await processAndSavePhoto(fotoUri, doc.id, false);
             Alert.alert('Pronto!', `Seu ${tipo} tá guardado.`, [
                 { text: 'OK', onPress: () => router.back() },
             ]);

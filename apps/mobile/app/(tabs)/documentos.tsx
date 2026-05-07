@@ -3,6 +3,9 @@ import { View, Text, FlatList, TouchableOpacity, Modal, Image, StyleSheet } from
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
+import { practiceDataAccess } from '../../src/db/practiceDataAccess';
+import { usePracticeMode } from '../../src/hooks/usePracticeMode';
+import PracticeModeIndicator from '../../components/PracticeModeIndicator';
 import { colors, spacing, typography, MIN_TOUCH_TARGET } from '../../constants/theme';
 
 type DocRow = { type: string; file_url: string | null; status: string | null };
@@ -10,30 +13,41 @@ type DocRow = { type: string; file_url: string | null; status: string | null };
 const TIPOS = ['CAF', 'CAR', 'CCIR', 'ITR', 'NFA-e'];
 
 export default function Documentos() {
+    const { isPracticeMode, practicePhotos } = usePracticeMode();
     const [docs, setDocs] = useState<DocRow[]>([]);
     const [fotoVisivel, setFotoVisivel] = useState<string | null>(null);
 
     useFocusEffect(
         useCallback(() => {
             async function carregar() {
-                const rows = await agricultoresDb?.getAllAsync<DocRow>(
-                    `SELECT type, file_url, status FROM documents
-                     WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
-                     GROUP BY type
-                     HAVING created_at = MAX(created_at)`
-                );
+                const rows = isPracticeMode
+                    ? await practiceDataAccess.getDocuments(true)
+                    : await agricultoresDb?.getAllAsync<DocRow>(
+                        `SELECT type, file_url, status FROM documents
+                         WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
+                         GROUP BY type
+                         HAVING created_at = MAX(created_at)`
+                    );
 
                 const mapa: Record<string, DocRow> = {};
-                rows?.forEach((r) => (mapa[r.type] = r));
+                rows?.forEach((r: any) => (mapa[r.type] = r));
 
+            if (isPracticeMode) {
+                setDocs(TIPOS.map((tipo) => ({
+                    ...(mapa[tipo] ?? { type: tipo, file_url: null, status: null }),
+                    file_url: practicePhotos[tipo] ?? mapa[tipo]?.file_url ?? null,
+                })));
+            } else {
                 setDocs(TIPOS.map((tipo) => mapa[tipo] ?? { type: tipo, file_url: null, status: null }));
             }
+            }
             carregar();
-        }, [])
+        }, [isPracticeMode, practicePhotos])
     );
 
     return (
         <View style={styles.container}>
+            <PracticeModeIndicator />
             <Text style={styles.titulo}>Meus Documentos</Text>
 
             <FlatList

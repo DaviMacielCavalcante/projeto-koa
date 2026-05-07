@@ -2,6 +2,9 @@ import { router, useFocusEffect } from 'expo-router';
 import { useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { agricultoresDb } from '../../src/db/index';
+import { practiceDataAccess } from '../../src/db/practiceDataAccess';
+import { usePracticeMode } from '../../src/hooks/usePracticeMode';
+import PracticeModeIndicator from '../../components/PracticeModeIndicator';
 import { colors } from '../../constants/theme';
 
 const TIPOS = ['CAF', 'CAR', 'CCIR', 'ITR', 'NFA-e'];
@@ -28,6 +31,7 @@ function calcularCor(row: DocRow | null): string {
 }
 
 export default function Inicio() {
+    const { isPracticeMode } = usePracticeMode();
     const [docs, setDocs] = useState(
         TIPOS.map((nome) => ({ nome, cor: colors.statusGray }))
     );
@@ -35,15 +39,17 @@ export default function Inicio() {
     useFocusEffect(
         useCallback(() => {
             async function carregarCores() {
-                const rows = await agricultoresDb?.getAllAsync<DocRow>(
-                    `SELECT type, status, expiration_date FROM documents
-                     WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
-                     GROUP BY type
-                     HAVING created_at = MAX(created_at)`
-                );
+                const rows = isPracticeMode
+                    ? await practiceDataAccess.getDocuments(true)
+                    : await agricultoresDb?.getAllAsync<DocRow>(
+                        `SELECT type, status, expiration_date FROM documents
+                         WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
+                         GROUP BY type
+                         HAVING created_at = MAX(created_at)`
+                    );
 
                 const mapa: Record<string, DocRow> = {};
-                rows?.forEach((r) => (mapa[r.type] = r));
+                rows?.forEach((r: any) => (mapa[r.type] = r));
 
                 setDocs(TIPOS.map((nome) => ({
                     nome,
@@ -51,11 +57,12 @@ export default function Inicio() {
                 })));
             }
             carregarCores();
-        }, [])
+        }, [isPracticeMode])
     );
 
     return (
         <View>
+            <PracticeModeIndicator />
             <Text>Olá, João</Text>
             <FlatList
                 data={docs}

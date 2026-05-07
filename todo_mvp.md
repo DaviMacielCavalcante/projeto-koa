@@ -5,6 +5,7 @@
 **Dias úteis disponíveis**: ~15 dias
 
 **Stack definida**:
+
 - Plataforma: React Native + TypeScript + Expo (managed workflow com development builds)
 - Backend: Firebase (Firestore + Auth + Storage)
 - Banco local: expo-sqlite
@@ -20,6 +21,7 @@
 - Atualizações OTA: expo-updates (correções sem redistribuir APK)
 
 **Observações importantes**:
+
 - Expo Go NÃO pode ser usado neste projeto. O @react-native-firebase exige módulos nativos que não estão no Expo Go. Usar development builds (expo-dev-client) desde o início.
 - O banco local SQLite (expo-sqlite) não tem limite de operações pendentes. A sync com Firestore é customizada: gravar localmente primeiro, depois subir para o Firestore quando houver conexão.
 - O APK universal (compartilhado via WhatsApp) pode ultrapassar 20 MB. O download via Play Store será menor graças a App Bundles.
@@ -42,24 +44,24 @@
 - [x] Ativar Firebase Crashlytics
 - [x] Baixar google-services.json e configurar em app.json (expo.android.googleServicesFile)
 - [x] Instalar módulos Firebase:
-  - npx expo install @react-native-firebase/app
-  - npx expo install @react-native-firebase/auth
-  - npx expo install @react-native-firebase/firestore
-  - npx expo install @react-native-firebase/storage
-  - npx expo install @react-native-firebase/crashlytics
+    - npx expo install @react-native-firebase/app
+    - npx expo install @react-native-firebase/auth
+    - npx expo install @react-native-firebase/firestore
+    - npx expo install @react-native-firebase/storage
+    - npx expo install @react-native-firebase/crashlytics
 - [x] Configurar config plugins no app.json para cada módulo Firebase
 - [x] Instalar expo-build-properties e configurar useFrameworks se necessário
 - [x] Gerar primeiro development build via EAS Build: eas build --profile development --platform android
 - [x] Instalar development build em dispositivo de teste e validar que o app abre
 - [x] Instalar módulos Expo do MVP:
-  - npx expo install expo-camera
-  - npx expo install expo-av
-  - npx expo install expo-notifications
-  - npx expo install expo-image-manipulator
-  - npx expo install expo-sqlite
-  - npx expo install expo-file-system
-  - npx expo install expo-linking
-  - npx expo install expo-secure-store
+    - npx expo install expo-camera
+    - npx expo install expo-av
+    - npx expo install expo-notifications
+    - npx expo install expo-image-manipulator
+    - npx expo install expo-sqlite
+    - npx expo install expo-file-system
+    - npx expo install expo-linking
+    - npx expo install expo-secure-store
 - [x] Configurar EAS Build (eas.json com profiles: development, preview, production)
 - [ ] Levantar e organizar os arquivos de áudio conforme necessário durante a implementação de cada tela
 - [x] Decidir sobre RF08 no MVP: botão "Falar com a cooperativa" NÃO entra no MVP — UC02 terá apenas "Ligar pra EMATER"
@@ -72,20 +74,20 @@
 
 - [x] Inicializar banco SQLite com expo-sqlite (SQLite.openDatabaseAsync('agricultores.db'))
 - [x] Criar e migrar tabelas SQLite:
-  - Tabela "users": id (UUID PK), name, phone (único), municipality, consentimento_lgpd (integer 0/1), onboarding_concluido (integer 0/1), created_at, updated_at
-  - Tabela "properties": id (UUID PK), user_id (FK → users), name, area_hectares, location, created_at, updated_at
-  - Tabela "documents": id (UUID PK), user_id (FK → users), property_id (FK → properties, nullable), type (ENUM: CAF/CAR/CCIR/ITR/NFA-e), number, issue_date, expiration_date, file_url (URI local), storage_url (URL Firebase Storage, nullable), status (active/expiring_soon/expired — renderizado como verde/amarelo/vermelho; cinza quando nulo), sincronizado (integer 0/1), created_at, updated_at
-  - Tabela "educational_contents": id (UUID PK), title, body (texto narrado), category (ex: documentos, onboarding), created_at, updated_at
-  - Tabela "user_content_progress": id (UUID PK), user_id (FK → users), content_id (FK → educational_contents), read_at, created_at, updated_at
-  - Tabela "sync_queue": id (UUID PK), tabela, operacao (insert/update/delete), payload (JSON), created_at
+    - Tabela "users": id (UUID PK), name, phone (único), municipality, consentimento_lgpd (integer 0/1), onboarding_concluido (integer 0/1), created_at, updated_at
+    - Tabela "properties": id (UUID PK), user_id (FK → users), name, area_hectares, location, created_at, updated_at
+    - Tabela "documents": id (UUID PK), user_id (FK → users), property_id (FK → properties, nullable), type (ENUM: CAF/CAR/CCIR/ITR/NFA-e), number, issue_date, expiration_date, file_url (URI local), storage_url (URL Firebase Storage, nullable), status (active/expiring_soon/expired — renderizado como verde/amarelo/vermelho; cinza quando nulo), sincronizado (integer 0/1), created_at, updated_at
+    - Tabela "educational_contents": id (UUID PK), title, body (texto narrado), category (ex: documentos, onboarding), created_at, updated_at
+    - Tabela "user_content_progress": id (UUID PK), user_id (FK → users), content_id (FK → educational_contents), read_at, created_at, updated_at
+    - Tabela "sync_queue": id (UUID PK), tabela, operacao (insert/update/delete), payload (JSON), created_at
 - [x] Configurar regras de segurança do Firestore (agricultor só acessa seus próprios dados — ainda usado para auth e storage)
 - [x] Configurar Firebase Storage com regras de segurança (agricultor só acessa suas próprias fotos)
 - [x] Implementar pipeline de foto:
-  - Captura via expo-camera
-  - Compressão via expo-image-manipulator (resize + compress) ✓ (serviço criado em src/services/photo.ts)
-  - Remoção de metadados de localização via expo-image-manipulator ✓ (serviço criado em src/services/photo.ts)
-  - Salvamento do URI local na coluna file_url da tabela "documents" do SQLite com sincronizado = 0 ✓ (serviço criado em src/services/photo.ts)
-  - Upload ao Firebase Storage quando houver conexão; atualizar storage_url e sincronizado = 1 ✓ (implementado em src/services/sync.ts)
+    - Captura via expo-camera
+    - Compressão via expo-image-manipulator (resize + compress) ✓ (serviço criado em src/services/photo.ts)
+    - Remoção de metadados de localização via expo-image-manipulator ✓ (serviço criado em src/services/photo.ts)
+    - Salvamento do URI local na coluna file_url da tabela "documents" do SQLite com sincronizado = 0 ✓ (serviço criado em src/services/photo.ts)
+    - Upload ao Firebase Storage quando houver conexão; atualizar storage_url e sincronizado = 1 ✓ (implementado em src/services/sync.ts)
 - [ ] Implementar auto-salvamento de progresso parcial via SQLite (RF14)
 
 ### Autenticação (Firebase Auth — SMS OTP)
@@ -114,8 +116,8 @@
 ### Navegação geral
 
 - [x] Instalar e configurar navegação (opções: React Navigation ou Expo Router)
-  - Se React Navigation: npx expo install @react-navigation/native @react-navigation/bottom-tabs @react-navigation/stack react-native-screens react-native-safe-area-context
-  - Se Expo Router: já incluído no Expo, configurar app directory
+    - Se React Navigation: npx expo install @react-navigation/native @react-navigation/bottom-tabs @react-navigation/stack react-native-screens react-native-safe-area-context
+    - Se Expo Router: já incluído no Expo, configurar app directory
 - [x] Implementar barra de navegação inferior fixa (4 ícones: início, documentos, avisos, ajuda)
 - [x] Implementar botão "Voltar" fixo no canto superior esquerdo em todas as telas — componente BackButton com router.back() padrão
 - [x] Garantir que todos os alvos de toque tenham no mínimo 56dp (RNF05)
@@ -125,12 +127,12 @@
 ### Componente reutilizável de áudio (usado em todas as telas)
 
 - [x] Criar componente AudioPlayer com expo-av:
-  - Props: source (arquivo de áudio), autoPlay (boolean), onFinish (callback)
-  - Estado: playing, paused, stopped
-  - Botão de play (alto-falante) — posição fixa na tela, mesmo lugar em todas as telas
-  - Botão de pular/parar (ícone avançar)
-  - Carregamento do áudio via Audio.Sound.createAsync()
-  - Liberação de recursos via sound.unloadAsync() no cleanup
+    - Props: source (arquivo de áudio), autoPlay (boolean), onFinish (callback)
+    - Estado: playing, paused, stopped
+    - Botão de play (alto-falante) — posição fixa na tela, mesmo lugar em todas as telas
+    - Botão de pular/parar (ícone avançar)
+    - Carregamento do áudio via Audio.Sound.createAsync()
+    - Liberação de recursos via sound.unloadAsync() no cleanup
 - [ ] Testar reprodução em dispositivo de entrada (volume, latência)
 
 ### UC07 — Onboarding inicial (RF13, RF13.1, RF13.2, RF12)
@@ -149,11 +151,11 @@
 
 ### UC08 parcial — Modo prática (RF12)
 
-- [ ] Implementar modo prática com dados fictícios (estado em memória via React state, sem tocar no Firestore)
-- [ ] Implementar identidade visual diferenciada (borda ou fundo indicando modo prática)
+- [x] Implementar modo prática com dados fictícios (estado em memória via React state, sem tocar no Firestore)
+- [x] Implementar identidade visual diferenciada (borda ou fundo indicando modo prática)
 - [ ] Implementar áudio explicando que nada será salvo de verdade
-- [ ] Implementar botão "Voltar pro app de verdade"
-- [ ] Garantir que nenhum dado real é afetado pelo modo prática
+- [x] Implementar botão "Voltar pro app de verdade"
+- [x] Garantir que nenhum dado real é afetado pelo modo prática
 
 ### UC01 — Painel de regularização (RF01, RF02, RF02.1, RF02.2)
 
@@ -183,10 +185,10 @@
 - [x] Implementar botão de captura grande e circular (CameraCapturedPicture via takePictureAsync())
 - [x] Implementar tela de pré-visualização com botões "Ficou bom" e "Tirar de novo"
 - [x] Implementar pipeline pós-captura:
-  - Compressão via ImageManipulator.manipulateAsync() (resize + compress 0.75)
-  - Remoção de EXIF/GPS via ImageManipulator
-  - Salvamento local do URI na coluna file_url da tabela "documents" no SQLite
-  - Upload ao Firebase Storage quando houver conexão (reference.putFile()); atualizar storage_url e sincronizado = 1
+    - Compressão via ImageManipulator.manipulateAsync() (resize + compress 0.75)
+    - Remoção de EXIF/GPS via ImageManipulator
+    - Salvamento local do URI na coluna file_url da tabela "documents" no SQLite
+    - Upload ao Firebase Storage quando houver conexão (reference.putFile()); atualizar storage_url e sincronizado = 1
 - [ ] Implementar atualização do status do documento no Firestore para "verde" após salvar
 - [ ] Implementar confirmação em áudio via AudioPlayer ("Pronto, seu [documento] tá guardado")
 - [x] Implementar organização por categoria: agricultor acessa documento em no máximo 2 toques (RF05)
@@ -196,11 +198,11 @@
 ### UC05 — Alertas de prazo (RF06)
 
 - [ ] Configurar expo-notifications:
-  - Solicitar permissão: Notifications.requestPermissionsAsync()
-  - Configurar canal de notificação Android: Notifications.setNotificationChannelAsync()
+    - Solicitar permissão: Notifications.requestPermissionsAsync()
+    - Configurar canal de notificação Android: Notifications.setNotificationChannelAsync()
 - [ ] Implementar agendamento de notificações locais baseado em documents.expiration_date do SQLite:
-  - Notifications.scheduleNotificationAsync() com trigger de data
-  - Reagendar quando o agricultor abrir o app (recalcular prazos)
+    - Notifications.scheduleNotificationAsync() com trigger de data
+    - Reagendar quando o agricultor abrir o app (recalcular prazos)
 - [ ] Implementar mudança automática de cor do indicador (verde → amarelo → vermelho) baseada na data atual vs. data de vencimento
 - [ ] Implementar conteúdo da notificação com nome do agricultor + nome do documento
 - [ ] Implementar deep linking: toque na notificação abre tela de detalhe do documento correspondente
@@ -240,14 +242,14 @@
 ### Produção de áudio
 
 - [ ] Escrever roteiro de todos os áudios do MVP:
-  - Onboarding: boas-vindas, explicação de cada funcionalidade, convite pro modo prática, consentimento LGPD
-  - Documentos: explicação do CAF, CAR, CCIR, ITR, NFA-e (5 áudios de ~30s cada)
-  - Guias: instruções de como obter cada documento (5 áudios)
-  - Confirmações: "Pronto, seu [documento] tá guardado" (5 variações)
-  - Alertas: "[Nome], seu [documento] precisa ser renovado em [X] dias"
-  - Modo prática: "Você está no modo prática, nada será salvo de verdade"
-  - Exclusão: "Todos os seus dados serão apagados permanentemente"
-  - Auth: "Digite seu número de telefone", "Digite o código que você recebeu por mensagem"
+    - Onboarding: boas-vindas, explicação de cada funcionalidade, convite pro modo prática, consentimento LGPD
+    - Documentos: explicação do CAF, CAR, CCIR, ITR, NFA-e (5 áudios de ~30s cada)
+    - Guias: instruções de como obter cada documento (5 áudios)
+    - Confirmações: "Pronto, seu [documento] tá guardado" (5 variações)
+    - Alertas: "[Nome], seu [documento] precisa ser renovado em [X] dias"
+    - Modo prática: "Você está no modo prática, nada será salvo de verdade"
+    - Exclusão: "Todos os seus dados serão apagados permanentemente"
+    - Auth: "Digite seu número de telefone", "Digite o código que você recebeu por mensagem"
 - [ ] Gravar áudios em português com sotaque regional paraense (RNF16)
 - [ ] Comprimir áudios para formato leve (MP3 64kbps, ~240 KB por áudio de 30s)
 - [ ] Colocar áudios na pasta assets/ do projeto (embutidos no bundle)
