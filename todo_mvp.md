@@ -162,10 +162,10 @@
 - [x] Implementar lógica de cores dos indicadores baseada em documents.status e documents.expiration_date do SQLite (active→verde, expiring_soon→amarelo, expired→vermelho, nulo→cinza)
 - [x] Implementar navegação do indicador para tela de detalhe do documento ao toque
 - [x] Implementar tela de detalhe do documento com ilustração e status
-- [ ] Implementar AudioPlayer para explicação em áudio (RF02)
+- [x] Implementar AudioPlayer para explicação em áudio (RF02)
 - [ ] Implementar reprodução automática do áudio apenas na primeira visita — registrar em user_content_progress (RF02)
-- [ ] Implementar botão de pular/interromper áudio via AudioPlayer (RF02.1)
-- [ ] Implementar botão de play permanente e na mesma posição via AudioPlayer (RF02.2)
+- [x] Implementar botão de pular/interromper áudio via AudioPlayer (RF02.1)
+- [x] Implementar botão de play permanente e na mesma posição via AudioPlayer (RF02.2)
 - [x] Implementar três botões na tela de detalhe: "Como consigo?", "Tenho dúvida", "Já tenho, quero guardar"
 
 ### UC02 — Guia passo a passo (RF03, RF15)
@@ -174,7 +174,7 @@
 - [x] Implementar exibição de horário de funcionamento
 - [x] Implementar lista visual do que levar (ícones + rótulo curto para RG, CPF, conta de luz)
 - [x] Implementar botão "Ligar pra EMATER" com Linking.openURL('tel:NUMERO') via expo-linking (RF15) — número pendente de confirmação
-- [ ] Implementar AudioPlayer para instruções narradas
+- [x] Implementar AudioPlayer para instruções narradas
 
 ### UC03 — Fotografar e armazenar documento (RF04, RF05, RF14)
 
