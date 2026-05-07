@@ -1,6 +1,7 @@
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
 import { useState, useCallback } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { detalheDocumentoStyles as styles } from '../../styles/detalheDocumentoStyles';
 import { agricultoresDb } from '../../src/db/index';
 import { ScreenContainer, GradientButton, TopBar } from '../../design/components';
@@ -99,10 +100,15 @@ export default function DetalheDocumento() {
                 <Text style={styles.titulo}>{tipo}</Text>
                 <Text style={styles.subtitulo}>{FULL_NAMES[tipo] ?? tipo}</Text>
 
-                <View style={[styles.statusCircle, { backgroundColor: statusGradients[docStatus][0] }]}>
+                <LinearGradient
+                    colors={[...statusGradients[docStatus]]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.statusCircle}
+                >
                     <Text style={styles.statusBig}>{big}</Text>
                     <Text style={styles.statusSub}>{sub}</Text>
-                </View>
+                </LinearGradient>
 
                 <Text style={styles.descricao}>{DESCRICAO[tipo] ?? ''}</Text>
 

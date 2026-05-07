@@ -152,6 +152,38 @@ export const onboardingStyles = StyleSheet.create({
         lineHeight: 20,
         paddingHorizontal: 14,
     },
+    tourTopBar: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 12,
+        paddingBottom: 4,
+        minHeight: 56,
+    },
+    tourPular: {
+        paddingVertical: 8,
+        paddingHorizontal: 4,
+    },
+    tourPularTexto: {
+        fontFamily: fonts.bodyMedium,
+        fontSize: sizes.body,
+        color: 'rgba(255,255,255,0.85)',
+    },
+    tourBotaoVoltar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingHorizontal: 14,
+        paddingVertical: 14,
+        borderRadius: 30,
+        backgroundColor: 'rgba(255,255,255,0.18)',
+    },
+    tourBotaoVoltarTexto: {
+        fontFamily: fonts.bodyMedium,
+        fontSize: sizes.body,
+        color: 'rgba(255,255,255,0.9)',
+    },
     tourDots: { flexDirection: 'row', gap: 8 },
     tourDot: {
         width: 8, height: 8, borderRadius: 4,
@@ -216,6 +248,34 @@ export const onboardingStyles = StyleSheet.create({
         color: colors.inkMute,
         marginTop: 2,
         lineHeight: 16,
+    },
+    // Botão voltar — sobre fundo colorido (lgpd, tour)
+    botaoVoltarLink: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        paddingVertical: 14,
+        marginBottom: 8,
+    },
+    botaoVoltarLinkTexto: {
+        fontFamily: fonts.bodyMedium,
+        fontSize: sizes.body,
+        color: 'rgba(255,255,255,0.8)',
+    },
+    // Botão voltar — dentro de card claro (perfil, pratica)
+    botaoVoltarCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        paddingVertical: 12,
+        marginTop: 4,
+    },
+    botaoVoltarCardTexto: {
+        fontFamily: fonts.bodyMedium,
+        fontSize: sizes.body,
+        color: colors.inkMute,
     },
 });
 

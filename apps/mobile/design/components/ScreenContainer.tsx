@@ -1,8 +1,7 @@
 import { View, SafeAreaView, StatusBar, StyleProp, ViewStyle } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { screenContainerStyles as styles } from './styles/screenContainerStyles';
 import { colors, screenGradients } from '../theme';
-
-const USE_GRADIENTS = false; // mude para true após o rebuild com expo-linear-gradient
 
 type Variant = 'teal' | 'gold' | 'red' | 'orange' | 'cream';
 
@@ -23,10 +22,14 @@ export default function ScreenContainer({ variant = 'teal', children, style }: S
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: screenGradients[variant][0] }, style]}>
+    <LinearGradient
+      colors={[...screenGradients[variant]]}
+      style={[styles.container, style]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+    >
       <StatusBar barStyle="light-content" backgroundColor={screenGradients[variant][0]} />
       <SafeAreaView style={styles.safe}>{children}</SafeAreaView>
-    </View>
+    </LinearGradient>
   );
 }
-

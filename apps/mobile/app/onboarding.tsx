@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { onboardingStyles as styles, onboardingIlStyles as il } from '../styles/onboardingStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import auth from '@react-native-firebase/auth';
-import uuid from 'react-native-uuid';
 import { ScreenContainer, GradientButton, TopBar, AudioCircle } from '../design/components';
 import { colors } from '../design/theme';
 import { agricultoresDb } from '../src/db/index';
@@ -256,6 +255,10 @@ export default function Onboarding() {
                         </View>
                     </View>
                 </View>
+                <TouchableOpacity style={styles.botaoVoltarLink} onPress={() => setEtapa('boas_vindas')}>
+                    <Ionicons name="arrow-back" size={16} color="rgba(255,255,255,0.8)" />
+                    <Text style={styles.botaoVoltarLinkTexto}>Voltar</Text>
+                </TouchableOpacity>
             </ScreenContainer>
         );
     }
@@ -310,6 +313,10 @@ export default function Onboarding() {
                         onPress={() => { setTourSlide(0); setEtapa('tour'); }}
                         style={[styles.botaoFull, { marginTop: 8 }]}
                     />
+                    <TouchableOpacity style={styles.botaoVoltarCard} onPress={() => setEtapa('lgpd')}>
+                        <Ionicons name="arrow-back" size={16} color={colors.inkMute} />
+                        <Text style={styles.botaoVoltarCardTexto}>Voltar</Text>
+                    </TouchableOpacity>
                 </View>
             </ScreenContainer>
         );
@@ -324,7 +331,12 @@ export default function Onboarding() {
 
         return (
             <ScreenContainer variant="orange">
-                <TopBar leftIcon="arrow-back" rightIcon="volume-high" onLeftPress={() => tourSlide > 0 ? setTourSlide(t => t - 1) : setEtapa('perfil')} />
+                <View style={styles.tourTopBar}>
+                    <TouchableOpacity onPress={() => setEtapa('pratica')} style={styles.tourPular}>
+                        <Text style={styles.tourPularTexto}>Pular</Text>
+                    </TouchableOpacity>
+                    <Ionicons name="volume-high" size={22} color="rgba(255,255,255,0.7)" />
+                </View>
                 <View style={styles.tourCentro}>
                     <IlustracaoTour index={tourSlide} />
                     <Text style={styles.tourTitulo}>{slide.titulo}</Text>
@@ -336,14 +348,15 @@ export default function Onboarding() {
                     </View>
                 </View>
                 <View style={styles.tourRodape}>
+                    <TouchableOpacity
+                        style={styles.tourBotaoVoltar}
+                        onPress={() => tourSlide > 0 ? setTourSlide(t => t - 1) : setEtapa('perfil')}
+                    >
+                        <Ionicons name="arrow-back" size={18} color="rgba(255,255,255,0.9)" />
+                        <Text style={styles.tourBotaoVoltarTexto}>Voltar</Text>
+                    </TouchableOpacity>
                     <GradientButton
-                        label="PULAR TUDO"
-                        variant="cream"
-                        onPress={() => setEtapa('pratica')}
-                        style={{ flex: 1 }}
-                    />
-                    <GradientButton
-                        label={ultimo ? 'FINALIZAR' : 'PRÓXIMO'}
+                        label={ultimo ? 'FINALIZAR' : 'PRÓXIMO →'}
                         variant="red"
                         onPress={() => ultimo ? setEtapa('pratica') : setTourSlide(t => t + 1)}
                         style={{ flex: 1 }}
@@ -394,6 +407,13 @@ export default function Onboarding() {
                     </View>
                 </TouchableOpacity>
             </View>
+            <TouchableOpacity
+                style={styles.botaoVoltarCard}
+                onPress={() => setEtapa('tour')}
+            >
+                <Ionicons name="arrow-back" size={16} color={colors.inkMute} />
+                <Text style={styles.botaoVoltarCardTexto}>Voltar</Text>
+            </TouchableOpacity>
         </ScreenContainer>
     );
 }

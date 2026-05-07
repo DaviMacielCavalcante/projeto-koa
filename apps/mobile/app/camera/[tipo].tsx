@@ -45,7 +45,7 @@ export default function CameraDocumento() {
     }, [etapa]);
 
     async function tirarFoto() {
-        const foto = await cameraRef.current?.takePictureAsync();
+        const foto = await cameraRef.current?.takePictureAsync({ shutterSound: false });
         if (foto) {
             setFotoUri(foto.uri);
             setEtapa('preview');

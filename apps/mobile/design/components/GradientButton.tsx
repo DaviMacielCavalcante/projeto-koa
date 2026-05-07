@@ -1,4 +1,5 @@
 import { Text, TouchableOpacity, StyleProp, ViewStyle, TextStyle } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, buttonGradients } from '../theme';
 import { gradientButtonStyles as styles } from './styles/gradientButtonStyles';
 
@@ -37,14 +38,15 @@ export default function GradientButton({
   }
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.85}
-      disabled={disabled}
-      style={[styles.btn, { backgroundColor: buttonGradients[variant][0], alignItems: align === 'center' ? 'center' : 'flex-start', opacity: disabled ? 0.5 : 1 }, style]}
-    >
-      <Text style={[styles.txt, textStyle]}>{label}</Text>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.85} disabled={disabled} style={[{ opacity: disabled ? 0.5 : 1 }, style]}>
+      <LinearGradient
+        colors={[...buttonGradients[variant]]}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={[styles.btn, { alignItems: align === 'center' ? 'center' : 'flex-start' }]}
+      >
+        <Text style={[styles.txt, textStyle]}>{label}</Text>
+      </LinearGradient>
     </TouchableOpacity>
   );
 }
-

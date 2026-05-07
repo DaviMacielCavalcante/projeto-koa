@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, statusGradients } from '../theme';
 import { docCircleStyles as styles } from './styles/docCircleStyles';
 
@@ -24,12 +25,16 @@ function getDotColor(status: DocStatus): string {
 export default function DocCircle({ name, subtitle, status = 'grey', onPress, size = 90 }: DocCircleProps) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2, backgroundColor: statusGradients[status][0] }]}>
+      <LinearGradient
+        colors={[...statusGradients[status]]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}
+      >
         <View style={[styles.dot, { backgroundColor: getDotColor(status) }]} />
         <Text style={styles.name}>{name}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-      </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 }
-
