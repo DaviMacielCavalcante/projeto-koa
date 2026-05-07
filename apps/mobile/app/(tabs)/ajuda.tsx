@@ -74,7 +74,7 @@ export default function Ajuda() {
 
             {isPracticeMode ? (
                 <TouchableOpacity
-                    style={styles.botaoTeste}
+                    style={styles.botaoPratica}
                     onPress={() =>
                         Alert.alert('Sair do Modo Prática', 'Voltar ao app de verdade?', [
                             { text: 'Cancelar', style: 'cancel' },
@@ -82,11 +82,11 @@ export default function Ajuda() {
                         ])
                     }
                 >
-                    <Text style={styles.botaoTesteTexto}>← Voltar pro App de Verdade</Text>
+                    <Text style={styles.botaoPraticaTexto}>← Voltar pro App de Verdade</Text>
                 </TouchableOpacity>
             ) : (
-                <TouchableOpacity style={styles.botaoTeste} onPress={() => router.push('/practice')}>
-                    <Text style={styles.botaoTesteTexto}>🔶 Entrar no Modo Prática</Text>
+                <TouchableOpacity style={styles.botaoPratica} onPress={() => router.push('/practice')}>
+                    <Text style={styles.botaoPraticaTexto}>🔶 Entrar no Modo Prática</Text>
                 </TouchableOpacity>
             )}
 

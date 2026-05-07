@@ -31,6 +31,20 @@ export const ajudaStyles = StyleSheet.create({
     botaoDangerDesabilitado: {
         backgroundColor: colors.border,
     },
+    botaoPratica: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#FF9800',
+        borderRadius: 8,
+        minHeight: MIN_TOUCH_TARGET,
+        paddingHorizontal: spacing.md,
+        marginBottom: spacing.md,
+    },
+    botaoPraticaTexto: {
+        ...typography.subtitle,
+        color: '#fff',
+    },
     botaoTeste: {
         marginTop: spacing.md,
         alignItems: 'center',
