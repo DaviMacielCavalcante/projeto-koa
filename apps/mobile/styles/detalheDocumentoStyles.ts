@@ -3,6 +3,12 @@ import { colors, fonts, sizes } from '../design/theme';
 
 export const detalheDocumentoStyles = StyleSheet.create({
     top: { paddingHorizontal: 22, alignItems: 'center', paddingTop: 4 },
+    heroIconWrap: {
+        padding: 10,
+        borderRadius: 32,
+        backgroundColor: 'rgba(255,255,255,0.18)',
+        marginBottom: 12,
+    },
     titulo: {
         fontFamily: fonts.displayBlack,
         fontSize: sizes.xl,

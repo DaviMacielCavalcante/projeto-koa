@@ -72,7 +72,7 @@ export default function CameraDocumento() {
                 [tipo]
             );
             if (!doc) {
-                const novoId = uuid.v4() as string;
+                const novoId = uuid.v4();
                 const agora = new Date().toISOString();
                 await agricultoresDb?.runAsync(
                     `INSERT INTO documents (id, type, status, sincronizado, created_at, updated_at) VALUES (?, ?, 'active', 0, ?, ?)`,
@@ -133,7 +133,7 @@ export default function CameraDocumento() {
             <ScreenContainer variant="teal">
                 <TopBar leftIcon="arrow-back" />
                 <View style={styles.preparoContainer}>
-                    <Ionicons name="camera-off" size={64} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="camera-outline" size={64} color="rgba(255,255,255,0.7)" />
                     <Text style={styles.preparoTitulo}>Permissão necessária</Text>
                     <Text style={styles.preparoSubtitulo}>
                         Precisamos acessar a câmera para fotografar seu documento.

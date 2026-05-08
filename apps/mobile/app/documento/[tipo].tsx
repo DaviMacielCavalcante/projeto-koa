@@ -1,13 +1,14 @@
-import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
-import { useState, useCallback } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { detalheDocumentoStyles as styles } from '../../styles/detalheDocumentoStyles';
 import { agricultoresDb } from '../../src/db/index';
-import { ScreenContainer, GradientButton, TopBar } from '../../design/components';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, Text, View } from 'react-native';
+import AudioPlayer from '../../components/AudioPlayer';
+import { DocumentTypeIcon, GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors, statusGradients } from '../../design/theme';
-import AudioPlayer from '../../components/AudioPlayer';
+import { detalheDocumentoStyles as styles } from '../../styles/detalheDocumentoStyles';
+import { documentMeta, isDocumentType } from '../../src/constants/documents';
 
 type DocumentoStatus = 'active' | 'expiring_soon' | 'expired' | null;
 
@@ -16,22 +17,6 @@ type Documento = {
     type: string;
     expiration_date: string | null;
     status: DocumentoStatus;
-};
-
-const FULL_NAMES: Record<string, string> = {
-    CAF: 'Cadastro da Agricultura Familiar',
-    CAR: 'Cadastro Ambiental Rural',
-    CCIR: 'Certificado de Cadastro de Imóvel Rural',
-    ITR: 'Imposto Territorial Rural',
-    'NFA-e': 'Nota Fiscal Avulsa Eletrônica',
-};
-
-const DESCRICAO: Record<string, string> = {
-    CAF: 'Comprova que você é agricultor familiar e dá acesso a políticas públicas.',
-    CAR: 'Registro obrigatório da sua propriedade no sistema ambiental.',
-    CCIR: 'Documento que identifica e certifica seu imóvel rural.',
-    ITR: 'Declaração anual obrigatória sobre sua propriedade rural.',
-    'NFA-e': 'Usada para emitir notas na venda dos seus produtos.',
 };
 
 function resolverStatus(doc: Documento | null): DocStatus {
@@ -63,10 +48,14 @@ export default function DetalheDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
     const [documento, setDocumento] = useState<Documento | null>(null);
     const [loading, setLoading] = useState(true);
+    const documentType = tipo && isDocumentType(tipo) ? tipo : null;
+    const meta = documentType ? documentMeta[documentType] : null;
 
     useFocusEffect(
         useCallback(() => {
             async function buscarDocumento() {
+                setLoading(true);
+
                 try {
                     const result = await agricultoresDb?.getFirstAsync<Documento>(
                         'SELECT * FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
@@ -77,6 +66,7 @@ export default function DetalheDocumento() {
                     setLoading(false);
                 }
             }
+
             buscarDocumento();
         }, [tipo])
     );
@@ -97,8 +87,14 @@ export default function DetalheDocumento() {
             <TopBar leftIcon="arrow-back" rightIcon="volume-high" />
 
             <View style={styles.top}>
+                {documentType ? (
+                    <View style={styles.heroIconWrap}>
+                        <DocumentTypeIcon type={documentType} size={104} />
+                    </View>
+                ) : null}
+
                 <Text style={styles.titulo}>{tipo}</Text>
-                <Text style={styles.subtitulo}>{FULL_NAMES[tipo] ?? tipo}</Text>
+                <Text style={styles.subtitulo}>{meta?.fullName ?? tipo}</Text>
 
                 <LinearGradient
                     colors={[...statusGradients[docStatus]]}
@@ -110,19 +106,29 @@ export default function DetalheDocumento() {
                     <Text style={styles.statusSub}>{sub}</Text>
                 </LinearGradient>
 
-                <Text style={styles.descricao}>{DESCRICAO[tipo] ?? ''}</Text>
+                <Text style={styles.descricao}>{meta?.description ?? ''}</Text>
 
-                {documento?.expiration_date && (
+                {documento?.expiration_date ? (
                     <Text style={styles.validade}>
                         Validade: {new Date(documento.expiration_date).toLocaleDateString('pt-BR')}
                     </Text>
-                )}
+                ) : null}
             </View>
 
             <View style={styles.acoes}>
-                <GradientButton label="📍  Como consigo?" variant="teal" align="flex-start" onPress={() => router.push(`/guia/${tipo}`)} />
-                <GradientButton label="❓  Tenho dúvida" variant="orange" align="flex-start" />
-                <GradientButton label="📷  Já tenho, quero guardar" variant="red" align="flex-start" onPress={() => router.push(`/camera/${tipo}`)} />
+                <GradientButton
+                    label="Como consigo?"
+                    variant="teal"
+                    align="flex-start"
+                    onPress={() => router.push(`/guia/${tipo}`)}
+                />
+                <GradientButton label="Tenho duvida" variant="orange" align="flex-start" />
+                <GradientButton
+                    label="Ja tenho, quero guardar"
+                    variant="red"
+                    align="flex-start"
+                    onPress={() => router.push(`/camera/${tipo}`)}
+                />
             </View>
 
             <AudioPlayer
@@ -133,4 +139,3 @@ export default function DetalheDocumento() {
         </ScreenContainer>
     );
 }
-

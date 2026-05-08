@@ -1,6 +1,8 @@
-import { TouchableOpacity, Text, StyleProp, ViewStyle } from 'react-native';
+import { TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { Audio } from 'expo-av';
 import { useEffect, useRef, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../design/theme';
 
 interface AudioPlayerProps {
     source: any;
@@ -71,8 +73,34 @@ export default function AudioPlayer({ source, autoPlay = false, onFinish, style 
     }
 
     return (
-        <TouchableOpacity onPress={handlePlay} style={style}>
-            <Text>{isPlaying ? 'Pausar' : 'Tocar'}</Text>
+        <TouchableOpacity
+            accessibilityLabel={isPlaying ? 'Pausar audio' : 'Tocar audio'}
+            activeOpacity={0.88}
+            onPress={handlePlay}
+            style={[
+                {
+                    width: 72,
+                    height: 72,
+                    borderRadius: 36,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: colors.creamLight,
+                    borderWidth: 1,
+                    borderColor: 'rgba(14, 79, 79, 0.08)',
+                    shadowColor: colors.tealDark,
+                    shadowOffset: { width: 0, height: 6 },
+                    shadowOpacity: 0.12,
+                    shadowRadius: 16,
+                    elevation: 6,
+                },
+                style,
+            ]}
+        >
+            <Ionicons
+                color={colors.tealDark}
+                name={isPlaying ? 'pause' : 'volume-high'}
+                size={30}
+            />
         </TouchableOpacity>
     );
 }

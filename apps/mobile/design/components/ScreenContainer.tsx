@@ -1,5 +1,6 @@
-import { View, SafeAreaView, StatusBar, StyleProp, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { View, StatusBar, StyleProp, ViewStyle } from 'react-native';
+import { SafeAreaView, Edge } from 'react-native-safe-area-context';
 import { screenContainerStyles as styles } from './styles/screenContainerStyles';
 import { colors, screenGradients } from '../theme';
 
@@ -9,14 +10,24 @@ interface ScreenContainerProps {
   variant?: Variant;
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  edges?: Edge[];
 }
 
-export default function ScreenContainer({ variant = 'teal', children, style }: ScreenContainerProps) {
+const DEFAULT_EDGES: Edge[] = ['top', 'bottom'];
+
+export default function ScreenContainer({
+  variant = 'teal',
+  children,
+  style,
+  edges = DEFAULT_EDGES,
+}: ScreenContainerProps) {
   if (variant === 'cream') {
     return (
       <View style={[styles.container, { backgroundColor: colors.creamLight }, style]}>
         <StatusBar barStyle="dark-content" backgroundColor={colors.creamLight} />
-        <SafeAreaView style={styles.safe}>{children}</SafeAreaView>
+        <SafeAreaView edges={edges} style={styles.safe}>
+          {children}
+        </SafeAreaView>
       </View>
     );
   }
@@ -29,7 +40,9 @@ export default function ScreenContainer({ variant = 'teal', children, style }: S
       end={{ x: 0.5, y: 1 }}
     >
       <StatusBar barStyle="light-content" backgroundColor={screenGradients[variant][0]} />
-      <SafeAreaView style={styles.safe}>{children}</SafeAreaView>
-    </LinearGradient>
+      <SafeAreaView edges={edges} style={styles.safe}>
+        {children}
+      </SafeAreaView>
+    </LinearGradient>     
   );
 }

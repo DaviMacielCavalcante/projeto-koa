@@ -266,7 +266,7 @@
 
 ### Ícones e ilustrações
 
-- [ ] Criar ou selecionar ícones semi-realistas para os 5 documentos
+- [x] Criar ou selecionar ícones semi-realistas para os 5 documentos
 - [ ] Criar ou selecionar ícones de navegação (casa, caderno, sino, interrogação)
 - [ ] Criar ou selecionar ilustrações para as telas de detalhe de cada documento
 - [ ] Criar ou selecionar ícones para a lista do que levar (RG, CPF, conta de luz)
