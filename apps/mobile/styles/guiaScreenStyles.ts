@@ -22,4 +22,36 @@ export const guiaScreenStyles = StyleSheet.create({
     },
     itemTexto: { fontFamily: fonts.bodyMedium, fontSize: sizes.body, color: colors.white, flex: 1 },
     botao: { width: '100%' },
+    cardCabecalho: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        marginBottom: 8,
+    },
+    passoItem: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 12,
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255,255,255,0.15)',
+    },
+    passoNumero: {
+        width: 28, height: 28, borderRadius: 14,
+        backgroundColor: 'rgba(255,255,255,0.25)',
+        alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0,
+    },
+    passoNumeroTexto: {
+        fontFamily: fonts.bodyBold,
+        fontSize: sizes.bodySm,
+        color: colors.white,
+    },
+    passoTexto: {
+        fontFamily: fonts.bodyMedium,
+        fontSize: sizes.body,
+        color: 'rgba(255,255,255,0.9)',
+        flex: 1,
+        lineHeight: 22,
+    },
 });

@@ -10,7 +10,7 @@ import { DocStatus } from '../../design/components/DocCircle';
 import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
 
-const TIPOS = ['CAF', 'CAR', 'CCIR', 'ITR', 'NFA-e'];
+const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR', 'NFA-e'];
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
 
 const STATUS_SUBTITLE: Record<DocStatus, string> = {
@@ -88,7 +88,6 @@ export default function Inicio() {
                     <Text style={styles.greetLabel}>Bom dia,</Text>
                     <Text style={styles.greetName}>{nomeUsuario}</Text>
                 </View>
-                <Ionicons name="volume-high" size={20} color={colors.white} style={{ opacity: 0.85 }} />
             </View>
 
             <Text style={styles.sectionTitle}>Seus Documentos</Text>
@@ -104,9 +103,6 @@ export default function Inicio() {
                     />
                 ))}
 
-                <View style={styles.audioBtn}>
-                    <AudioCircle icon="volume-high" size={50} iconColor={colors.tealDark} />
-                </View>
             </View>
 
             <AudioPlayer
