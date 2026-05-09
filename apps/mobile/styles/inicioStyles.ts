@@ -40,9 +40,8 @@ export const inicioStyles = StyleSheet.create({
     },
     grid: {
         flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
+        flexDirection: 'column',
+        alignItems: 'center',
         paddingHorizontal: 16,
         gap: 12,
         paddingBottom: 100,
