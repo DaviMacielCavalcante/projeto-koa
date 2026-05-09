@@ -9,29 +9,57 @@ import { DocumentTypeIcon, ScreenContainer } from '../../design/components';
 import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
 import { DOCUMENT_TYPES, documentMeta, type DocumentType } from '../../src/constants/documents';
+import { practiceDataAccess } from '../../src/db/practiceDataAccess';
+import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 
-type DocRow = { type: DocumentType; file_url: string | null; status: string | null };
+export type DocRow = { type: DocumentType; file_url: string | null; status: string | null };
 
 export default function Documentos() {
+    const { isPracticeMode, practicePhotos } = usePracticeMode();
     const [docs, setDocs] = useState<DocRow[]>([]);
     const [fotoVisivel, setFotoVisivel] = useState<string | null>(null);
     const insets = useSafeAreaInsets();
 
     useFocusEffect(
         useCallback(() => {
+            const mapa: Partial<Record<DocumentType, DocRow>> = {};
             async function carregar() {
-                const rows = await agricultoresDb?.getAllAsync<DocRow>(
-                    `SELECT type, file_url, status FROM documents
-                     WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
-                     GROUP BY type
-                     HAVING created_at = MAX(created_at)`
-                );
-                const mapa: Partial<Record<DocumentType, DocRow>> = {};
+                const rows = isPracticeMode
+                    ? await practiceDataAccess.getDocuments(true)
+                    : await agricultoresDb?.getAllAsync<DocRow>(
+                        `SELECT type, file_url, status FROM documents
+                         WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
+                         GROUP BY type
+                         HAVING created_at = MAX(created_at)`
+                    );
                 rows?.forEach((r) => (mapa[r.type] = r));
                 setDocs(DOCUMENT_TYPES.map((tipo) => mapa[tipo] ?? { type: tipo, file_url: null, status: null }));
             }
+            if (isPracticeMode) {
+                setDocs(
+                    DOCUMENT_TYPES.map((tipo) => ({
+                        ...(mapa[tipo] ?? {
+                            type: tipo,
+                            file_url: null,
+                            status: null,
+                        }),
+                        file_url: practicePhotos[tipo] ?? mapa[tipo]?.file_url ?? null,
+                    }))
+                );
+            } else {
+                setDocs(
+                    DOCUMENT_TYPES.map(
+                        (tipo) =>
+                            mapa[tipo] ?? {
+                                type: tipo,
+                                file_url: null,
+                                status: null,
+                            }
+                    )
+                );
+            }
             carregar();
-        }, [])
+        }, [isPracticeMode, practicePhotos])
     );
 
     return (
