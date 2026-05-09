@@ -1,6 +1,8 @@
+import type { DocumentType } from '../constants/documents';
+
 type MockDocument = {
     id: string;
-    type: string;
+    type: DocumentType;
     status: 'active' | 'expired' | 'expiring_soon' | null;
     expiration_date: string | null;
     file_url: string | null;
