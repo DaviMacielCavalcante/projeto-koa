@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useState, useCallback } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { inicioStyles as styles } from '../../styles/inicioStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
@@ -80,30 +80,49 @@ export default function Inicio() {
 
     return (
         <ScreenContainer variant="cream">
-            <View style={styles.greetCard}>
-                <View style={styles.avatar}>
-                    <Ionicons name="person" size={22} color={colors.tealDark} />
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.greetCard}>
+                    <View style={styles.avatar}>
+                        <Ionicons name="person" size={22} color={colors.tealDark} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.greetLabel}>Bom dia,</Text>
+                        <Text style={styles.greetName}>{nomeUsuario}</Text>
+                    </View>
                 </View>
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.greetLabel}>Bom dia,</Text>
-                    <Text style={styles.greetName}>{nomeUsuario}</Text>
+
+                <Text style={styles.sectionTitle}>Seus Documentos</Text>
+
+                <View style={styles.grid}>
+                    {docs.map((doc) => (
+                        <DocCircle
+                            key={doc.nome}
+                            name={doc.nome}
+                            subtitle={STATUS_SUBTITLE[doc.status]}
+                            status={doc.status}
+                            onPress={() => router.push('/documento/' + doc.nome)}
+                        />
+                    ))}
                 </View>
-            </View>
 
-            <Text style={styles.sectionTitle}>Seus Documentos</Text>
-
-            <View style={styles.grid}>
-                {docs.map((doc) => (
-                    <DocCircle
-                        key={doc.nome}
-                        name={doc.nome}
-                        subtitle={STATUS_SUBTITLE[doc.status]}
-                        status={doc.status}
-                        onPress={() => router.push('/documento/' + doc.nome)}
-                    />
-                ))}
-
-            </View>
+                <TouchableOpacity
+                    style={styles.educationalCard}
+                    activeOpacity={0.85}
+                    onPress={() => router.push('/roadmap')}
+                >
+                    <View style={styles.educationalIcon}>
+                        <Ionicons name="book" size={22} color={colors.white} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.educationalTitle}>Aprender sobre os documentos</Text>
+                        <Text style={styles.educationalSub}>Estude no seu ritmo</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
+                </TouchableOpacity>
+            </ScrollView>
 
             <AudioPlayer
                 source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
