@@ -59,4 +59,51 @@ export const detalheDocumentoStyles = StyleSheet.create({
         marginTop: 'auto' as const,
     },
     player: { position: 'absolute', bottom: 24, right: 24 },
+    imagemContainer: {
+        flex: 1,
+        marginHorizontal: 16,
+        marginBottom: 8,
+        borderRadius: 18,
+        overflow: 'hidden',
+        backgroundColor: 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    imagemReferencia: {
+        width: '100%',
+        height: '100%',
+    },
+    statusBadge: {
+        position: 'absolute',
+        bottom: 12,
+        right: 12,
+        borderRadius: 20,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        alignItems: 'center',
+    },
+    semImagem: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 16,
+    },
+});
+
+export const docImagemModalStyles = StyleSheet.create({
+    fundo: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.92)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    imagem: {
+        width: '90%',
+        height: '75%',
+    },
+    fechar: {
+        position: 'absolute',
+        top: 48,
+        right: 20,
+    },
 });

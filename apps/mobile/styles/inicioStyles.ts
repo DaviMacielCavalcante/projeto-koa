@@ -57,3 +57,41 @@ export const inicioStyles = StyleSheet.create({
         right: 24,
     },
 });
+
+export const inicioModalStyles = StyleSheet.create({
+    fundo: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.94)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    titulo: {
+        fontFamily: fonts.displayBlack,
+        fontSize: sizes.xl,
+        color: colors.white,
+        marginBottom: 16,
+        letterSpacing: 2,
+    },
+    imagem: {
+        width: '100%',
+        height: '70%',
+    },
+    fechar: {
+        position: 'absolute',
+        top: 52,
+        right: 20,
+    },
+    botaoDetalhes: {
+        marginTop: 20,
+        paddingHorizontal: 28,
+        paddingVertical: 12,
+        backgroundColor: colors.tealDark,
+        borderRadius: 30,
+    },
+    botaoDetalhesTexto: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.body,
+        color: colors.white,
+    },
+});

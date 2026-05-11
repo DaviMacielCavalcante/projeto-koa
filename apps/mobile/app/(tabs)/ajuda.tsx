@@ -63,14 +63,14 @@ export default function Ajuda() {
             <View style={styles.content}>
                 {isPracticeMode ? (
                     <GradientButton
-                        label="↩  Sair do modo prática"
+                        label="Sair do modo prática"
                         variant="gold"
                         onPress={exitPracticeMode}
                         style={styles.botao}
                     />
                 ) : (
                     <GradientButton
-                        label="📖  Rever apresentação"
+                        label="Rever apresentação"
                         variant="teal"
                         onPress={() => router.push('/onboarding')}
                         style={styles.botao}
@@ -78,14 +78,14 @@ export default function Ajuda() {
                 )}
                 {!isPracticeMode && (
                     <GradientButton
-                        label="🔶  Modo Prática"
+                        label="Modo Prática"
                         variant="gold"
                         onPress={enterPracticeMode}
                         style={styles.botao}
                     />
                 )}
                 <GradientButton
-                    label="🗑️  Apagar todos os meus dados"
+                    label="Apagar todos os meus dados"
                     variant="red"
                     onPress={() => setConfirmando(true)}
                     style={styles.botao}
@@ -114,7 +114,7 @@ export default function Ajuda() {
                             Todos os seus dados, fotos e documentos serão apagados permanentemente.
                         </Text>
                         <GradientButton
-                            label={contador > 0 ? `Apagar tudo (${contador})` : '🗑️  Apagar tudo'}
+                            label={contador > 0 ? `Apagar tudo (${contador})` : 'Apagar tudo'}
                             variant="red"
                             disabled={contador > 0}
                             onPress={fecharModal}
