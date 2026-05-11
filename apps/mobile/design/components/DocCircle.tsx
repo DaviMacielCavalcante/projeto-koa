@@ -2,9 +2,6 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, statusGradients } from '../theme';
 import { docCircleStyles as styles } from './styles/docCircleStyles';
-import DocumentTypeIcon from './DocumentTypeIcon';
-import { isDocumentType } from '../../src/constants/documents';
-
 export type DocStatus = 'green' | 'yellow' | 'red' | 'grey';
 
 interface DocCircleProps {
@@ -25,8 +22,6 @@ function getDotColor(status: DocStatus): string {
 }
 
 export default function DocCircle({ name, subtitle, status = 'grey', onPress, size = 90 }: DocCircleProps) {
-  const hasDocumentIcon = isDocumentType(name);
-
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <LinearGradient
@@ -36,7 +31,6 @@ export default function DocCircle({ name, subtitle, status = 'grey', onPress, si
         style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}
       >
         <View style={[styles.dot, { backgroundColor: getDotColor(status) }]} />
-        {hasDocumentIcon ? <DocumentTypeIcon type={name} size={size * 0.45} /> : null}
         <Text style={styles.name}>{name}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
       </LinearGradient>

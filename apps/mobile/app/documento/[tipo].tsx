@@ -1,8 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { agricultoresDb } from '../../src/db/index';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Text, View, Modal, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AudioPlayer from '../../components/AudioPlayer';
 import { DocumentTypeIcon, GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
@@ -48,6 +49,11 @@ export default function DetalheDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
     const [documento, setDocumento] = useState<Documento | null>(null);
     const [loading, setLoading] = useState(true);
+    const [avisoNfae, setAvisoNfae] = useState(false);
+
+    useEffect(() => {
+        if (tipo === 'NFA-e') setAvisoNfae(true);
+    }, [tipo]);
     const documentType = tipo && isDocumentType(tipo) ? tipo : null;
     const meta = documentType ? documentMeta[documentType] : null;
 
@@ -136,6 +142,28 @@ export default function DetalheDocumento() {
                 autoPlay={false}
                 style={styles.player}
             />
+
+            <Modal visible={avisoNfae} transparent animationType="fade">
+                <View style={styles.avisoFundo}>
+                    <View style={styles.avisoCard}>
+                        <View style={styles.avisoIcone}>
+                            <Ionicons name="warning" size={32} color={colors.white} />
+                        </View>
+                        <Text style={styles.avisoTitulo}>Cuidado antes de continuar</Text>
+                        <Text style={styles.avisoTexto}>
+                            Antes de fazer uma nota fiscal, confira bem os dados — nome, quantidade e valor do que você vai vender.{'\n\n'}
+                            A nota usa as informações que você já colocou no app. Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.{'\n\n'}
+                            Com dúvida? Fale com a EMATER primeiro.
+                        </Text>
+                        <TouchableOpacity style={styles.avisoBtn} onPress={() => setAvisoNfae(false)}>
+                            <Text style={styles.avisoBtnTexto}>Entendi, continuar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.avisoBtnVoltar} onPress={() => { setAvisoNfae(false); router.back(); }}>
+                            <Text style={styles.avisoBtnVoltarTexto}>Voltar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </ScreenContainer>
     );
 }

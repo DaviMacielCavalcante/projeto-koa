@@ -59,4 +59,62 @@ export const detalheDocumentoStyles = StyleSheet.create({
         marginTop: 'auto' as const,
     },
     player: { position: 'absolute', bottom: 24, right: 24 },
+    avisoFundo: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.65)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
+    },
+    avisoCard: {
+        backgroundColor: colors.creamLight,
+        borderRadius: 24,
+        padding: 24,
+        width: '100%',
+        alignItems: 'center',
+        gap: 14,
+    },
+    avisoIcone: {
+        width: 60, height: 60, borderRadius: 30,
+        backgroundColor: colors.orangeMid,
+        alignItems: 'center', justifyContent: 'center',
+    },
+    avisoTitulo: {
+        fontFamily: fonts.displayBlack,
+        fontSize: sizes.md,
+        color: colors.orangeDark,
+        textAlign: 'center',
+    },
+    avisoTexto: {
+        fontFamily: fonts.body,
+        fontSize: sizes.bodySm,
+        color: colors.inkSoft,
+        textAlign: 'center',
+        lineHeight: 20,
+    },
+    avisoDestaque: {
+        fontFamily: fonts.bodyBold,
+        color: colors.redDark,
+    },
+    avisoBtn: {
+        width: '100%',
+        backgroundColor: colors.tealDark,
+        borderRadius: 30,
+        paddingVertical: 14,
+        alignItems: 'center',
+    },
+    avisoBtnTexto: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.body,
+        color: colors.white,
+    },
+    avisoBtnVoltar: {
+        paddingVertical: 10,
+        alignItems: 'center',
+    },
+    avisoBtnVoltarTexto: {
+        fontFamily: fonts.bodyMedium,
+        fontSize: sizes.body,
+        color: colors.inkMute,
+    },
 });
