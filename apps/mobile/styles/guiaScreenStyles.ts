@@ -22,6 +22,29 @@ export const guiaScreenStyles = StyleSheet.create({
     },
     itemTexto: { fontFamily: fonts.bodyMedium, fontSize: sizes.body, color: colors.white, flex: 1 },
     botao: { width: '100%' },
+    itemCritico: {
+        backgroundColor: 'rgba(200,95,46,0.12)',
+        borderRadius: 10,
+        marginHorizontal: -4,
+        paddingHorizontal: 4,
+        borderBottomWidth: 0,
+        marginBottom: 4,
+    },
+    itemIconeCritico: {
+        backgroundColor: 'rgba(200,95,46,0.18)',
+    },
+    itemTextoCritico: {
+        color: colors.white,
+        fontFamily: fonts.bodySemi,
+    },
+    itemTagCritico: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.micro,
+        color: colors.orangeLight,
+        marginTop: 2,
+        letterSpacing: 0.3,
+        textTransform: 'uppercase' as const,
+    },
     cardCabecalho: {
         flexDirection: 'row',
         alignItems: 'center',

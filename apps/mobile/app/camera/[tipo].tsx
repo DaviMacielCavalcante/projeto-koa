@@ -114,7 +114,7 @@ export default function CameraDocumento() {
 
                 <View style={styles.preparoBotao}>
                     <GradientButton
-                        label="📷  Abrir câmera"
+                        label="Abrir câmera"
                         variant="cream"
                         onPress={() => {
                             if (!permission?.granted) requestPermission().then((r) => { if (r.granted) setEtapa('camera'); });
@@ -187,14 +187,14 @@ export default function CameraDocumento() {
                 </View>
                 <View style={styles.previewBotoes}>
                     <GradientButton
-                        label="↩  Tirar de novo"
+                        label="Tirar de novo"
                         variant="cream"
                         onPress={() => { setFotoUri(null); setEtapa('camera'); }}
                         disabled={salvando}
                         style={{ flex: 1 }}
                     />
                     <GradientButton
-                        label={salvando ? 'Salvando...' : '✓  Ficou bom!'}
+                        label={salvando ? 'Salvando...' : 'Ficou bom!'}
                         variant="teal"
                         onPress={confirmarFoto}
                         disabled={salvando}
