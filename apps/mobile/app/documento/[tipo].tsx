@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { agricultoresDb } from '../../src/db/index';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View, Modal, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Text, View, Modal, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AudioPlayer from '../../components/AudioPlayer';
 import { DocumentTypeIcon, GradientButton, ScreenContainer, TopBar } from '../../design/components';
@@ -18,6 +18,7 @@ type Documento = {
     type: string;
     expiration_date: string | null;
     status: DocumentoStatus;
+    file_url: string | null;
 };
 
 function resolverStatus(doc: Documento | null): DocStatus {
@@ -50,6 +51,7 @@ export default function DetalheDocumento() {
     const [documento, setDocumento] = useState<Documento | null>(null);
     const [loading, setLoading] = useState(true);
     const [avisoNfae, setAvisoNfae] = useState(false);
+    const [fotoVisivel, setFotoVisivel] = useState(false);
 
     useEffect(() => {
         if (tipo === 'NFA-e') setAvisoNfae(true);
@@ -122,20 +124,34 @@ export default function DetalheDocumento() {
             </View>
 
             <View style={styles.acoes}>
+                {documento?.file_url ? (
+                    <GradientButton
+                        label="Ver foto salva"
+                        variant="gold"
+                        onPress={() => setFotoVisivel(true)}
+                    />
+                ) : null}
                 <GradientButton
                     label="Como consigo?"
                     variant="teal"
-                    align="flex-start"
                     onPress={() => router.push(`/guia/${tipo}`)}
                 />
-                <GradientButton label="Tenho duvida" variant="orange" align="flex-start" />
+                <GradientButton label="Tenho duvida" variant="orange" />
                 <GradientButton
                     label="Ja tenho, quero guardar"
                     variant="red"
-                    align="flex-start"
                     onPress={() => router.push(`/camera/${tipo}`)}
                 />
             </View>
+
+            <Modal visible={fotoVisivel} transparent animationType="fade">
+                <TouchableOpacity style={styles.avisoFundo} activeOpacity={1} onPress={() => setFotoVisivel(false)}>
+                    <Image source={{ uri: documento?.file_url ?? '' }} style={{ width: '90%', height: '75%' }} resizeMode="contain" />
+                    <TouchableOpacity style={{ position: 'absolute', top: 52, right: 20 }} onPress={() => setFotoVisivel(false)}>
+                        <Ionicons name="close-circle" size={52} color="#fff" />
+                    </TouchableOpacity>
+                </TouchableOpacity>
+            </Modal>
 
             <AudioPlayer
                 source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}

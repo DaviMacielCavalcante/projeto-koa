@@ -241,7 +241,7 @@ export default function Onboarding() {
                         </Text>
                         <View style={styles.lgpdAcoes}>
                             <GradientButton
-                                label="✓  Sim, eu concordo"
+                                label="Sim, eu concordo"
                                 variant="teal"
                                 onPress={() => { setLgpdConsentido(true); setEtapa('perfil'); }}
                                 style={styles.botaoFull}

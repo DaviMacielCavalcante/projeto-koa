@@ -221,14 +221,14 @@ export default function GuiaDocumento() {
 
                 {guia.telefone && (
                     <GradientButton
-                        label="📞  Ligar para o órgão responsável"
+                        label="Ligar para o órgão responsável"
                         variant="teal"
                         onPress={() => Linking.openURL(guia.telefone!)}
                         style={styles.botao}
                     />
                 )}
                 <GradientButton
-                    label="📷  Já tenho, quero guardar"
+                    label="Já tenho, quero guardar"
                     variant="gold"
                     onPress={() => router.push(`/camera/${tipo}`)}
                     style={styles.botao}
