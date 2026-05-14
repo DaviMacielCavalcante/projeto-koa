@@ -3,7 +3,8 @@ import { Tabs } from 'expo-router';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PracticeModeIndicator from '../../components/PracticeModeIndicator';
-import { colors } from '../../design/theme';
+import TutorialOverlay from '../../components/TutorialOverlay';
+import { colors, fonts } from '../../design/theme';
 
 export default function TabsLayout() {
     const insets = useSafeAreaInsets();
@@ -24,7 +25,7 @@ export default function TabsLayout() {
                         borderTopWidth: 1,
                     },
                     tabBarLabelStyle: {
-                        fontFamily: 'Inter_600SemiBold',
+                        fontFamily: fonts.bodySemi,
                         fontSize: 11,
                     },
                     tabBarItemStyle: {
@@ -61,6 +62,7 @@ export default function TabsLayout() {
                     }}
                 />
             </Tabs>
+            <TutorialOverlay />
         </View>
     );
 }

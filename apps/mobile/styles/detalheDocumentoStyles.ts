@@ -13,8 +13,7 @@ export const detalheDocumentoStyles = StyleSheet.create({
         fontFamily: fonts.displayBlack,
         fontSize: sizes.xl,
         color: colors.white,
-        fontWeight: '900',
-        letterSpacing: 1,
+        letterSpacing: 0.5,
     },
     subtitulo: {
         fontFamily: fonts.body,
@@ -33,7 +32,7 @@ export const detalheDocumentoStyles = StyleSheet.create({
         shadowRadius: 12,
         elevation: 6,
     },
-    statusBig: { fontFamily: fonts.display, fontSize: sizes.lg, color: colors.white, fontWeight: '800' },
+    statusBig: { fontFamily: fonts.displayBlack, fontSize: sizes.lg, color: colors.white },
     statusSub: {
         fontFamily: fonts.bodyMedium,
         fontSize: sizes.tiny,

@@ -10,7 +10,7 @@ export const avisosStyles = StyleSheet.create({
     },
     titulo: {
         fontFamily: fonts.displayBlack,
-        fontSize: 26,
+        fontSize: sizes.lg,
         color: colors.tealDark,
     },
     subtitulo: {
@@ -42,10 +42,9 @@ export const avisosStyles = StyleSheet.create({
         alignItems: 'center', justifyContent: 'center',
     },
     cardTitulo: {
-        fontFamily: fonts.display,
-        fontSize: sizes.bodySm,
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.body,
         color: colors.white,
-        fontWeight: '700',
     },
     cardSub: {
         fontFamily: fonts.body,

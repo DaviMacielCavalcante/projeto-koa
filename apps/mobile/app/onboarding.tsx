@@ -9,6 +9,7 @@ import { ScreenContainer, GradientButton, TopBar, AudioCircle } from '../design/
 import { colors } from '../design/theme';
 import { agricultoresDb } from '../src/db/index';
 import { usePracticeMode } from '../src/hooks/usePracticeMode';
+import { useTutorial } from '../src/contexts/TutorialContext';
 
 // ─── ILUSTRAÇÕES ──────────────────────────────────────────────────────────────
 
@@ -167,6 +168,7 @@ async function concluirOnboarding(nome: string, lgpdConsentido: boolean) {
 
 export default function Onboarding() {
     const { enterPracticeMode } = usePracticeMode();
+    const { iniciar: iniciarTutorial } = useTutorial();
     const [etapa, setEtapa] = useState<Etapa>('boas_vindas');
     const [nome, setNome] = useState('');
     const [lgpdConsentido, setLgpdConsentido] = useState(false);
@@ -406,6 +408,20 @@ export default function Onboarding() {
                         <Text style={styles.praticaCardSub}>Ouvir a explicação de novo</Text>
                     </View>
                 </TouchableOpacity>
+
+                {/* <TouchableOpacity
+                    style={styles.praticaCard}
+                    activeOpacity={0.85}
+                    onPress={() => { irParaTabs(); iniciarTutorial(); }}
+                >
+                    <View style={[styles.praticaIcone, { backgroundColor: colors.tealMid }]}>
+                        <Ionicons name="map" size={26} color={colors.white} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.praticaCardTitulo}>Ver tutorial do app</Text>
+                        <Text style={styles.praticaCardSub}>Um guia rápido mostrando cada parte do app</Text>
+                    </View>
+                </TouchableOpacity> */}
             </View>
             <TouchableOpacity
                 style={styles.botaoVoltarCard}

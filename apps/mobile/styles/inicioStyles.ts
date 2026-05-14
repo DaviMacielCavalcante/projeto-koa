@@ -26,15 +26,13 @@ export const inicioStyles = StyleSheet.create({
     },
     greetName: {
         fontFamily: fonts.display,
-        fontSize: 16,
+        fontSize: sizes.md,
         color: colors.white,
-        fontWeight: '700',
     },
     sectionTitle: {
         fontFamily: fonts.display,
-        fontSize: 16,
+        fontSize: sizes.md,
         color: colors.tealDark,
-        fontWeight: '700',
         textAlign: 'center',
         paddingBottom: 10,
     },

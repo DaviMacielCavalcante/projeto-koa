@@ -88,6 +88,12 @@ export default function Inicio() {
                     <Text style={styles.greetLabel}>Bom dia,</Text>
                     <Text style={styles.greetName}>{nomeUsuario}</Text>
                 </View>
+                <TouchableOpacity
+                    onPress={() => router.push('/perfil')}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                    <Ionicons name="pencil" size={18} color="rgba(255,255,255,0.7)" />
+                </TouchableOpacity>
             </View>
 
             <Text style={styles.sectionTitle}>Seus Documentos</Text>

@@ -57,7 +57,6 @@ export const onboardingStyles = StyleSheet.create({
         fontFamily: fonts.display,
         fontSize: sizes.md,
         color: colors.ink,
-        fontWeight: '700',
         textAlign: 'center',
     },
     lgpdCorpo: {
@@ -93,7 +92,6 @@ export const onboardingStyles = StyleSheet.create({
         fontFamily: fonts.display,
         fontSize: sizes.md,
         color: colors.ink,
-        fontWeight: '700',
         marginBottom: 12,
     },
     perfilInput: {
@@ -238,8 +236,7 @@ export const onboardingStyles = StyleSheet.create({
     },
     praticaCardTitulo: {
         fontFamily: fonts.display,
-        fontSize: 16,
-        fontWeight: '700',
+        fontSize: sizes.md,
         color: colors.ink,
     },
     praticaCardSub: {
@@ -318,7 +315,7 @@ export const onboardingIlStyles = StyleSheet.create({
         shadowColor: '#000', shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.2, shadowRadius: 6, elevation: 4,
     },
-    docLabel: { fontFamily: fonts.bodySemi, fontSize: 9, color: colors.white, fontWeight: '700' },
+    docLabel: { fontFamily: fonts.bodySemi, fontSize: sizes.micro, color: colors.white },
     telefone: {
         width: 120, height: 190, borderRadius: 18,
         backgroundColor: '#1a1a1a', overflow: 'hidden',

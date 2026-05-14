@@ -11,6 +11,7 @@ import { syncQueue } from '../src/services/sync';
 import { configurarNotificacoes, agendarAlertas } from '../src/services/notificacoes';
 import * as NetInfo from '@react-native-community/netinfo';
 import { PracticeModeProvider } from '../src/contexts/PracticeMode';
+import { TutorialProvider } from '../src/contexts/TutorialContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 Notifications.setNotificationHandler({
@@ -81,9 +82,11 @@ export default function RootLayout() {
 
     return (
         <SafeAreaProvider>
-            <PracticeModeProvider>
-                <Stack screenOptions={{ gestureEnabled: false, headerShown: false }} />
-            </PracticeModeProvider>
+            <TutorialProvider>
+                <PracticeModeProvider>
+                    <Stack screenOptions={{ gestureEnabled: false, headerShown: false }} />
+                </PracticeModeProvider>
+            </TutorialProvider>
         </SafeAreaProvider>
     )
 }

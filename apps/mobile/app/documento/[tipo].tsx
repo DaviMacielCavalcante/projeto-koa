@@ -133,7 +133,7 @@ export default function DetalheDocumento() {
                     />
                 ) : null}
                 <GradientButton
-                    label="Como consigo?"
+                    label="Como conseguir"
                     variant="teal"
                     onPress={() => router.push(`/guia/${tipo}`)}
                 />
@@ -185,7 +185,6 @@ export default function DetalheDocumento() {
                         <Text style={styles.avisoTexto}>
                             Antes de fazer uma nota fiscal, confira bem os dados — nome, quantidade e valor do que você vai vender.{'\n\n'}
                             A nota usa as informações que você já colocou no app. Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.{'\n\n'}
-                            Com dúvida? Fale com a EMATER primeiro.
                         </Text>
                         <TouchableOpacity style={styles.avisoBtn} onPress={() => setAvisoNfae(false)}>
                             <Text style={styles.avisoBtnTexto}>Entendi, continuar</Text>

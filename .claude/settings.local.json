@@ -14,7 +14,11 @@
       "Bash(echo \"--- exit code: $? ---\")",
       "Bash(git reset *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(mkdir \"c:\\\\Users\\\\JM\\\\Documents\\\\GitHub\\\\projeto-teste\\\\apps\\\\mobile\\\\src\\\\tutorial\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\JM\\Documents\\GitHub\\projeto-teste\\apps\\mobile\\src"
     ]
   }
 }
