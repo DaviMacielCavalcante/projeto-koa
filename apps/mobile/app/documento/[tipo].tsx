@@ -163,6 +163,13 @@ export default function DetalheDocumento() {
                     onPress={() => router.push(`/guia/${tipo}`)}
                 />
                 <GradientButton label="Tenho duvida" variant="orange" onPress={() => router.push(`/faq/${tipo}`)} />
+                {tipo === 'NFA-e' && (
+                    <GradientButton
+                        label="Ver notas salvas"
+                        variant="teal"
+                        onPress={() => router.push('/nfae-lista')}
+                    />
+                )}
                 <GradientButton
                     label={tipo === 'NFA-e' ? 'Preencher dados da nota' : 'Guardar foto do documento'}
                     variant="red"

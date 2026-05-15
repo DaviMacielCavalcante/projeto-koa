@@ -65,15 +65,14 @@ export default function NfaeForm() {
         setSalvando(true);
         try {
             const agora = new Date().toISOString();
+            const novoId = uuid.v4() as string;
             await agricultoresDb?.runAsync(
                 `INSERT OR REPLACE INTO nfae_rascunhos
                  (id, produtor_cnpj, produtor_endereco, comprador_nome, comprador_doc, descricao, valor, natureza, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [uuid.v4() as string, produtorCnpj, produtorEndereco, compradorNome, compradorDoc, descricao, valor, natureza, agora, agora]
+                [novoId, produtorCnpj, produtorEndereco, compradorNome, compradorDoc, descricao, valor, natureza, agora, agora]
             );
-            Alert.alert('Dados salvos', 'Os dados da nota foram salvos. Leve essas informações ao emitir a NFA-e.', [
-                { text: 'OK', onPress: () => router.back() },
-            ]);
+            router.replace({ pathname: '/nfae-preview', params: { id: novoId } });
         } catch {
             Alert.alert('Erro', 'Não foi possível salvar os dados.');
         } finally {
