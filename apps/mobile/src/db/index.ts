@@ -69,11 +69,25 @@ async function initDb() {
 
     await agricultoresDb.execAsync(`
         CREATE TABLE IF NOT EXISTS sync_queue(
-        id TEXT PRIMARY KEY, 
-        tabela TEXT, 
-        operacao TEXT, 
-        payload TEXT,  
+        id TEXT PRIMARY KEY,
+        tabela TEXT,
+        operacao TEXT,
+        payload TEXT,
         created_at TEXT)
+    `);
+
+    await agricultoresDb.execAsync(`
+        CREATE TABLE IF NOT EXISTS nfae_rascunhos(
+        id TEXT PRIMARY KEY,
+        produtor_cnpj TEXT,
+        produtor_endereco TEXT,
+        comprador_nome TEXT,
+        comprador_doc TEXT,
+        descricao TEXT,
+        valor TEXT,
+        natureza TEXT,
+        created_at TEXT,
+        updated_at TEXT)
     `);
 
 }

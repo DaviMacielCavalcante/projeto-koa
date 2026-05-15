@@ -139,9 +139,9 @@ export default function DetalheDocumento() {
                 />
                 <GradientButton label="Tenho duvida" variant="orange" onPress={() => setDuvidaVisivel(true)} />
                 <GradientButton
-                    label="Ja tenho, quero guardar"
+                    label={tipo === 'NFA-e' ? 'Preencher dados da nota' : 'Ja tenho, quero guardar'}
                     variant="red"
-                    onPress={() => router.push(`/camera/${tipo}`)}
+                    onPress={() => tipo === 'NFA-e' ? router.push('/nfae-form') : router.push(`/camera/${tipo}`)}
                 />
             </View>
 
@@ -184,7 +184,7 @@ export default function DetalheDocumento() {
                         <Text style={styles.avisoTitulo}>Cuidado antes de continuar</Text>
                         <Text style={styles.avisoTexto}>
                             Antes de fazer uma nota fiscal, confira bem os dados — nome, quantidade e valor do que você vai vender.{'\n\n'}
-                            A nota usa as informações que você já colocou no app. Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.{'\n\n'}
+                            Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.{'\n\n'}
                         </Text>
                         <TouchableOpacity style={styles.avisoBtn} onPress={() => setAvisoNfae(false)}>
                             <Text style={styles.avisoBtnTexto}>Entendi, continuar</Text>
