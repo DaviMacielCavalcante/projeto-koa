@@ -316,6 +316,34 @@ export const onboardingIlStyles = StyleSheet.create({
         shadowOpacity: 0.2, shadowRadius: 6, elevation: 4,
     },
     docLabel: { fontFamily: fonts.bodySemi, fontSize: sizes.micro, color: colors.white },
+    // Cards (slide 1 tour)
+    cardsWrap: {
+        width: 200,
+        gap: 5,
+    },
+    docCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.92)',
+        borderRadius: 10,
+        overflow: 'hidden',
+        height: 30,
+        gap: 8,
+    },
+    docCardBarra: {
+        width: 5,
+        alignSelf: 'stretch',
+    },
+    docCardLabel: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.micro,
+        color: colors.ink,
+        flex: 1,
+    },
+    docCardDot: {
+        width: 7, height: 7, borderRadius: 4,
+        marginRight: 10,
+    },
     telefone: {
         width: 120, height: 190, borderRadius: 18,
         backgroundColor: '#1a1a1a', overflow: 'hidden',

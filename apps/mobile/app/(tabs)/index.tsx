@@ -1,6 +1,7 @@
 import { router, useFocusEffect } from 'expo-router';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { useTutorial } from '../../src/contexts/TutorialContext';
 import { inicioStyles as styles } from '../../styles/inicioStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
@@ -12,6 +13,7 @@ import AudioPlayer from '../../components/AudioPlayer';
 
 const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR', 'NFA-e'];
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
+
 
 const STATUS_SUBTITLE: Record<DocStatus, string> = {
     green: 'em dia',
@@ -39,6 +41,16 @@ function calcularStatus(row: DocRow | null): DocStatus {
 
 export default function Inicio() {
     const { isPracticeMode } = usePracticeMode();
+    const { registrarRef } = useTutorial();
+    const greetRef = useRef<View>(null);
+    const docsRef = useRef<View>(null);
+
+    useEffect(() => {
+        registrarRef('greet', greetRef);
+        registrarRef('docs', docsRef);
+        registrarRef('cores', docsRef);
+    }, []);
+
     const [docs, setDocs] = useState(
         TIPOS.map((nome) => ({ nome, status: 'grey' as DocStatus }))
     );
@@ -69,10 +81,7 @@ export default function Inicio() {
                 );
                 const mapa: Record<string, DocRow> = {};
                 rows?.forEach((r) => (mapa[r.type] = r));
-                setDocs(TIPOS.map((nome) => ({
-                    nome,
-                    status: calcularStatus(mapa[nome] ?? null),
-                })));
+                setDocs(TIPOS.map((nome) => ({ nome, status: calcularStatus(mapa[nome] ?? null) })));
             }
             carregarStatus();
         }, [isPracticeMode])
@@ -80,7 +89,7 @@ export default function Inicio() {
 
     return (
         <ScreenContainer variant="cream">
-            <View style={styles.greetCard}>
+            <View ref={greetRef} style={styles.greetCard}>
                 <View style={styles.avatar}>
                     <Ionicons name="person" size={22} color={colors.tealDark} />
                 </View>
@@ -99,6 +108,7 @@ export default function Inicio() {
             <Text style={styles.sectionTitle}>Seus Documentos</Text>
 
             <ScrollView
+                ref={docsRef as any}
                 style={{ flex: 1 }}
                 contentContainerStyle={styles.grid}
                 showsVerticalScrollIndicator={false}

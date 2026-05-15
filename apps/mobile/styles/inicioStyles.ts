@@ -75,6 +75,10 @@ export const inicioStyles = StyleSheet.create({
         color: colors.inkMute,
         marginTop: 2,
     },
+    docCardBloqueado: {
+        opacity: 0.55,
+        backgroundColor: colors.creamDeep,
+    },
     docCardDireita: {
         paddingHorizontal: 14,
         alignItems: 'center',

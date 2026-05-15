@@ -3,7 +3,6 @@ import { Tabs } from 'expo-router';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PracticeModeIndicator from '../../components/PracticeModeIndicator';
-import TutorialOverlay from '../../components/TutorialOverlay';
 import { colors, fonts } from '../../design/theme';
 
 export default function TabsLayout() {
@@ -62,7 +61,6 @@ export default function TabsLayout() {
                     }}
                 />
             </Tabs>
-            <TutorialOverlay />
         </View>
     );
 }

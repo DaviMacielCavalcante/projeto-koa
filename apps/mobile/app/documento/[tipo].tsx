@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { agricultoresDb } from '../../src/db/index';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, Text, View, Modal, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AudioPlayer from '../../components/AudioPlayer';
@@ -53,10 +53,11 @@ export default function DetalheDocumento() {
     const [avisoNfae, setAvisoNfae] = useState(false);
     const [fotoVisivel, setFotoVisivel] = useState(false);
     const [duvidaVisivel, setDuvidaVisivel] = useState(false);
+    const [avisoDependencia, setAvisoDependencia] = useState<string | null>(null);
+    const [dependenciaCumprida, setDependenciaCumprida] = useState(true);
 
-    useEffect(() => {
-        if (tipo === 'NFA-e') setAvisoNfae(true);
-    }, [tipo]);
+    const DEPENDENCIAS: Partial<Record<string, string>> = { CAF: 'CCIR', CAR: 'CAF' };
+
     const documentType = tipo && isDocumentType(tipo) ? tipo : null;
     const meta = documentType ? documentMeta[documentType] : null;
 
@@ -64,18 +65,30 @@ export default function DetalheDocumento() {
         useCallback(() => {
             async function buscarDocumento() {
                 setLoading(true);
-
                 try {
                     const result = await agricultoresDb?.getFirstAsync<Documento>(
                         'SELECT * FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
                         [tipo]
                     );
                     setDocumento(result ?? null);
+
+                    const dep = DEPENDENCIAS[tipo];
+                    if (dep) {
+                        const depDoc = await agricultoresDb?.getFirstAsync<{ id: string }>(
+                            'SELECT id FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
+                            [dep]
+                        );
+                        const cumprida = !!depDoc;
+                        setDependenciaCumprida(cumprida);
+                        setAvisoDependencia(cumprida ? null : dep);
+                    } else {
+                        setDependenciaCumprida(true);
+                        setAvisoDependencia(null);
+                    }
                 } finally {
                     setLoading(false);
                 }
             }
-
             buscarDocumento();
         }, [tipo])
     );
@@ -124,6 +137,18 @@ export default function DetalheDocumento() {
                 ) : null}
             </View>
 
+            {avisoDependencia && (
+                <View style={styles.bannnerDep}>
+                    <Ionicons name="lock-closed" size={16} color={colors.orangeDark} />
+                    <Text style={styles.bannerDepTexto}>
+                        Para guardar a foto do {tipo} você precisa primeiro registrar o{' '}
+                        <Text style={styles.bannerDepLink} onPress={() => router.push(`/documento/${avisoDependencia}`)}>
+                            {avisoDependencia}
+                        </Text>.
+                    </Text>
+                </View>
+            )}
+
             <View style={styles.acoes}>
                 {documento?.file_url ? (
                     <GradientButton
@@ -137,11 +162,12 @@ export default function DetalheDocumento() {
                     variant="teal"
                     onPress={() => router.push(`/guia/${tipo}`)}
                 />
-                <GradientButton label="Tenho duvida" variant="orange" onPress={() => setDuvidaVisivel(true)} />
+                <GradientButton label="Tenho duvida" variant="orange" onPress={() => router.push(`/faq/${tipo}`)} />
                 <GradientButton
-                    label={tipo === 'NFA-e' ? 'Preencher dados da nota' : 'Ja tenho, quero guardar'}
+                    label={tipo === 'NFA-e' ? 'Preencher dados da nota' : 'Guardar foto do documento'}
                     variant="red"
-                    onPress={() => tipo === 'NFA-e' ? router.push('/nfae-form') : router.push(`/camera/${tipo}`)}
+                    disabled={!dependenciaCumprida && tipo !== 'NFA-e'}
+                    onPress={() => tipo === 'NFA-e' ? setAvisoNfae(true) : router.push(`/camera/${tipo}`)}
                 />
             </View>
 
@@ -186,10 +212,10 @@ export default function DetalheDocumento() {
                             Antes de fazer uma nota fiscal, confira bem os dados — nome, quantidade e valor do que você vai vender.{'\n\n'}
                             Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.{'\n\n'}
                         </Text>
-                        <TouchableOpacity style={styles.avisoBtn} onPress={() => setAvisoNfae(false)}>
+                        <TouchableOpacity style={styles.avisoBtn} onPress={() => { setAvisoNfae(false); router.push('/nfae-form'); }}>
                             <Text style={styles.avisoBtnTexto}>Entendi, continuar</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.avisoBtnVoltar} onPress={() => { setAvisoNfae(false); router.back(); }}>
+                        <TouchableOpacity style={styles.avisoBtnVoltar} onPress={() => setAvisoNfae(false)}>
                             <Text style={styles.avisoBtnVoltarTexto}>Voltar</Text>
                         </TouchableOpacity>
                     </View>

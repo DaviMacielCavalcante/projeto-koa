@@ -52,13 +52,6 @@ export default function PhoneScreen() {
                     disabled={inputState.trim().length === 0}
                     style={styles.botao}
                 />
-
-                <GradientButton
-                    label="[TESTE] Ir para tabs"
-                    variant="cream"
-                    onPress={() => router.push('/(tabs)')}
-                    style={[styles.botao, { marginTop: 8, opacity: 0.6 }]}
-                />
             </View>
             </KeyboardAvoidingView>
         </ScreenContainer>

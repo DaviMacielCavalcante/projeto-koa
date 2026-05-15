@@ -104,12 +104,12 @@ export default function Ajuda() {
                         style={styles.botao}
                     />
                 )}
-                {/* <GradientButton
+                <GradientButton
                     label="Tutorial do app"
                     variant="teal"
                     onPress={() => { router.replace('/(tabs)'); iniciarTutorial(); }}
                     style={styles.botao}
-                /> */}
+                />
                 {!isPracticeMode && (
                     <GradientButton
                         label="Modo Prática"
@@ -131,12 +131,7 @@ export default function Ajuda() {
                 }}>
                     <Text style={styles.botaoTesteTexto}>[TESTE] Resetar onboarding</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.botaoTeste} onPress={testarNotificacaoDireta}>
-                    <Text style={styles.botaoTesteTexto}>[TESTE] Notificação direta (5s)</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.botaoTeste} onPress={inserirDocumentoTeste}>
-                    <Text style={styles.botaoTesteTexto}>[TESTE] Inserir CAF vencendo + notificação</Text>
-                </TouchableOpacity>
+                
             </View>
 
             <Modal visible={confirmando} transparent animationType="fade">

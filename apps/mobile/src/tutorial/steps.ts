@@ -4,13 +4,17 @@ export type TutorialZone =
     | 'cores'
     | 'tab-avisos'
     | 'tab-outros'
-    | 'tab-ajuda';
+    | 'tab-ajuda'
+    | 'doc-hero'
+    | 'doc-status'
+    | 'doc-acoes';
 
 export interface TutorialStep {
     zone: TutorialZone;
     titulo: string;
     texto: string;
     calloutPos: 'above' | 'below';
+    navigateTo?: string;
 }
 
 export const TUTORIAL_STEPS: TutorialStep[] = [
@@ -48,6 +52,25 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
         zone: 'tab-ajuda',
         titulo: 'Aba Ajuda',
         texto: 'Aqui você pode rever este tutorial, alterar seu nome, entrar no modo prática e gerenciar seus dados.',
+        calloutPos: 'above',
+    },
+    {
+        zone: 'doc-hero',
+        titulo: 'Dentro de um documento',
+        texto: 'Vamos ver como funciona a tela do ITR. O ícone e o nome do documento ficam aqui no topo.',
+        calloutPos: 'below',
+        navigateTo: '/documento/ITR',
+    },
+    {
+        zone: 'doc-status',
+        titulo: 'Situação do documento',
+        texto: 'Este círculo mostra se o seu ITR está em dia, vencendo ou vencido. A cor muda conforme a situação.',
+        calloutPos: 'below',
+    },
+    {
+        zone: 'doc-acoes',
+        titulo: 'O que você pode fazer',
+        texto: 'Aqui você acessa o guia de como conseguir o documento, tira foto para guardar, ou vê suas dúvidas.',
         calloutPos: 'above',
     },
 ];

@@ -1,87 +1,100 @@
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Modal } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTutorial } from '../src/contexts/TutorialContext';
 import { TUTORIAL_STEPS } from '../src/tutorial/steps';
 import { colors, fonts, sizes } from '../design/theme';
 
 const { width: W, height: H } = Dimensions.get('window');
-const TAB_HEIGHT = 72;
 const TAB_W = W / 4;
 
 type Rect = { top: number; left: number; width: number; height: number };
 
-function getZoneRect(zone: string): Rect {
-    switch (zone) {
-        case 'greet':
-            return { top: 60, left: 16, width: W - 32, height: 74 };
-        case 'docs':
-            return { top: 155, left: 16, width: W - 32, height: H * 0.42 };
-        case 'cores':
-            return { top: 155, left: 16, width: W - 32, height: H * 0.42 };
-        case 'tab-outros':
-            return { top: H - TAB_HEIGHT, left: TAB_W, width: TAB_W, height: TAB_HEIGHT };
-        case 'tab-avisos':
-            return { top: H - TAB_HEIGHT, left: TAB_W * 2, width: TAB_W, height: TAB_HEIGHT };
-        case 'tab-ajuda':
-            return { top: H - TAB_HEIGHT, left: TAB_W * 3, width: TAB_W, height: TAB_HEIGHT };
-        default:
-            return { top: H / 2 - 40, left: 16, width: W - 32, height: 80 };
-    }
-}
-
 export default function TutorialOverlay() {
     const { ativo, etapa, total, proximo, pular } = useTutorial();
+    const insets = useSafeAreaInsets();
+    const TAB_HEIGHT = 72 + insets.bottom;
 
     if (!ativo) return null;
 
     const step = TUTORIAL_STEPS[etapa];
-    const rect = getZoneRect(step.zone);
+
+    function getRect(): Rect {
+        const top = insets.top;
+        switch (step.zone) {
+            case 'greet':
+                return { top: top + 12, left: 16, width: W - 32, height: 74 };
+            case 'docs':
+                return { top: top + 108, left: 16, width: W - 32, height: H * 0.40 };
+            case 'cores':
+                return { top: top + 108, left: 16, width: W - 32, height: H * 0.40 };
+            case 'tab-outros':
+                return { top: H - TAB_HEIGHT, left: TAB_W, width: TAB_W, height: TAB_HEIGHT };
+            case 'tab-avisos':
+                return { top: H - TAB_HEIGHT, left: TAB_W * 2, width: TAB_W, height: TAB_HEIGHT };
+            case 'tab-ajuda':
+                return { top: H - TAB_HEIGHT, left: TAB_W * 3, width: TAB_W, height: TAB_HEIGHT };
+            // Zonas da tela de detalhe do documento
+            case 'doc-hero':
+                return { top: top + 56, left: 16, width: W - 32, height: 160 };
+            case 'doc-status':
+                return { top: top + 220, left: W / 2 - 70, width: 140, height: 140 };
+            case 'doc-acoes':
+                return { top: H - TAB_HEIGHT - 200, left: 16, width: W - 32, height: 180 };
+            default:
+                return { top: H / 2 - 40, left: 16, width: W - 32, height: 80 };
+        }
+    }
+
+    const rect = getRect();
     const isAbove = step.calloutPos === 'above';
-    const calloutTop = isAbove ? rect.top - 180 : rect.top + rect.height + 12;
+    const calloutTop = isAbove ? rect.top - 190 : rect.top + rect.height + 14;
+    const calloutTopClamped = Math.max(insets.top + 8, Math.min(calloutTop, H - 220));
 
     return (
-        <View style={StyleSheet.absoluteFillObject} pointerEvents="box-none">
-            {/* overlay escuro */}
-            <View style={[StyleSheet.absoluteFillObject, styles.overlay]} pointerEvents="none" />
+        <Modal visible transparent animationType="fade" statusBarTranslucent>
+            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'transparent' }]} pointerEvents="box-none">
+                <View style={[StyleSheet.absoluteFillObject, styles.overlay]} pointerEvents="none" />
 
-            {/* spotlight — borda dourada sobre a área destacada */}
-            <View
-                style={[styles.spotlight, { top: rect.top, left: rect.left, width: rect.width, height: rect.height }]}
-                pointerEvents="none"
-            />
+                <View
+                    style={[styles.spotlight, {
+                        top: rect.top,
+                        left: rect.left,
+                        width: rect.width,
+                        height: rect.height,
+                    }]}
+                    pointerEvents="none"
+                />
 
-            {/* seta */}
-            {isAbove ? (
-                <View style={[styles.setaBaixo, { top: rect.top - 12, left: rect.left + rect.width / 2 - 8 }]} pointerEvents="none" />
-            ) : (
-                <View style={[styles.setaCima, { top: rect.top + rect.height, left: rect.left + rect.width / 2 - 8 }]} pointerEvents="none" />
-            )}
+                {isAbove ? (
+                    <View style={[styles.setaBaixo, { top: rect.top - 13, left: rect.left + rect.width / 2 - 8 }]} pointerEvents="none" />
+                ) : (
+                    <View style={[styles.setaCima, { top: rect.top + rect.height, left: rect.left + rect.width / 2 - 8 }]} pointerEvents="none" />
+                )}
 
-            {/* callout */}
-            <View style={[styles.callout, { top: Math.max(8, Math.min(calloutTop, H - 200)) }]}>
-                <View style={styles.calloutHeader}>
-                    <Text style={styles.calloutTitulo}>{step.titulo}</Text>
-                    <Text style={styles.calloutContador}>{etapa + 1}/{total}</Text>
-                </View>
-                <Text style={styles.calloutTexto}>{step.texto}</Text>
-                <View style={styles.calloutBotoes}>
-                    <TouchableOpacity style={styles.btnPular} onPress={pular}>
-                        <Text style={styles.btnPularTexto}>Pular</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.btnProximo} onPress={proximo}>
-                        <Text style={styles.btnProximoTexto}>
-                            {etapa + 1 === total ? 'Concluir' : 'Próximo'}
-                        </Text>
-                    </TouchableOpacity>
+                <View style={[styles.callout, { top: calloutTopClamped }]}>
+                    <View style={styles.calloutHeader}>
+                        <Text style={styles.calloutTitulo}>{step.titulo}</Text>
+                        <Text style={styles.calloutContador}>{etapa + 1}/{total}</Text>
+                    </View>
+                    <Text style={styles.calloutTexto}>{step.texto}</Text>
+                    <View style={styles.calloutBotoes}>
+                        <TouchableOpacity style={styles.btnPular} onPress={pular}>
+                            <Text style={styles.btnPularTexto}>Pular</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.btnProximo} onPress={proximo}>
+                            <Text style={styles.btnProximoTexto}>
+                                {etapa + 1 === total ? 'Concluir' : 'Próximo'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
-        </View>
+        </Modal>
     );
 }
 
 const styles = StyleSheet.create({
-    overlay: {
-        backgroundColor: 'rgba(0,0,0,0.72)',
-    },
+    overlay: { backgroundColor: 'rgba(0,0,0,0.72)' },
     spotlight: {
         position: 'absolute',
         borderWidth: 2,
@@ -94,14 +107,14 @@ const styles = StyleSheet.create({
         width: 0, height: 0,
         borderLeftWidth: 8, borderLeftColor: 'transparent',
         borderRightWidth: 8, borderRightColor: 'transparent',
-        borderBottomWidth: 12, borderBottomColor: colors.goldLight,
+        borderBottomWidth: 13, borderBottomColor: colors.goldLight,
     },
     setaBaixo: {
         position: 'absolute',
         width: 0, height: 0,
         borderLeftWidth: 8, borderLeftColor: 'transparent',
         borderRightWidth: 8, borderRightColor: 'transparent',
-        borderTopWidth: 12, borderTopColor: colors.goldLight,
+        borderTopWidth: 13, borderTopColor: colors.goldLight,
     },
     callout: {
         position: 'absolute',

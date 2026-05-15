@@ -49,32 +49,22 @@ function IlustracaoTour({ index }: { index: number }) {
     }
 
     if (index === 1) {
-        // Cena: 5 círculos de documento
         const docs = [
-            { label: 'CAF', cor: colors.tealDark },
-            { label: 'CAR', cor: colors.goldDark },
-            { label: 'CCIR', cor: colors.orangeMid },
-            { label: 'ITR', cor: colors.redMid },
+            { label: 'ITR',   cor: colors.redMid },
+            { label: 'CCIR',  cor: colors.orangeMid },
+            { label: 'CAF',   cor: colors.tealDark },
+            { label: 'CAR',   cor: colors.goldDark },
             { label: 'NFA-e', cor: colors.tealMid },
         ];
         return (
-            <View style={il.cena}>
-                <View style={il.docsGrid}>
-                    <View style={il.docsLinha1}>
-                        {docs.slice(0, 3).map((d) => (
-                            <View key={d.label} style={[il.docCirculo, { backgroundColor: d.cor }]}>
-                                <Text style={il.docLabel}>{d.label}</Text>
-                            </View>
-                        ))}
+            <View style={il.cardsWrap}>
+                {docs.map((d) => (
+                    <View key={d.label} style={il.docCard}>
+                        <View style={[il.docCardBarra, { backgroundColor: d.cor }]} />
+                        <Text style={il.docCardLabel}>{d.label}</Text>
+                        <View style={[il.docCardDot, { backgroundColor: d.cor }]} />
                     </View>
-                    <View style={il.docsLinha2}>
-                        {docs.slice(3).map((d) => (
-                            <View key={d.label} style={[il.docCirculo, { backgroundColor: d.cor }]}>
-                                <Text style={il.docLabel}>{d.label}</Text>
-                            </View>
-                        ))}
-                    </View>
-                </View>
+                ))}
             </View>
         );
     }
@@ -313,6 +303,7 @@ export default function Onboarding() {
                         label="SALVAR E CONTINUAR"
                         variant="gold"
                         onPress={() => { setTourSlide(0); setEtapa('tour'); }}
+                        disabled={!nome.trim()}
                         style={[styles.botaoFull, { marginTop: 8 }]}
                     />
                     <TouchableOpacity style={styles.botaoVoltarCard} onPress={() => setEtapa('lgpd')}>
@@ -389,16 +380,6 @@ export default function Onboarding() {
                     </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.praticaCard} activeOpacity={0.85} onPress={() => irParaTabs(true)}>
-                    <View style={[styles.praticaIcone, { backgroundColor: colors.goldMid }]}>
-                        <Ionicons name="play" size={26} color={colors.white} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.praticaCardTitulo}>Modo Prática</Text>
-                        <Text style={styles.praticaCardSub}>Treina sem mexer nos documentos de verdade</Text>
-                    </View>
-                </TouchableOpacity>
-
                 <TouchableOpacity style={styles.praticaCard} activeOpacity={0.85} onPress={() => setEtapa('boas_vindas')}>
                     <View style={[styles.praticaIcone, { backgroundColor: colors.redMid }]}>
                         <Ionicons name="help-circle" size={26} color={colors.white} />
@@ -409,7 +390,7 @@ export default function Onboarding() {
                     </View>
                 </TouchableOpacity>
 
-                {/* <TouchableOpacity
+                <TouchableOpacity
                     style={styles.praticaCard}
                     activeOpacity={0.85}
                     onPress={() => { irParaTabs(); iniciarTutorial(); }}
@@ -421,7 +402,7 @@ export default function Onboarding() {
                         <Text style={styles.praticaCardTitulo}>Ver tutorial do app</Text>
                         <Text style={styles.praticaCardSub}>Um guia rápido mostrando cada parte do app</Text>
                     </View>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
             </View>
             <TouchableOpacity
                 style={styles.botaoVoltarCard}

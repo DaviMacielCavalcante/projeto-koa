@@ -1,31 +1,75 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, RefObject, ReactNode } from 'react';
+import { View, Dimensions } from 'react-native';
+import { router } from 'expo-router';
+import { TUTORIAL_STEPS } from '../tutorial/steps';
+
+export type ZonaRect = { top: number; left: number; width: number; height: number };
 
 interface TutorialContextType {
     ativo: boolean;
     etapa: number;
     total: number;
+    rects: Record<string, ZonaRect>;
     iniciar: () => void;
     proximo: () => void;
     pular: () => void;
+    registrarRef: (zona: string, ref: RefObject<View | null>) => void;
 }
 
 const TutorialContext = createContext<TutorialContextType | null>(null);
 
+const { width: W, height: H } = Dimensions.get('window');
+
 export function TutorialProvider({ children }: { children: ReactNode }) {
     const [ativo, setAtivo] = useState(false);
     const [etapa, setEtapa] = useState(0);
-    const total = 6;
+    const [rects, setRects] = useState<Record<string, ZonaRect>>({});
+    const refs = useRef<Record<string, RefObject<View | null>>>({});
+    const total = TUTORIAL_STEPS.length;
 
-    function iniciar() {
+    function registrarRef(zona: string, ref: React.RefObject<View>) {
+        refs.current[zona] = ref;
+    }
+
+    function medirTudo(): Promise<void> {
+        return new Promise((resolve) => {
+            const zonas = Object.keys(refs.current);
+            let medidas: Record<string, ZonaRect> = {};
+            let pendentes = zonas.length;
+
+            if (pendentes === 0) { resolve(); return; }
+
+            zonas.forEach((zona) => {
+                const ref = refs.current[zona];
+                ref?.current?.measureInWindow((x, y, width, height) => {
+                    medidas[zona] = { top: y, left: x, width, height };
+                    pendentes--;
+                    if (pendentes === 0) {
+                        setRects(medidas);
+                        resolve();
+                    }
+                });
+            });
+        });
+    }
+
+    async function iniciar() {
         setEtapa(0);
+        await medirTudo();
         setAtivo(true);
     }
 
     function proximo() {
-        if (etapa + 1 >= total) {
+        const proxEtapa = etapa + 1;
+        if (proxEtapa >= total) {
             setAtivo(false);
+            router.replace('/(tabs)');
         } else {
-            setEtapa(e => e + 1);
+            const proxStep = TUTORIAL_STEPS[proxEtapa];
+            if (proxStep.navigateTo) {
+                router.push(proxStep.navigateTo as any);
+            }
+            setEtapa(proxEtapa);
         }
     }
 
@@ -34,7 +78,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <TutorialContext.Provider value={{ ativo, etapa, total, iniciar, proximo, pular }}>
+        <TutorialContext.Provider value={{ ativo, etapa, total, rects, iniciar, proximo, pular, registrarRef }}>
             {children}
         </TutorialContext.Provider>
     );
