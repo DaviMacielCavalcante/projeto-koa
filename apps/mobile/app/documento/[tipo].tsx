@@ -49,7 +49,7 @@ function statusTexto(doc: Documento | null, docStatus: DocStatus): { big: string
 
 export default function DetalheDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
-    const { registrarRef } = useTutorial();
+    const { registrarRef, zonaAtiva } = useTutorial();
     const heroRef = useRef<View>(null);
     const statusRef = useRef<View>(null);
     const acoesRef = useRef<View>(null);
@@ -118,7 +118,7 @@ export default function DetalheDocumento() {
         <ScreenContainer variant="gold">
             <TopBar leftIcon="arrow-back" />
 
-            <View ref={heroRef} style={styles.top}>
+            <View ref={heroRef} style={[styles.top, zonaAtiva === 'doc-hero' && { backgroundColor: colors.highlight, borderRadius: 20, paddingVertical: 12, marginHorizontal: 12 }]}>
                 {documentType ? (
                     <View style={styles.heroIconWrap}>
                         <DocumentTypeIcon type={documentType} size={104} />
@@ -130,7 +130,7 @@ export default function DetalheDocumento() {
 
                 <View ref={statusRef}>
                     <LinearGradient
-                        colors={[...statusGradients[docStatus]]}
+                        colors={zonaAtiva === 'doc-status' ? [colors.highlight, colors.highlightDeep] : [...statusGradients[docStatus]]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={styles.statusCircle}
@@ -161,7 +161,7 @@ export default function DetalheDocumento() {
                 </View>
             )}
 
-            <View ref={acoesRef} style={styles.acoes}>
+            <View ref={acoesRef} style={[styles.acoes, zonaAtiva === 'doc-acoes' && { backgroundColor: colors.highlight, borderRadius: 20, marginHorizontal: 12 }]}>
                 {documento?.file_url ? (
                     <GradientButton
                         label="Ver foto salva"

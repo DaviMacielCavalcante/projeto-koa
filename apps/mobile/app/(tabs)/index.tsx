@@ -41,7 +41,7 @@ function calcularStatus(row: DocRow | null): DocStatus {
 
 export default function Inicio() {
     const { isPracticeMode } = usePracticeMode();
-    const { registrarRef } = useTutorial();
+    const { registrarRef, zonaAtiva } = useTutorial();
     const greetRef = useRef<View>(null);
     const docsRef = useRef<View>(null);
 
@@ -89,7 +89,7 @@ export default function Inicio() {
 
     return (
         <ScreenContainer variant="cream">
-            <View ref={greetRef} style={styles.greetCard}>
+            <View ref={greetRef} style={[styles.greetCard, zonaAtiva === 'greet' && { backgroundColor: colors.highlight }]}>
                 <View style={styles.avatar}>
                     <Ionicons name="person" size={22} color={colors.tealDark} />
                 </View>
@@ -124,7 +124,10 @@ export default function Inicio() {
                     return (
                         <TouchableOpacity
                             key={doc.nome}
-                            style={styles.docCard}
+                            style={[
+                                styles.docCard,
+                                (zonaAtiva === 'docs' || zonaAtiva === 'cores') && styles.docCardDestaque,
+                            ]}
                             activeOpacity={0.85}
                             onPress={() => router.push('/documento/' + doc.nome)}
                         >

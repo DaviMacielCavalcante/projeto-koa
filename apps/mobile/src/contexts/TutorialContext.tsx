@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useRef, RefObject, ReactNode } from 'react';
 import { View, Dimensions } from 'react-native';
 import { router } from 'expo-router';
-import { TUTORIAL_STEPS } from '../tutorial/steps';
+import { TUTORIAL_STEPS, TutorialZone } from '../tutorial/steps';
 
 export type ZonaRect = { top: number; left: number; width: number; height: number };
 
@@ -9,6 +9,7 @@ interface TutorialContextType {
     ativo: boolean;
     etapa: number;
     total: number;
+    zonaAtiva: TutorialZone | null;
     rects: Record<string, ZonaRect>;
     iniciar: () => void;
     proximo: () => void;
@@ -82,8 +83,10 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         setAtivo(false);
     }
 
+    const zonaAtiva: TutorialZone | null = ativo ? (TUTORIAL_STEPS[etapa]?.zone ?? null) : null;
+
     return (
-        <TutorialContext.Provider value={{ ativo, etapa, total, rects, iniciar, proximo, pular, registrarRef, medirTudo }}>
+        <TutorialContext.Provider value={{ ativo, etapa, total, zonaAtiva, rects, iniciar, proximo, pular, registrarRef, medirTudo }}>
             {children}
         </TutorialContext.Provider>
     );
