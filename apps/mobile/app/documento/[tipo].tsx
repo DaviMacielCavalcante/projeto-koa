@@ -52,7 +52,6 @@ export default function DetalheDocumento() {
     const [loading, setLoading] = useState(true);
     const [avisoNfae, setAvisoNfae] = useState(false);
     const [fotoVisivel, setFotoVisivel] = useState(false);
-    const [duvidaVisivel, setDuvidaVisivel] = useState(false);
     const [avisoDependencia, setAvisoDependencia] = useState<string | null>(null);
     const [dependenciaCumprida, setDependenciaCumprida] = useState(true);
 
@@ -192,21 +191,6 @@ export default function DetalheDocumento() {
                 autoPlay={false}
                 style={styles.player}
             />
-
-            <Modal visible={duvidaVisivel} transparent animationType="fade">
-                <TouchableOpacity style={styles.avisoFundo} activeOpacity={1} onPress={() => setDuvidaVisivel(false)}>
-                    <TouchableOpacity style={styles.avisoCard} activeOpacity={1}>
-                        <View style={[styles.avisoIcone, { backgroundColor: colors.tealMid }]}>
-                            <Ionicons name="help-circle" size={32} color={colors.white} />
-                        </View>
-                        <Text style={styles.avisoTitulo}>{tipo}</Text>
-                        <Text style={[styles.avisoTexto, { textAlign: 'left' }]}>{meta?.description ?? ''}</Text>
-                        <TouchableOpacity style={[styles.avisoBtn, { backgroundColor: colors.tealDark }]} onPress={() => setDuvidaVisivel(false)}>
-                            <Text style={styles.avisoBtnTexto}>Entendi</Text>
-                        </TouchableOpacity>
-                    </TouchableOpacity>
-                </TouchableOpacity>
-            </Modal>
 
             <Modal visible={avisoNfae} transparent animationType="fade">
                 <View style={styles.avisoFundo}>
