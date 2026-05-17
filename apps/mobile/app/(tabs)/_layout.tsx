@@ -1,12 +1,25 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { View } from 'react-native';
+import { useRef, useEffect } from 'react';
+import { View, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PracticeModeIndicator from '../../components/PracticeModeIndicator';
 import { colors, fonts } from '../../design/theme';
+import { useTutorial } from '../../src/contexts/TutorialContext';
 
 export default function TabsLayout() {
     const insets = useSafeAreaInsets();
+    const { registrarRef } = useTutorial();
+    const outrosRef = useRef<View>(null);
+    const avisosRef = useRef<View>(null);
+    const ajudaRef = useRef<View>(null);
+
+    useEffect(() => {
+        registrarRef('tab-outros', outrosRef);
+        registrarRef('tab-avisos', avisosRef);
+        registrarRef('tab-ajuda', ajudaRef);
+    }, []);
+
     return (
         <View style={{ flex: 1 }}>
             <PracticeModeIndicator />
@@ -44,6 +57,15 @@ export default function TabsLayout() {
                     options={{
                         title: 'Outros',
                         tabBarIcon: ({ color }) => <Ionicons name="book-outline" color={color} size={24} />,
+                        tabBarButton: (props) => (
+                            <Pressable ref={outrosRef} onPress={props.onPress} onLongPress={props.onLongPress}
+                                style={props.style} accessible={props.accessible}
+                                accessibilityLabel={props.accessibilityLabel}
+                                accessibilityRole={props.accessibilityRole}
+                                accessibilityState={props.accessibilityState}>
+                                {props.children}
+                            </Pressable>
+                        ),
                     }}
                 />
                 <Tabs.Screen
@@ -51,6 +73,15 @@ export default function TabsLayout() {
                     options={{
                         title: 'Avisos',
                         tabBarIcon: ({ color }) => <Ionicons name="notifications-outline" color={color} size={24} />,
+                        tabBarButton: (props) => (
+                            <Pressable ref={avisosRef} onPress={props.onPress} onLongPress={props.onLongPress}
+                                style={props.style} accessible={props.accessible}
+                                accessibilityLabel={props.accessibilityLabel}
+                                accessibilityRole={props.accessibilityRole}
+                                accessibilityState={props.accessibilityState}>
+                                {props.children}
+                            </Pressable>
+                        ),
                     }}
                 />
                 <Tabs.Screen
@@ -58,6 +89,15 @@ export default function TabsLayout() {
                     options={{
                         title: 'Ajuda',
                         tabBarIcon: ({ color }) => <Ionicons name="help-circle-outline" color={color} size={24} />,
+                        tabBarButton: (props) => (
+                            <Pressable ref={ajudaRef} onPress={props.onPress} onLongPress={props.onLongPress}
+                                style={props.style} accessible={props.accessible}
+                                accessibilityLabel={props.accessibilityLabel}
+                                accessibilityRole={props.accessibilityRole}
+                                accessibilityState={props.accessibilityState}>
+                                {props.children}
+                            </Pressable>
+                        ),
                     }}
                 />
             </Tabs>

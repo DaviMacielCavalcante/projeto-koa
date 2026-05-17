@@ -1,8 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { agricultoresDb } from '../../src/db/index';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { ActivityIndicator, Text, View, Modal, Image, TouchableOpacity } from 'react-native';
+import { useTutorial } from '../../src/contexts/TutorialContext';
 import { Ionicons } from '@expo/vector-icons';
 import AudioPlayer from '../../components/AudioPlayer';
 import { DocumentTypeIcon, GradientButton, ScreenContainer, TopBar } from '../../design/components';
@@ -48,8 +49,18 @@ function statusTexto(doc: Documento | null, docStatus: DocStatus): { big: string
 
 export default function DetalheDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
+    const { registrarRef } = useTutorial();
+    const heroRef = useRef<View>(null);
+    const statusRef = useRef<View>(null);
+    const acoesRef = useRef<View>(null);
     const [documento, setDocumento] = useState<Documento | null>(null);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        registrarRef('doc-hero', heroRef);
+        registrarRef('doc-status', statusRef);
+        registrarRef('doc-acoes', acoesRef);
+    }, []);
     const [avisoNfae, setAvisoNfae] = useState(false);
     const [fotoVisivel, setFotoVisivel] = useState(false);
     const [avisoDependencia, setAvisoDependencia] = useState<string | null>(null);
@@ -105,9 +116,9 @@ export default function DetalheDocumento() {
 
     return (
         <ScreenContainer variant="gold">
-            <TopBar leftIcon="arrow-back" rightIcon="volume-high" />
+            <TopBar leftIcon="arrow-back" />
 
-            <View style={styles.top}>
+            <View ref={heroRef} style={styles.top}>
                 {documentType ? (
                     <View style={styles.heroIconWrap}>
                         <DocumentTypeIcon type={documentType} size={104} />
@@ -117,15 +128,17 @@ export default function DetalheDocumento() {
                 <Text style={styles.titulo}>{tipo}</Text>
                 <Text style={styles.subtitulo}>{meta?.fullName ?? tipo}</Text>
 
-                <LinearGradient
-                    colors={[...statusGradients[docStatus]]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.statusCircle}
-                >
-                    <Text style={styles.statusBig}>{big}</Text>
-                    <Text style={styles.statusSub}>{sub}</Text>
-                </LinearGradient>
+                <View ref={statusRef}>
+                    <LinearGradient
+                        colors={[...statusGradients[docStatus]]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.statusCircle}
+                    >
+                        <Text style={styles.statusBig}>{big}</Text>
+                        <Text style={styles.statusSub}>{sub}</Text>
+                    </LinearGradient>
+                </View>
 
                 <Text style={styles.descricao}>{meta?.description ?? ''}</Text>
 
@@ -148,7 +161,7 @@ export default function DetalheDocumento() {
                 </View>
             )}
 
-            <View style={styles.acoes}>
+            <View ref={acoesRef} style={styles.acoes}>
                 {documento?.file_url ? (
                     <GradientButton
                         label="Ver foto salva"

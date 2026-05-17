@@ -29,7 +29,11 @@ export const documentosTabStyles = StyleSheet.create({
         borderRadius: 24,
         padding: 16,
         minHeight: 252,
-        boxShadow: '0 10px 20px rgba(14, 79, 79, 0.08)',
+        shadowColor: colors.tealDark,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.08,
+        shadowRadius: 20,
+        elevation: 3,
     },
     cardPressable: {
         flex: 1,

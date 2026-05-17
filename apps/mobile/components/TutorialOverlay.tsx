@@ -1,5 +1,6 @@
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Modal, InteractionManager } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useEffect, useState } from 'react';
 import { useTutorial } from '../src/contexts/TutorialContext';
 import { TUTORIAL_STEPS } from '../src/tutorial/steps';
 import { colors, fonts, sizes } from '../design/theme';
@@ -10,34 +11,40 @@ const TAB_W = W / 4;
 type Rect = { top: number; left: number; width: number; height: number };
 
 export default function TutorialOverlay() {
-    const { ativo, etapa, total, proximo, pular } = useTutorial();
+    const { ativo, etapa, total, rects, medirTudo, proximo, pular } = useTutorial();
     const insets = useSafeAreaInsets();
     const TAB_HEIGHT = 72 + insets.bottom;
+    const [pronto, setPronto] = useState(false);
+
+    useEffect(() => {
+        if (!ativo) { setPronto(false); return; }
+        setPronto(false);
+        const task = InteractionManager.runAfterInteractions(() => {
+            requestAnimationFrame(() => {
+                medirTudo().then(() => setPronto(true));
+            });
+        });
+        return () => task.cancel();
+    }, [ativo, etapa]);
 
     if (!ativo) return null;
 
     const step = TUTORIAL_STEPS[etapa];
 
     function getRect(): Rect {
-        const top = insets.top;
+        if (rects[step.zone]) return rects[step.zone];
+
         switch (step.zone) {
-            case 'greet':
-                return { top: top + 12, left: 16, width: W - 32, height: 74 };
-            case 'docs':
-                return { top: top + 108, left: 16, width: W - 32, height: H * 0.40 };
-            case 'cores':
-                return { top: top + 108, left: 16, width: W - 32, height: H * 0.40 };
             case 'tab-outros':
                 return { top: H - TAB_HEIGHT, left: TAB_W, width: TAB_W, height: TAB_HEIGHT };
             case 'tab-avisos':
                 return { top: H - TAB_HEIGHT, left: TAB_W * 2, width: TAB_W, height: TAB_HEIGHT };
             case 'tab-ajuda':
                 return { top: H - TAB_HEIGHT, left: TAB_W * 3, width: TAB_W, height: TAB_HEIGHT };
-            // Zonas da tela de detalhe do documento
             case 'doc-hero':
-                return { top: top + 56, left: 16, width: W - 32, height: 160 };
+                return { top: insets.top + 56, left: 16, width: W - 32, height: 160 };
             case 'doc-status':
-                return { top: top + 220, left: W / 2 - 70, width: 140, height: 140 };
+                return { top: insets.top + 220, left: W / 2 - 70, width: 140, height: 140 };
             case 'doc-acoes':
                 return { top: H - TAB_HEIGHT - 200, left: 16, width: W - 32, height: 180 };
             default:
@@ -45,9 +52,10 @@ export default function TutorialOverlay() {
         }
     }
 
-    const rect = getRect();
+    const rawRect = getRect();
+    const rect = { ...rawRect, width: Math.min(rawRect.width, W - rawRect.left) };
     const isAbove = step.calloutPos === 'above';
-    const calloutTop = isAbove ? rect.top - 190 : rect.top + rect.height + 14;
+    const calloutTop = isAbove ? rect.top - 250 : rect.top + rect.height + 14;
     const calloutTopClamped = Math.max(insets.top + 8, Math.min(calloutTop, H - 220));
 
     return (
@@ -55,39 +63,41 @@ export default function TutorialOverlay() {
             <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'transparent' }]} pointerEvents="box-none">
                 <View style={[StyleSheet.absoluteFillObject, styles.overlay]} pointerEvents="none" />
 
-                <View
-                    style={[styles.spotlight, {
-                        top: rect.top,
-                        left: rect.left,
-                        width: rect.width,
-                        height: rect.height,
-                    }]}
-                    pointerEvents="none"
-                />
+                {pronto && <>
+                    <View
+                        style={[styles.spotlight, {
+                            top: rect.top,
+                            left: rect.left,
+                            width: rect.width,
+                            height: rect.height,
+                        }]}
+                        pointerEvents="none"
+                    />
 
-                {isAbove ? (
-                    <View style={[styles.setaBaixo, { top: rect.top - 13, left: rect.left + rect.width / 2 - 8 }]} pointerEvents="none" />
-                ) : (
-                    <View style={[styles.setaCima, { top: rect.top + rect.height, left: rect.left + rect.width / 2 - 8 }]} pointerEvents="none" />
-                )}
+                    {isAbove ? (
+                        <View style={[styles.setaBaixo, { top: rect.top - 13, left: rect.left + rect.width / 2 - 8 }]} pointerEvents="none" />
+                    ) : (
+                        <View style={[styles.setaCima, { top: rect.top + rect.height, left: rect.left + rect.width / 2 - 8 }]} pointerEvents="none" />
+                    )}
 
-                <View style={[styles.callout, { top: calloutTopClamped }]}>
-                    <View style={styles.calloutHeader}>
-                        <Text style={styles.calloutTitulo}>{step.titulo}</Text>
-                        <Text style={styles.calloutContador}>{etapa + 1}/{total}</Text>
+                    <View style={[styles.callout, { top: calloutTopClamped }]}>
+                        <View style={styles.calloutHeader}>
+                            <Text style={styles.calloutTitulo}>{step.titulo}</Text>
+                            <Text style={styles.calloutContador}>{etapa + 1}/{total}</Text>
+                        </View>
+                        <Text style={styles.calloutTexto}>{step.texto}</Text>
+                        <View style={styles.calloutBotoes}>
+                            <TouchableOpacity style={styles.btnPular} onPress={pular}>
+                                <Text style={styles.btnPularTexto}>Pular</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.btnProximo} onPress={proximo}>
+                                <Text style={styles.btnProximoTexto}>
+                                    {etapa + 1 === total ? 'Concluir' : 'Próximo'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    <Text style={styles.calloutTexto}>{step.texto}</Text>
-                    <View style={styles.calloutBotoes}>
-                        <TouchableOpacity style={styles.btnPular} onPress={pular}>
-                            <Text style={styles.btnPularTexto}>Pular</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.btnProximo} onPress={proximo}>
-                            <Text style={styles.btnProximoTexto}>
-                                {etapa + 1 === total ? 'Concluir' : 'Próximo'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                </>}
             </View>
         </Modal>
     );

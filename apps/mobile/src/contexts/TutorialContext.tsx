@@ -14,6 +14,7 @@ interface TutorialContextType {
     proximo: () => void;
     pular: () => void;
     registrarRef: (zona: string, ref: RefObject<View | null>) => void;
+    medirTudo: () => Promise<void>;
 }
 
 const TutorialContext = createContext<TutorialContextType | null>(null);
@@ -39,23 +40,27 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
 
             if (pendentes === 0) { resolve(); return; }
 
+            function decrementar() {
+                pendentes--;
+                if (pendentes === 0) {
+                    setRects(medidas);
+                    resolve();
+                }
+            }
+
             zonas.forEach((zona) => {
                 const ref = refs.current[zona];
-                ref?.current?.measureInWindow((x, y, width, height) => {
+                if (!ref?.current) { decrementar(); return; }
+                ref.current.measureInWindow((x, y, width, height) => {
                     medidas[zona] = { top: y, left: x, width, height };
-                    pendentes--;
-                    if (pendentes === 0) {
-                        setRects(medidas);
-                        resolve();
-                    }
+                    decrementar();
                 });
             });
         });
     }
 
-    async function iniciar() {
+    function iniciar() {
         setEtapa(0);
-        await medirTudo();
         setAtivo(true);
     }
 
@@ -78,7 +83,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <TutorialContext.Provider value={{ ativo, etapa, total, rects, iniciar, proximo, pular, registrarRef }}>
+        <TutorialContext.Provider value={{ ativo, etapa, total, rects, iniciar, proximo, pular, registrarRef, medirTudo }}>
             {children}
         </TutorialContext.Provider>
     );

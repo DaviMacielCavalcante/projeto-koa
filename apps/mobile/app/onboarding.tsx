@@ -218,7 +218,7 @@ export default function Onboarding() {
     if (etapa === 'lgpd') {
         return (
             <ScreenContainer variant="teal">
-                <TopBar leftIcon="arrow-back" rightIcon="volume-high" onLeftPress={() => setEtapa('boas_vindas')} />
+                <TopBar leftIcon="arrow-back" onLeftPress={() => setEtapa('boas_vindas')} />
                 <View style={styles.lgpdContainer}>
                     <View style={styles.lgpdCard}>
                         <View style={styles.lgpdIcone}>
@@ -261,7 +261,7 @@ export default function Onboarding() {
     if (etapa === 'perfil') {
         return (
             <ScreenContainer variant="gold">
-                <TopBar leftIcon="arrow-back" rightIcon="volume-high" onLeftPress={() => setEtapa('lgpd')} />
+                <TopBar leftIcon="arrow-back" onLeftPress={() => setEtapa('lgpd')} />
                 <View style={styles.perfilEspacador} />
                 <View style={styles.perfilCard}>
                     <View style={styles.perfilAvatar}>
@@ -328,7 +328,6 @@ export default function Onboarding() {
                     <TouchableOpacity onPress={() => setEtapa('pratica')} style={styles.tourPular}>
                         <Text style={styles.tourPularTexto}>Pular</Text>
                     </TouchableOpacity>
-                    <Ionicons name="volume-high" size={22} color="rgba(255,255,255,0.7)" />
                 </View>
                 <View style={styles.tourCentro}>
                     <IlustracaoTour index={tourSlide} />
@@ -364,7 +363,7 @@ export default function Onboarding() {
     // ─────────────────────────────────────────
     return (
         <ScreenContainer variant="cream">
-            <TopBar leftIcon="arrow-back" rightIcon="volume-high" dark onLeftPress={() => setEtapa('tour')} />
+            <TopBar leftIcon="arrow-back" dark onLeftPress={() => setEtapa('tour')} />
             <View style={styles.praticaHeader}>
                 <Text style={styles.praticaTitulo}>Quer treinar?</Text>
                 <Text style={styles.praticaSub}>Pode brincar sem medo de errar</Text>

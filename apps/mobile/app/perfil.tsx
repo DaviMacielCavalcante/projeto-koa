@@ -35,7 +35,7 @@ export default function Perfil() {
 
     return (
         <ScreenContainer variant="gold">
-            <TopBar leftIcon="arrow-back" rightIcon="volume-high" />
+            <TopBar leftIcon="arrow-back" />
             <View style={styles.perfilEspacador} />
             <View style={styles.perfilCard}>
                 <View style={styles.perfilAvatar}>
