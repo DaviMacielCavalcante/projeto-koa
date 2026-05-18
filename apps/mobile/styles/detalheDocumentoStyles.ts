@@ -82,6 +82,35 @@ export const detalheDocumentoStyles = StyleSheet.create({
         color: colors.tealDark,
         textDecorationLine: 'underline' as const,
     },
+    imagemContainer: {
+        flex: 1,
+        marginHorizontal: 16,
+        marginBottom: 8,
+        borderRadius: 18,
+        overflow: 'hidden',
+        backgroundColor: 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    imagemReferencia: {
+        width: '100%',
+        height: '100%',
+    },
+    statusBadge: {
+        position: 'absolute',
+        bottom: 12,
+        right: 12,
+        borderRadius: 20,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        alignItems: 'center',
+    },
+    semImagem: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 16,
+    },
     avisoFundo: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.65)',
@@ -110,10 +139,10 @@ export const detalheDocumentoStyles = StyleSheet.create({
     },
     avisoTexto: {
         fontFamily: fonts.body,
-        fontSize: sizes.bodySm,
+        fontSize: sizes.body,
         color: colors.inkSoft,
         textAlign: 'center',
-        lineHeight: 20,
+        lineHeight: 22,
     },
     avisoDestaque: {
         fontFamily: fonts.bodyBold,
@@ -139,5 +168,23 @@ export const detalheDocumentoStyles = StyleSheet.create({
         fontFamily: fonts.bodyMedium,
         fontSize: sizes.body,
         color: colors.inkMute,
+    },
+});
+
+export const docImagemModalStyles = StyleSheet.create({
+    fundo: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.92)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    imagem: {
+        width: '90%',
+        height: '75%',
+    },
+    fechar: {
+        position: 'absolute',
+        top: 48,
+        right: 20,
     },
 });
