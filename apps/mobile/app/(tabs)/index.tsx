@@ -11,6 +11,7 @@ import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
 
 const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR', 'NFA-e'];
+
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
 
 const STATUS_SUBTITLE: Record<DocStatus, string> = {
@@ -130,6 +131,7 @@ export default function Inicio() {
                 autoPlay={false}
                 style={styles.playerFixed}
             />
+
         </ScreenContainer>
     );
 }

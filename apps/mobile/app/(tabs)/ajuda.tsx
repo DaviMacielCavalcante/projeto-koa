@@ -139,17 +139,13 @@ export default function Ajuda() {
                         <Text style={styles.modalTexto}>
                             Todos os seus dados, fotos e documentos serão apagados permanentemente.
                         </Text>
-                        {apagando ? (
-                            <ActivityIndicator color={colors.redMid} size="large" />
-                        ) : (
-                            <GradientButton
-                                label={contador > 0 ? `Apagar tudo (${contador})` : 'Apagar tudo'}
-                                variant="red"
-                                disabled={contador > 0}
-                                onPress={apagarTodosDados}
-                                style={styles.botao}
-                            />
-                        )}
+                        <GradientButton
+                            label={contador > 0 ? `Apagar tudo (${contador})` : 'Apagar tudo'}
+                            variant="red"
+                            disabled={contador > 0}
+                            onPress={fecharModal}
+                            style={styles.botao}
+                        />
                         <GradientButton
                             label="Não, voltar"
                             variant="cream"
