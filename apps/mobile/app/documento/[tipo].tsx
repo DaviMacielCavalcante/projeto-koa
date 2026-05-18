@@ -134,7 +134,7 @@ export default function DetalheDocumento() {
                     <Text style={styles.titulo}>{tipo}</Text>
                     <Text style={styles.subtitulo}>{meta?.fullName ?? tipo}</Text>
 
-                    <TutorialGlow active={zonaAtiva === 'doc-status'} borderRadius={20}>
+                    
                         <View ref={statusRef}>
                             <LinearGradient
                                 colors={[...statusGradients[docStatus]]}
@@ -145,19 +145,23 @@ export default function DetalheDocumento() {
                                 <Text style={styles.statusBadgeTexto}>{big} · {sub}</Text>
                             </LinearGradient>
                         </View>
-                    </TutorialGlow>
+                    
                 </View>
             </TutorialGlow>
 
             {/* Imagem do documento — ocupa o espaço principal */}
             {imagemDoc ? (
+                 
                 <TouchableOpacity
                     style={styles.imagemWrap}
                     onPress={() => setImagemVisivel(true)}
                     activeOpacity={0.9}
                 >
+                    <TutorialGlow active={zonaAtiva === 'doc-status'} borderRadius={20}>
                     <Image source={imagemDoc} style={styles.imagemHeroFull} resizeMode="contain" />
+                    </TutorialGlow>
                 </TouchableOpacity>
+                
             ) : (
                 <View style={styles.semImagemWrap}>
                     <LinearGradient
