@@ -152,32 +152,35 @@ export default function Outros() {
 
             {/* Modal — adicionar documento */}
             <Modal visible={modalAdicionar} transparent animationType="slide">
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <TouchableOpacity style={styles.modalFundo} activeOpacity={1} onPress={() => setModalAdicionar(false)}>
-                    <TouchableOpacity style={styles.modalCard} activeOpacity={1}>
-                        <Text style={styles.modalTitulo}>Nome do documento</Text>
-                        <Text style={styles.modalSubtitulo}>Ex: Contrato de arrendamento, Certidão de nascimento...</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={nomeNovo}
-                            onChangeText={setNomeNovo}
-                            placeholder="Nome do documento"
-                            placeholderTextColor={colors.greyLight}
-                            autoCapitalize="words"
-                            autoFocus
-                        />
-                        <TouchableOpacity
-                            style={[styles.btnConfirmar, !nomeNovo.trim() && { opacity: 0.4 }]}
-                            onPress={confirmarAdicionar}
-                            disabled={!nomeNovo.trim()}
-                        >
-                            <Text style={styles.btnConfirmarTexto}>Tirar foto</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.btnCancelar} onPress={() => { setModalAdicionar(false); setNomeNovo(''); }}>
-                            <Text style={styles.btnCancelarTexto}>Cancelar</Text>
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                >
+                    <TouchableOpacity style={styles.modalFundo} activeOpacity={1} onPress={() => setModalAdicionar(false)}>
+                        <TouchableOpacity style={styles.modalCard} activeOpacity={1}>
+                            <Text style={styles.modalTitulo}>Nome do documento</Text>
+                            <Text style={styles.modalSubtitulo}>Ex: Contrato de arrendamento, Certidão de nascimento...</Text>
+                            <TextInput
+                                style={styles.input}
+                                value={nomeNovo}
+                                onChangeText={setNomeNovo}
+                                placeholder="Nome do documento"
+                                placeholderTextColor={colors.greyLight}
+                                autoCapitalize="words"
+                                autoFocus
+                            />
+                            <TouchableOpacity
+                                style={[styles.btnConfirmar, !nomeNovo.trim() && { opacity: 0.4 }]}
+                                onPress={confirmarAdicionar}
+                                disabled={!nomeNovo.trim()}
+                            >
+                                <Text style={styles.btnConfirmarTexto}>Tirar foto</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.btnCancelar} onPress={() => { setModalAdicionar(false); setNomeNovo(''); }}>
+                                <Text style={styles.btnCancelarTexto}>Cancelar</Text>
+                            </TouchableOpacity>
                         </TouchableOpacity>
                     </TouchableOpacity>
-                </TouchableOpacity>
                 </KeyboardAvoidingView>
             </Modal>
 

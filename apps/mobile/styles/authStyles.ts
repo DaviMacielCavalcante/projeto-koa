@@ -30,7 +30,7 @@ export const loginStyles = StyleSheet.create({
         borderRadius: 30,
         paddingHorizontal: 22,
         paddingVertical: 14,
-        fontSize: 18,
+        fontSize: sizes.md,
         color: colors.white,
         textAlign: 'center',
         fontFamily: fonts.bodyMedium,

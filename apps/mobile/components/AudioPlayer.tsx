@@ -1,6 +1,6 @@
 import { TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { Audio } from 'expo-av';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../design/theme';
 
@@ -11,64 +11,45 @@ interface AudioPlayerProps {
     style?: StyleProp<ViewStyle>;
 }
 
-export default function AudioPlayer({ source, autoPlay = false, onFinish, style }: AudioPlayerProps) {
+export default function AudioPlayer({ source, onFinish, style }: AudioPlayerProps) {
     const soundRef = useRef<Audio.Sound | null>(null);
-    const mountedRef = useRef(true);
     const [isPlaying, setIsPlaying] = useState(false);
 
-    useEffect(() => {
-        mountedRef.current = true;
+    async function descarregar() {
+        const sound = soundRef.current;
+        if (!sound) return;
+        soundRef.current = null;
+        sound.setOnPlaybackStatusUpdate(null);
+        try { await sound.stopAsync(); } catch {}
+        try { await sound.unloadAsync(); } catch {}
+    }
 
-        async function load() {
-            try {
+    async function handlePlay() {
+        try {
+            if (isPlaying) {
+                await soundRef.current?.pauseAsync();
+                setIsPlaying(false);
+                return;
+            }
+
+            if (!soundRef.current) {
                 await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
                 const { sound } = await Audio.Sound.createAsync(source, { shouldPlay: false });
-
-                if (!mountedRef.current) {
-                    await sound.unloadAsync();
-                    return;
-                }
-
                 soundRef.current = sound;
 
                 sound.setOnPlaybackStatusUpdate((status) => {
-                    if (!mountedRef.current) return;
                     if (status.isLoaded && status.didJustFinish) {
                         setIsPlaying(false);
                         onFinish?.();
+                        descarregar();
                     }
                 });
-
-                if (autoPlay && mountedRef.current) {
-                    await sound.playAsync();
-                    if (mountedRef.current) setIsPlaying(true);
-                }
-            } catch {
-                // ignora erros de carregamento (ex: reload rápido)
             }
-        }
 
-        load();
-
-        return () => {
-            mountedRef.current = false;
-            soundRef.current?.unloadAsync().catch(() => {});
-            soundRef.current = null;
-        };
-    }, []);
-
-    async function handlePlay() {
-        if (!soundRef.current) return;
-        try {
-            if (isPlaying) {
-                await soundRef.current.pauseAsync();
-                setIsPlaying(false);
-            } else {
-                await soundRef.current.playAsync();
-                setIsPlaying(true);
-            }
+            await soundRef.current?.playAsync();
+            setIsPlaying(true);
         } catch {
-            // ignora erros de thread durante reload
+            setIsPlaying(false);
         }
     }
 

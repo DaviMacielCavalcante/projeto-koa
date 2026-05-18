@@ -26,15 +26,13 @@ export const inicioStyles = StyleSheet.create({
     },
     greetName: {
         fontFamily: fonts.display,
-        fontSize: 16,
+        fontSize: sizes.md,
         color: colors.white,
-        fontWeight: '700',
     },
     sectionTitle: {
         fontFamily: fonts.display,
-        fontSize: 16,
+        fontSize: sizes.md,
         color: colors.tealDark,
-        fontWeight: '700',
         textAlign: 'center',
         paddingBottom: 10,
     },
@@ -92,6 +90,16 @@ export const inicioStyles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 2,
     },
+    // Destaque do cartão durante o tutorial (passos "docs"/"cores"): anel
+    // roxo + brilho, sem pintar o fundo — o conteúdo continua legível.
+    docCardDestaque: {
+        borderWidth: 3,
+        borderColor: colors.highlight,
+        shadowColor: colors.highlight,
+        shadowOpacity: 0.55,
+        shadowRadius: 12,
+        elevation: 12,
+    },
     docCardBarra: {
         width: 6,
         alignSelf: 'stretch',
@@ -111,6 +119,10 @@ export const inicioStyles = StyleSheet.create({
         fontSize: sizes.caption,
         color: colors.inkMute,
         marginTop: 2,
+    },
+    docCardBloqueado: {
+        opacity: 0.55,
+        backgroundColor: colors.creamDeep,
     },
     docCardDireita: {
         paddingHorizontal: 14,

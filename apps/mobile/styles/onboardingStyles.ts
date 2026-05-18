@@ -57,7 +57,6 @@ export const onboardingStyles = StyleSheet.create({
         fontFamily: fonts.display,
         fontSize: sizes.md,
         color: colors.ink,
-        fontWeight: '700',
         textAlign: 'center',
     },
     lgpdCorpo: {
@@ -93,7 +92,6 @@ export const onboardingStyles = StyleSheet.create({
         fontFamily: fonts.display,
         fontSize: sizes.md,
         color: colors.ink,
-        fontWeight: '700',
         marginBottom: 12,
     },
     perfilInput: {
@@ -238,8 +236,7 @@ export const onboardingStyles = StyleSheet.create({
     },
     praticaCardTitulo: {
         fontFamily: fonts.display,
-        fontSize: 16,
-        fontWeight: '700',
+        fontSize: sizes.md,
         color: colors.ink,
     },
     praticaCardSub: {
@@ -318,7 +315,35 @@ export const onboardingIlStyles = StyleSheet.create({
         shadowColor: '#000', shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.2, shadowRadius: 6, elevation: 4,
     },
-    docLabel: { fontFamily: fonts.bodySemi, fontSize: 9, color: colors.white, fontWeight: '700' },
+    docLabel: { fontFamily: fonts.bodySemi, fontSize: sizes.micro, color: colors.white },
+    // Cards (slide 1 tour)
+    cardsWrap: {
+        width: 200,
+        gap: 5,
+    },
+    docCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.92)',
+        borderRadius: 10,
+        overflow: 'hidden',
+        height: 30,
+        gap: 8,
+    },
+    docCardBarra: {
+        width: 5,
+        alignSelf: 'stretch',
+    },
+    docCardLabel: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.micro,
+        color: colors.ink,
+        flex: 1,
+    },
+    docCardDot: {
+        width: 7, height: 7, borderRadius: 4,
+        marginRight: 10,
+    },
     telefone: {
         width: 120, height: 190, borderRadius: 18,
         backgroundColor: '#1a1a1a', overflow: 'hidden',

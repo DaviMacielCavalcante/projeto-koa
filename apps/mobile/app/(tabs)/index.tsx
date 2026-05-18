@@ -1,17 +1,17 @@
 import { router, useFocusEffect } from 'expo-router';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { useTutorial } from '../../src/contexts/TutorialContext';
 import { inicioStyles as styles } from '../../styles/inicioStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
-import { DocCircle, ScreenContainer } from '../../design/components';
+import { ScreenContainer } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
 
 const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR', 'NFA-e'];
-
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
 
 const STATUS_SUBTITLE: Record<DocStatus, string> = {
@@ -40,6 +40,16 @@ function calcularStatus(row: DocRow | null): DocStatus {
 
 export default function Inicio() {
     const { isPracticeMode } = usePracticeMode();
+    const { registrarRef } = useTutorial();
+    const greetRef = useRef<View>(null);
+    const docsRef = useRef<View>(null);
+
+    useEffect(() => {
+        registrarRef('greet', greetRef);
+        registrarRef('docs', docsRef);
+        registrarRef('cores', docsRef);
+    }, []);
+
     const [docs, setDocs] = useState(
         TIPOS.map((nome) => ({ nome, status: 'grey' as DocStatus }))
     );
@@ -70,10 +80,7 @@ export default function Inicio() {
                 );
                 const mapa: Record<string, DocRow> = {};
                 rows?.forEach((r) => (mapa[r.type] = r));
-                setDocs(TIPOS.map((nome) => ({
-                    nome,
-                    status: calcularStatus(mapa[nome] ?? null),
-                })));
+                setDocs(TIPOS.map((nome) => ({ nome, status: calcularStatus(mapa[nome] ?? null) })));
             }
             carregarStatus();
         }, [isPracticeMode])
@@ -81,48 +88,56 @@ export default function Inicio() {
 
     return (
         <ScreenContainer variant="cream">
+            <View ref={greetRef} style={styles.greetCard}>
+                <View style={styles.avatar}>
+                    <Ionicons name="person" size={22} color={colors.tealDark} />
+                </View>
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.greetLabel}>Bom dia,</Text>
+                    <Text style={styles.greetName}>{nomeUsuario}</Text>
+                </View>
+                <TouchableOpacity
+                    onPress={() => router.push('/perfil')}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                    <Ionicons name="pencil" size={18} color="rgba(255,255,255,0.7)" />
+                </TouchableOpacity>
+            </View>
+
+            <Text style={styles.sectionTitle}>Seus Documentos</Text>
+
             <ScrollView
-                contentContainerStyle={styles.scrollContent}
+                ref={docsRef as any}
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.grid}
                 showsVerticalScrollIndicator={false}
             >
-                <View style={styles.greetCard}>
-                    <View style={styles.avatar}>
-                        <Ionicons name="person" size={22} color={colors.tealDark} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.greetLabel}>Bom dia,</Text>
-                        <Text style={styles.greetName}>{nomeUsuario}</Text>
-                    </View>
-                </View>
+                {docs.map((doc) => {
+                    const barColor = {
+                        green: colors.statusGreen,
+                        yellow: colors.statusYellow,
+                        red: colors.statusRed,
+                        grey: colors.statusGrey,
+                    }[doc.status];
 
-                <Text style={styles.sectionTitle}>Seus Documentos</Text>
-
-                <View style={styles.grid}>
-                    {docs.map((doc) => (
-                        <DocCircle
+                    return (
+                        <TouchableOpacity
                             key={doc.nome}
-                            name={doc.nome}
-                            subtitle={STATUS_SUBTITLE[doc.status]}
-                            status={doc.status}
+                            style={styles.docCard}
+                            activeOpacity={0.85}
                             onPress={() => router.push('/documento/' + doc.nome)}
-                        />
-                    ))}
-                </View>
-
-                <TouchableOpacity
-                    style={styles.educationalCard}
-                    activeOpacity={0.85}
-                    onPress={() => router.push('/roadmap')}
-                >
-                    <View style={styles.educationalIcon}>
-                        <Ionicons name="book" size={22} color={colors.white} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.educationalTitle}>Aprender sobre os documentos</Text>
-                        <Text style={styles.educationalSub}>Estude no seu ritmo</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
-                </TouchableOpacity>
+                        >
+                            <View style={[styles.docCardBarra, { backgroundColor: barColor }]} />
+                            <View style={styles.docCardConteudo}>
+                                <Text style={styles.docCardNome}>{doc.nome}</Text>
+                                <Text style={styles.docCardSubtitulo}>{STATUS_SUBTITLE[doc.status]}</Text>
+                            </View>
+                            <View style={styles.docCardDireita}>
+                                <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
             </ScrollView>
 
             <AudioPlayer
@@ -130,8 +145,6 @@ export default function Inicio() {
                 autoPlay={false}
                 style={styles.playerFixed}
             />
-
         </ScreenContainer>
     );
 }
-

@@ -9,6 +9,7 @@ import { ScreenContainer, GradientButton, TopBar, AudioCircle } from '../design/
 import { colors } from '../design/theme';
 import { agricultoresDb } from '../src/db/index';
 import { usePracticeMode } from '../src/hooks/usePracticeMode';
+import { useTutorial } from '../src/contexts/TutorialContext';
 
 // ─── ILUSTRAÇÕES ──────────────────────────────────────────────────────────────
 
@@ -48,32 +49,22 @@ function IlustracaoTour({ index }: { index: number }) {
     }
 
     if (index === 1) {
-        // Cena: 5 círculos de documento
         const docs = [
-            { label: 'CAF', cor: colors.tealDark },
-            { label: 'CAR', cor: colors.goldDark },
-            { label: 'CCIR', cor: colors.orangeMid },
-            { label: 'ITR', cor: colors.redMid },
+            { label: 'ITR',   cor: colors.redMid },
+            { label: 'CCIR',  cor: colors.orangeMid },
+            { label: 'CAF',   cor: colors.tealDark },
+            { label: 'CAR',   cor: colors.goldDark },
             { label: 'NFA-e', cor: colors.tealMid },
         ];
         return (
-            <View style={il.cena}>
-                <View style={il.docsGrid}>
-                    <View style={il.docsLinha1}>
-                        {docs.slice(0, 3).map((d) => (
-                            <View key={d.label} style={[il.docCirculo, { backgroundColor: d.cor }]}>
-                                <Text style={il.docLabel}>{d.label}</Text>
-                            </View>
-                        ))}
+            <View style={il.cardsWrap}>
+                {docs.map((d) => (
+                    <View key={d.label} style={il.docCard}>
+                        <View style={[il.docCardBarra, { backgroundColor: d.cor }]} />
+                        <Text style={il.docCardLabel}>{d.label}</Text>
+                        <View style={[il.docCardDot, { backgroundColor: d.cor }]} />
                     </View>
-                    <View style={il.docsLinha2}>
-                        {docs.slice(3).map((d) => (
-                            <View key={d.label} style={[il.docCirculo, { backgroundColor: d.cor }]}>
-                                <Text style={il.docLabel}>{d.label}</Text>
-                            </View>
-                        ))}
-                    </View>
-                </View>
+                ))}
             </View>
         );
     }
@@ -167,6 +158,7 @@ async function concluirOnboarding(nome: string, lgpdConsentido: boolean) {
 
 export default function Onboarding() {
     const { enterPracticeMode } = usePracticeMode();
+    const { iniciar: iniciarTutorial } = useTutorial();
     const [etapa, setEtapa] = useState<Etapa>('boas_vindas');
     const [nome, setNome] = useState('');
     const [lgpdConsentido, setLgpdConsentido] = useState(false);
@@ -226,7 +218,7 @@ export default function Onboarding() {
     if (etapa === 'lgpd') {
         return (
             <ScreenContainer variant="teal">
-                <TopBar leftIcon="arrow-back" rightIcon="volume-high" onLeftPress={() => setEtapa('boas_vindas')} />
+                <TopBar leftIcon="arrow-back" onLeftPress={() => setEtapa('boas_vindas')} />
                 <View style={styles.lgpdContainer}>
                     <View style={styles.lgpdCard}>
                         <View style={styles.lgpdIcone}>
@@ -269,7 +261,7 @@ export default function Onboarding() {
     if (etapa === 'perfil') {
         return (
             <ScreenContainer variant="gold">
-                <TopBar leftIcon="arrow-back" rightIcon="volume-high" onLeftPress={() => setEtapa('lgpd')} />
+                <TopBar leftIcon="arrow-back" onLeftPress={() => setEtapa('lgpd')} />
                 <View style={styles.perfilEspacador} />
                 <View style={styles.perfilCard}>
                     <View style={styles.perfilAvatar}>
@@ -311,6 +303,7 @@ export default function Onboarding() {
                         label="SALVAR E CONTINUAR"
                         variant="gold"
                         onPress={() => { setTourSlide(0); setEtapa('tour'); }}
+                        disabled={!nome.trim()}
                         style={[styles.botaoFull, { marginTop: 8 }]}
                     />
                     <TouchableOpacity style={styles.botaoVoltarCard} onPress={() => setEtapa('lgpd')}>
@@ -335,7 +328,6 @@ export default function Onboarding() {
                     <TouchableOpacity onPress={() => setEtapa('pratica')} style={styles.tourPular}>
                         <Text style={styles.tourPularTexto}>Pular</Text>
                     </TouchableOpacity>
-                    <Ionicons name="volume-high" size={22} color="rgba(255,255,255,0.7)" />
                 </View>
                 <View style={styles.tourCentro}>
                     <IlustracaoTour index={tourSlide} />
@@ -371,7 +363,7 @@ export default function Onboarding() {
     // ─────────────────────────────────────────
     return (
         <ScreenContainer variant="cream">
-            <TopBar leftIcon="arrow-back" rightIcon="volume-high" dark onLeftPress={() => setEtapa('tour')} />
+            <TopBar leftIcon="arrow-back" dark onLeftPress={() => setEtapa('tour')} />
             <View style={styles.praticaHeader}>
                 <Text style={styles.praticaTitulo}>Quer treinar?</Text>
                 <Text style={styles.praticaSub}>Pode brincar sem medo de errar</Text>
@@ -387,16 +379,6 @@ export default function Onboarding() {
                     </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.praticaCard} activeOpacity={0.85} onPress={() => irParaTabs(true)}>
-                    <View style={[styles.praticaIcone, { backgroundColor: colors.goldMid }]}>
-                        <Ionicons name="play" size={26} color={colors.white} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.praticaCardTitulo}>Modo Prática</Text>
-                        <Text style={styles.praticaCardSub}>Treina sem mexer nos documentos de verdade</Text>
-                    </View>
-                </TouchableOpacity>
-
                 <TouchableOpacity style={styles.praticaCard} activeOpacity={0.85} onPress={() => setEtapa('boas_vindas')}>
                     <View style={[styles.praticaIcone, { backgroundColor: colors.redMid }]}>
                         <Ionicons name="help-circle" size={26} color={colors.white} />
@@ -404,6 +386,20 @@ export default function Onboarding() {
                     <View style={{ flex: 1 }}>
                         <Text style={styles.praticaCardTitulo}>Tô com dúvida</Text>
                         <Text style={styles.praticaCardSub}>Ouvir a explicação de novo</Text>
+                    </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.praticaCard}
+                    activeOpacity={0.85}
+                    onPress={() => { irParaTabs(); iniciarTutorial(); }}
+                >
+                    <View style={[styles.praticaIcone, { backgroundColor: colors.tealMid }]}>
+                        <Ionicons name="map" size={26} color={colors.white} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.praticaCardTitulo}>Ver tutorial do app</Text>
+                        <Text style={styles.praticaCardSub}>Um guia rápido mostrando cada parte do app</Text>
                     </View>
                 </TouchableOpacity>
             </View>

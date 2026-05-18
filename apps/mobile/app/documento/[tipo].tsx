@@ -1,8 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { agricultoresDb } from '../../src/db/index';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, Text, View, Modal, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { useCallback, useState, useRef, useEffect } from 'react';
+import { ActivityIndicator, Text, View, Modal, Image, TouchableOpacity } from 'react-native';
+import { useTutorial } from '../../src/contexts/TutorialContext';
 import { Ionicons } from '@expo/vector-icons';
 import AudioPlayer from '../../components/AudioPlayer';
 import { DocumentTypeIcon, GradientButton, ScreenContainer, TopBar } from '../../design/components';
@@ -55,10 +56,28 @@ function statusTexto(doc: Documento | null, docStatus: DocStatus): { big: string
 
 export default function DetalheDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
+    const { registrarRef } = useTutorial();
+    const heroRef = useRef<View>(null);
+    const statusRef = useRef<View>(null);
+    const acoesRef = useRef<View>(null);
+
     const [documento, setDocumento] = useState<Documento | null>(null);
     const [loading, setLoading] = useState(true);
+    const [avisoNfae, setAvisoNfae] = useState(false);
+    const [fotoVisivel, setFotoVisivel] = useState(false);
     const [imagemVisivel, setImagemVisivel] = useState(false);
+    const [avisoDependencia, setAvisoDependencia] = useState<string | null>(null);
+    const [dependenciaCumprida, setDependenciaCumprida] = useState(true);
+
+    const DEPENDENCIAS: Partial<Record<string, string>> = { CAF: 'CCIR', CAR: 'CAF' };
     const imagemDoc = IMAGENS_DOC[tipo];
+
+    useEffect(() => {
+        registrarRef('doc-hero', heroRef);
+        registrarRef('doc-status', statusRef);
+        registrarRef('doc-acoes', acoesRef);
+    }, []);
+
     const documentType = tipo && isDocumentType(tipo) ? tipo : null;
     const meta = documentType ? documentMeta[documentType] : null;
 
@@ -66,18 +85,30 @@ export default function DetalheDocumento() {
         useCallback(() => {
             async function buscarDocumento() {
                 setLoading(true);
-
                 try {
                     const result = await agricultoresDb?.getFirstAsync<Documento>(
                         'SELECT * FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
                         [tipo]
                     );
                     setDocumento(result ?? null);
+
+                    const dep = DEPENDENCIAS[tipo];
+                    if (dep) {
+                        const depDoc = await agricultoresDb?.getFirstAsync<{ id: string }>(
+                            'SELECT id FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
+                            [dep]
+                        );
+                        const cumprida = !!depDoc;
+                        setDependenciaCumprida(cumprida);
+                        setAvisoDependencia(cumprida ? null : dep);
+                    } else {
+                        setDependenciaCumprida(true);
+                        setAvisoDependencia(null);
+                    }
                 } finally {
                     setLoading(false);
                 }
             }
-
             buscarDocumento();
         }, [tipo])
     );
@@ -95,14 +126,18 @@ export default function DetalheDocumento() {
 
     return (
         <ScreenContainer variant="gold">
-            <TopBar leftIcon="arrow-back" rightIcon="volume-high" />
+            <TopBar leftIcon="arrow-back" />
 
-            <View style={styles.top}>
+            <View ref={heroRef} style={styles.top}>
+                {documentType ? (
+                    <View style={styles.heroIconWrap}>
+                        <DocumentTypeIcon type={documentType} size={104} />
+                    </View>
+                ) : null}
                 <Text style={styles.titulo}>{tipo}</Text>
                 <Text style={styles.subtitulo}>{meta?.fullName ?? tipo}</Text>
             </View>
 
-            {/* Imagem de referência (ocupa o espaço principal) */}
             {imagemDoc ? (
                 <TouchableOpacity
                     style={styles.imagemContainer}
@@ -110,11 +145,9 @@ export default function DetalheDocumento() {
                     onPress={() => setImagemVisivel(true)}
                 >
                     <Image source={imagemDoc} style={styles.imagemReferencia} resizeMode="contain" />
-                    
                 </TouchableOpacity>
             ) : (
-                <View style={styles.semImagem}>
-                    {documentType ? <DocumentTypeIcon type={documentType} size={100} /> : null}
+                <View ref={statusRef} style={styles.semImagem}>
                     <LinearGradient
                         colors={[...statusGradients[docStatus]]}
                         start={{ x: 0, y: 0 }}
@@ -127,7 +160,19 @@ export default function DetalheDocumento() {
                 </View>
             )}
 
-            <View style={styles.acoes}>
+            {avisoDependencia && (
+                <View style={styles.bannnerDep}>
+                    <Ionicons name="lock-closed" size={16} color={colors.orangeDark} />
+                    <Text style={styles.bannerDepTexto}>
+                        Para guardar a foto do {tipo} você precisa primeiro registrar o{' '}
+                        <Text style={styles.bannerDepLink} onPress={() => router.push(`/documento/${avisoDependencia}`)}>
+                            {avisoDependencia}
+                        </Text>.
+                    </Text>
+                </View>
+            )}
+
+            <View ref={acoesRef} style={styles.acoes}>
                 {documento?.file_url ? (
                     <GradientButton
                         label="Ver foto salva"
@@ -136,17 +181,40 @@ export default function DetalheDocumento() {
                     />
                 ) : null}
                 <GradientButton
-                    label="Como consigo?"
+                    label="Como conseguir"
                     variant="teal"
                     onPress={() => router.push(`/guia/${tipo}`)}
                 />
-                <GradientButton label="Tenho duvida" variant="orange" onPress={() => setDuvidaVisivel(true)} />
+                <GradientButton label="Tenho duvida" variant="orange" onPress={() => router.push(`/faq/${tipo}`)} />
+                {tipo === 'NFA-e' && (
+                    <GradientButton
+                        label="Ver notas salvas"
+                        variant="teal"
+                        onPress={() => router.push('/nfae-lista')}
+                    />
+                )}
                 <GradientButton
-                    label="Ja tenho, quero guardar"
+                    label={tipo === 'NFA-e' ? 'Preencher dados da nota' : 'Guardar foto do documento'}
                     variant="red"
-                    onPress={() => router.push(`/camera/${tipo}`)}
+                    disabled={!dependenciaCumprida && tipo !== 'NFA-e'}
+                    onPress={() => tipo === 'NFA-e' ? setAvisoNfae(true) : router.push(`/camera/${tipo}`)}
                 />
             </View>
+
+            <AudioPlayer
+                source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
+                autoPlay={false}
+                style={styles.player}
+            />
+
+            <Modal visible={fotoVisivel} transparent animationType="fade">
+                <TouchableOpacity style={styles.avisoFundo} activeOpacity={1} onPress={() => setFotoVisivel(false)}>
+                    <Image source={{ uri: documento?.file_url ?? '' }} style={{ width: '90%', height: '75%' }} resizeMode="contain" />
+                    <TouchableOpacity style={{ position: 'absolute', top: 52, right: 20 }} onPress={() => setFotoVisivel(false)}>
+                        <Ionicons name="close-circle" size={52} color="#fff" />
+                    </TouchableOpacity>
+                </TouchableOpacity>
+            </Modal>
 
             <Modal visible={imagemVisivel} transparent animationType="fade">
                 <TouchableOpacity style={modalStyles.fundo} activeOpacity={1} onPress={() => setImagemVisivel(false)}>
@@ -155,6 +223,27 @@ export default function DetalheDocumento() {
                         <Ionicons name="close-circle" size={48} color="#fff" />
                     </TouchableOpacity>
                 </TouchableOpacity>
+            </Modal>
+
+            <Modal visible={avisoNfae} transparent animationType="fade">
+                <View style={styles.avisoFundo}>
+                    <View style={styles.avisoCard}>
+                        <View style={styles.avisoIcone}>
+                            <Ionicons name="warning" size={32} color={colors.white} />
+                        </View>
+                        <Text style={styles.avisoTitulo}>Cuidado antes de continuar</Text>
+                        <Text style={styles.avisoTexto}>
+                            Antes de fazer uma nota fiscal, confira bem os dados — nome, quantidade e valor do que você vai vender.{'\n\n'}
+                            Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.
+                        </Text>
+                        <TouchableOpacity style={styles.avisoBtn} onPress={() => { setAvisoNfae(false); router.push('/nfae-form'); }}>
+                            <Text style={styles.avisoBtnTexto}>Entendi, continuar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.avisoBtnVoltar} onPress={() => setAvisoNfae(false)}>
+                            <Text style={styles.avisoBtnVoltarTexto}>Voltar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </Modal>
         </ScreenContainer>
     );

@@ -171,7 +171,7 @@ export default function GuiaDocumento() {
 
     return (
         <ScreenContainer variant="teal">
-            <TopBar leftIcon="arrow-back" rightIcon="volume-high" />
+            <TopBar leftIcon="arrow-back" />
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
                 <Text style={styles.titulo}>Como conseguir o {tipo}</Text>
