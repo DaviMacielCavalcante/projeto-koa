@@ -6,6 +6,8 @@ import { ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { seedEducationalContentsIfEmpty } from '../../src/db/seedEducationalContents';
+import { usePracticeMode } from '../../src/hooks/usePracticeMode';
+import { listarConcluidosDoUsuario } from '../../src/services/progress';
 import { roadmapStyles as styles } from '../../styles/roadmapStyles';
 
 type ContentRow = {
@@ -15,29 +17,32 @@ type ContentRow = {
     created_at: string;
 };
 
-type ProgressRow = { content_id: string };
-
 export default function Roadmap() {
+    const { isPracticeMode, practiceLidos } = usePracticeMode();
     const [topics, setTopics] = useState<ContentRow[]>([]);
     const [readIds, setReadIds] = useState<Set<string>>(new Set());
 
     useFocusEffect(
         useCallback(() => {
             async function carregar() {
-                await seedEducationalContentsIfEmpty();
+                if (!isPracticeMode) {
+                    await seedEducationalContentsIfEmpty();
+                }
 
                 const contents = await agricultoresDb?.getAllAsync<ContentRow>(
                     'SELECT id, title, category, created_at FROM educational_contents ORDER BY created_at ASC'
                 );
                 setTopics(contents ?? []);
 
-                const progresses = await agricultoresDb?.getAllAsync<ProgressRow>(
-                    'SELECT content_id FROM user_content_progress WHERE read_at IS NOT NULL'
-                );
-                setReadIds(new Set(progresses?.map((p) => p.content_id) ?? []));
+                if (isPracticeMode) {
+                    setReadIds(practiceLidos);
+                } else {
+                    const concluidos = await listarConcluidosDoUsuario();
+                    setReadIds(concluidos);
+                }
             }
             carregar();
-        }, [])
+        }, [isPracticeMode, practiceLidos])
     );
 
     return (

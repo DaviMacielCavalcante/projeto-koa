@@ -6,13 +6,17 @@ import { AudioCircle, GradientButton, ScreenContainer, TopBar } from '../../desi
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { getRoadmapContent } from '../../src/data/roadmapContent';
+import { usePracticeMode } from '../../src/hooks/usePracticeMode';
+import { isConcluido, marcarComoConcluido } from '../../src/services/progress';
 import { roadmapDetailStyles as styles } from '../../styles/roadmapDetailStyles';
 
 type ContentRow = { title: string; body: string | null; category: string | null };
 
 export default function RoadmapDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
+    const { isPracticeMode, practiceLidos, marcarLidoPratica } = usePracticeMode();
     const [content, setContent] = useState<ContentRow | null>(null);
+    const [concluido, setConcluido] = useState(false);
 
     useEffect(() => {
         async function carregar() {
@@ -22,9 +26,25 @@ export default function RoadmapDetail() {
                 [id]
             );
             setContent(row ?? null);
+
+            if (isPracticeMode) {
+                setConcluido(practiceLidos.has(id));
+            } else {
+                setConcluido(await isConcluido(id));
+            }
         }
         carregar();
-    }, [id]);
+    }, [id, isPracticeMode, practiceLidos]);
+
+    async function handleConcluir() {
+        if (!id || concluido) return;
+        if (isPracticeMode) {
+            marcarLidoPratica(id);
+        } else {
+            await marcarComoConcluido(id);
+        }
+        setConcluido(true);
+    }
 
     const rich = getRoadmapContent(content?.category);
 
@@ -36,7 +56,9 @@ export default function RoadmapDetail() {
                     <AudioCircle icon="volume-high" iconColor={colors.tealDark} size={88} />
                 </View>
 
-                <Text style={styles.titulo}>{content?.title ?? ''}</Text>
+                <Text style={[styles.titulo, concluido && styles.tituloConcluido]}>
+                    {content?.title ?? ''}
+                </Text>
 
                 {content?.category ? (
                     <View style={styles.categoriaBadge}>
@@ -76,8 +98,10 @@ export default function RoadmapDetail() {
                 )}
 
                 <GradientButton
-                    label="Marcar como concluído"
+                    label={concluido ? 'Concluído ✓' : 'Marcar como concluído'}
                     variant="teal"
+                    onPress={handleConcluir}
+                    disabled={concluido}
                     style={styles.botao}
                 />
             </ScrollView>

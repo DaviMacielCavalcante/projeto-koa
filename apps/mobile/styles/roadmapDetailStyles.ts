@@ -19,6 +19,9 @@ export const roadmapDetailStyles = StyleSheet.create({
         fontWeight: '700',
         textAlign: 'center',
     },
+    tituloConcluido: {
+        color: colors.statusGreen,
+    },
     categoriaBadge: {
         alignSelf: 'center',
         backgroundColor: colors.tealDark,
