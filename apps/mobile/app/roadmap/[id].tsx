@@ -1,9 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
-import { colors, fonts, sizes } from '../../design/theme';
+import { ScrollView, Text, View } from 'react-native';
+import { AudioCircle, GradientButton, ScreenContainer, TopBar } from '../../design/components';
+import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
+import { getRoadmapContent } from '../../src/data/roadmapContent';
+import { roadmapDetailStyles as styles } from '../../styles/roadmapDetailStyles';
 
 type ContentRow = { title: string; body: string | null; category: string | null };
 
@@ -23,23 +26,57 @@ export default function RoadmapDetail() {
         carregar();
     }, [id]);
 
+    const rich = getRoadmapContent(content?.category);
+
     return (
         <ScreenContainer variant="cream">
-            <TopBar leftIcon="arrow-back" dark />
-            <ScrollView contentContainerStyle={styles.content}>
-                <Text style={styles.titulo}>{content?.title ?? ''}</Text>
-                {content?.category ? (
-                    <Text style={styles.categoria}>{content.category}</Text>
-                ) : null}
-
-                <View style={styles.placeholder}>
-                    <Text style={styles.placeholderText}>
-                        Conteúdo em breve
-                    </Text>
+            <TopBar leftIcon="arrow-back" rightIcon="volume-high" dark />
+            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+                <View style={styles.audioWrap}>
+                    <AudioCircle icon="volume-high" iconColor={colors.tealDark} size={88} />
                 </View>
 
+                <Text style={styles.titulo}>{content?.title ?? ''}</Text>
+
+                {content?.category ? (
+                    <View style={styles.categoriaBadge}>
+                        <Text style={styles.categoriaBadgeText}>{content.category}</Text>
+                    </View>
+                ) : null}
+
+                {rich ? (
+                    <>
+                        <Text style={styles.hero}>{rich.hero}</Text>
+
+                        {rich.sections.map((section, i) => (
+                            <View key={`${section.title}-${i}`} style={styles.sectionCard}>
+                                <View style={styles.sectionIconWrap}>
+                                    <Ionicons name={section.icon} size={22} color={colors.tealDark} />
+                                </View>
+                                <View style={styles.sectionTextWrap}>
+                                    <Text style={styles.sectionTitle}>{section.title}</Text>
+                                    <Text style={styles.sectionBody}>{section.body}</Text>
+                                </View>
+                            </View>
+                        ))}
+
+                        <View style={styles.resumoCard}>
+                            <View style={styles.resumoIconWrap}>
+                                <Ionicons name="bulb" size={22} color={colors.white} />
+                            </View>
+                            <Text style={styles.resumoText}>{rich.resumo}</Text>
+                        </View>
+                    </>
+                ) : (
+                    <View style={styles.placeholder}>
+                        <Text style={styles.placeholderText}>
+                            Conteúdo em breve
+                        </Text>
+                    </View>
+                )}
+
                 <GradientButton
-                    label="Marcar como lido"
+                    label="Marcar como concluído"
                     variant="teal"
                     style={styles.botao}
                 />
@@ -47,43 +84,3 @@ export default function RoadmapDetail() {
         </ScreenContainer>
     );
 }
-
-const styles = StyleSheet.create({
-    content: {
-        paddingHorizontal: 24,
-        paddingTop: 16,
-        paddingBottom: 48,
-    },
-    titulo: {
-        fontFamily: fonts.display,
-        fontSize: sizes.xl,
-        color: colors.tealDark,
-        fontWeight: '700',
-        textAlign: 'center',
-    },
-    categoria: {
-        fontFamily: fonts.body,
-        fontSize: sizes.bodySm,
-        color: colors.inkMute,
-        textAlign: 'center',
-        marginTop: 6,
-    },
-    placeholder: {
-        marginTop: 32,
-        marginBottom: 32,
-        padding: 32,
-        borderRadius: 22,
-        backgroundColor: colors.white,
-        borderWidth: 1,
-        borderColor: colors.creamDeep,
-        alignItems: 'center',
-    },
-    placeholderText: {
-        fontFamily: fonts.body,
-        fontSize: sizes.body,
-        color: colors.inkMute,
-    },
-    botao: {
-        marginTop: 8,
-    },
-});
