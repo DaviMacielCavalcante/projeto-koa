@@ -6,6 +6,7 @@ import { ActivityIndicator, Text, View, Modal, Image, TouchableOpacity } from 'r
 import { useTutorial } from '../../src/contexts/TutorialContext';
 import { Ionicons } from '@expo/vector-icons';
 import AudioPlayer from '../../components/AudioPlayer';
+import TutorialGlow from '../../components/TutorialGlow';
 import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors, statusGradients } from '../../design/theme';
@@ -128,21 +129,25 @@ export default function DetalheDocumento() {
             <TopBar leftIcon="arrow-back" />
 
             {/* Cabeçalho: título + badge de status */}
-            <View ref={heroRef} style={[styles.top, zonaAtiva === 'doc-hero' && { backgroundColor: colors.highlight, borderRadius: 20, paddingVertical: 8, marginHorizontal: 12 }]}>
-                <Text style={styles.titulo}>{tipo}</Text>
-                <Text style={styles.subtitulo}>{meta?.fullName ?? tipo}</Text>
+            <TutorialGlow active={zonaAtiva === 'doc-hero'} borderRadius={20} style={{ marginHorizontal: 12 }}>
+                <View ref={heroRef} style={styles.top}>
+                    <Text style={styles.titulo}>{tipo}</Text>
+                    <Text style={styles.subtitulo}>{meta?.fullName ?? tipo}</Text>
 
-                <View ref={statusRef}>
-                    <LinearGradient
-                        colors={zonaAtiva === 'doc-status' ? [colors.highlight, colors.highlightDeep] : [...statusGradients[docStatus]]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.statusBadgeSmall}
-                    >
-                        <Text style={styles.statusBadgeTexto}>{big} · {sub}</Text>
-                    </LinearGradient>
+                    <TutorialGlow active={zonaAtiva === 'doc-status'} borderRadius={20}>
+                        <View ref={statusRef}>
+                            <LinearGradient
+                                colors={[...statusGradients[docStatus]]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={styles.statusBadgeSmall}
+                            >
+                                <Text style={styles.statusBadgeTexto}>{big} · {sub}</Text>
+                            </LinearGradient>
+                        </View>
+                    </TutorialGlow>
                 </View>
-            </View>
+            </TutorialGlow>
 
             {/* Imagem do documento — ocupa o espaço principal */}
             {imagemDoc ? (
@@ -189,34 +194,36 @@ export default function DetalheDocumento() {
                 </View>
             )}
 
-            <View ref={acoesRef} style={[styles.acoes, zonaAtiva === 'doc-acoes' && { backgroundColor: colors.highlight, borderRadius: 20, marginHorizontal: 12 }]}>
-                {documento?.file_url ? (
+            <TutorialGlow active={zonaAtiva === 'doc-acoes'} borderRadius={20} style={{ marginHorizontal: 12, marginTop: 'auto' as const }}>
+                <View ref={acoesRef} style={[styles.acoes, { marginTop: 0 }]}>
+                    {documento?.file_url ? (
+                        <GradientButton
+                            label="Ver foto salva"
+                            variant="gold"
+                            onPress={() => setFotoVisivel(true)}
+                        />
+                    ) : null}
                     <GradientButton
-                        label="Ver foto salva"
-                        variant="gold"
-                        onPress={() => setFotoVisivel(true)}
-                    />
-                ) : null}
-                <GradientButton
-                    label="Como conseguir"
-                    variant="teal"
-                    onPress={() => router.push(`/guia/${tipo}`)}
-                />
-                <GradientButton label="Tenho duvida" variant="orange" onPress={() => router.push(`/faq/${tipo}`)} />
-                {tipo === 'NFA-e' && (
-                    <GradientButton
-                        label="Ver notas salvas"
+                        label="Como conseguir"
                         variant="teal"
-                        onPress={() => router.push('/nfae-lista')}
+                        onPress={() => router.push(`/guia/${tipo}`)}
                     />
-                )}
-                <GradientButton
-                    label={tipo === 'NFA-e' ? 'Preencher dados da nota' : 'Guardar foto do documento'}
-                    variant="red"
-                    disabled={!dependenciaCumprida && tipo !== 'NFA-e'}
-                    onPress={() => tipo === 'NFA-e' ? setAvisoNfae(true) : router.push(`/camera/${tipo}`)}
-                />
-            </View>
+                    <GradientButton label="Tenho duvida" variant="orange" onPress={() => router.push(`/faq/${tipo}`)} />
+                    {tipo === 'NFA-e' && (
+                        <GradientButton
+                            label="Ver notas salvas"
+                            variant="teal"
+                            onPress={() => router.push('/nfae-lista')}
+                        />
+                    )}
+                    <GradientButton
+                        label={tipo === 'NFA-e' ? 'Preencher dados da nota' : 'Guardar foto do documento'}
+                        variant="red"
+                        disabled={!dependenciaCumprida && tipo !== 'NFA-e'}
+                        onPress={() => tipo === 'NFA-e' ? setAvisoNfae(true) : router.push(`/camera/${tipo}`)}
+                    />
+                </View>
+            </TutorialGlow>
 
             <Modal visible={fotoVisivel} transparent animationType="fade">
                 <TouchableOpacity style={styles.avisoFundo} activeOpacity={1} onPress={() => setFotoVisivel(false)}>

@@ -19,9 +19,6 @@ export const colors = {
   orangeMid: '#C95F2E',
   orangeLight: '#E8753C',
 
-  highlight: '#7C3AED',
-  highlightDeep: '#5B21B6',
-
   black: '#111111',
   ink: '#1a1a1a',
   inkSoft: '#555555',

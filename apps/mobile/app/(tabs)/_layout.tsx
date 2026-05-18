@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react';
 import { View, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PracticeModeIndicator from '../../components/PracticeModeIndicator';
+import TutorialGlow from '../../components/TutorialGlow';
 import { colors, fonts } from '../../design/theme';
 import { useTutorial } from '../../src/contexts/TutorialContext';
 
@@ -56,16 +57,17 @@ export default function TabsLayout() {
                     name="documentos"
                     options={{
                         title: 'Outros',
-                        tabBarIcon: ({ color }) => <Ionicons name="book-outline" color={zonaAtiva === 'tab-outros' ? colors.white : color} size={24} />,
-                        tabBarLabelStyle: [{ fontFamily: fonts.bodySemi, fontSize: 11 }, zonaAtiva === 'tab-outros' && { color: colors.white }],
+                        tabBarIcon: ({ color }) => <Ionicons name="book-outline" color={color} size={24} />,
                         tabBarButton: (props) => (
-                            <Pressable ref={outrosRef} onPress={props.onPress} onLongPress={props.onLongPress}
-                                style={[props.style, zonaAtiva === 'tab-outros' && { backgroundColor: colors.highlight, borderRadius: 16 }]} accessible={props.accessible}
-                                accessibilityLabel={props.accessibilityLabel}
-                                accessibilityRole={props.accessibilityRole}
-                                accessibilityState={props.accessibilityState}>
-                                {props.children}
-                            </Pressable>
+                            <TutorialGlow active={zonaAtiva === 'tab-outros'} borderRadius={16} inset={-4} style={props.style as any}>
+                                <Pressable ref={outrosRef} onPress={props.onPress} onLongPress={props.onLongPress}
+                                    style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} accessible={props.accessible}
+                                    accessibilityLabel={props.accessibilityLabel}
+                                    accessibilityRole={props.accessibilityRole}
+                                    accessibilityState={props.accessibilityState}>
+                                    {props.children}
+                                </Pressable>
+                            </TutorialGlow>
                         ),
                     }}
                 />
@@ -73,16 +75,17 @@ export default function TabsLayout() {
                     name="avisos"
                     options={{
                         title: 'Avisos',
-                        tabBarIcon: ({ color }) => <Ionicons name="notifications-outline" color={zonaAtiva === 'tab-avisos' ? colors.white : color} size={24} />,
-                        tabBarLabelStyle: [{ fontFamily: fonts.bodySemi, fontSize: 11 }, zonaAtiva === 'tab-avisos' && { color: colors.white }],
+                        tabBarIcon: ({ color }) => <Ionicons name="notifications-outline" color={color} size={24} />,
                         tabBarButton: (props) => (
-                            <Pressable ref={avisosRef} onPress={props.onPress} onLongPress={props.onLongPress}
-                                style={[props.style, zonaAtiva === 'tab-avisos' && { backgroundColor: colors.highlight, borderRadius: 16 }]} accessible={props.accessible}
-                                accessibilityLabel={props.accessibilityLabel}
-                                accessibilityRole={props.accessibilityRole}
-                                accessibilityState={props.accessibilityState}>
-                                {props.children}
-                            </Pressable>
+                            <TutorialGlow active={zonaAtiva === 'tab-avisos'} borderRadius={16} inset={-4} style={props.style as any}>
+                                <Pressable ref={avisosRef} onPress={props.onPress} onLongPress={props.onLongPress}
+                                    style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} accessible={props.accessible}
+                                    accessibilityLabel={props.accessibilityLabel}
+                                    accessibilityRole={props.accessibilityRole}
+                                    accessibilityState={props.accessibilityState}>
+                                    {props.children}
+                                </Pressable>
+                            </TutorialGlow>
                         ),
                     }}
                 />
@@ -90,16 +93,17 @@ export default function TabsLayout() {
                     name="ajuda"
                     options={{
                         title: 'Ajuda',
-                        tabBarIcon: ({ color }) => <Ionicons name="help-circle-outline" color={zonaAtiva === 'tab-ajuda' ? colors.white : color} size={24} />,
-                        tabBarLabelStyle: [{ fontFamily: fonts.bodySemi, fontSize: 11 }, zonaAtiva === 'tab-ajuda' && { color: colors.white }],
+                        tabBarIcon: ({ color }) => <Ionicons name="help-circle-outline" color={color} size={24} />,
                         tabBarButton: (props) => (
-                            <Pressable ref={ajudaRef} onPress={props.onPress} onLongPress={props.onLongPress}
-                                style={[props.style, zonaAtiva === 'tab-ajuda' && { backgroundColor: colors.highlight, borderRadius: 16 }]} accessible={props.accessible}
-                                accessibilityLabel={props.accessibilityLabel}
-                                accessibilityRole={props.accessibilityRole}
-                                accessibilityState={props.accessibilityState}>
-                                {props.children}
-                            </Pressable>
+                            <TutorialGlow active={zonaAtiva === 'tab-ajuda'} borderRadius={16} inset={-4} style={props.style as any}>
+                                <Pressable ref={ajudaRef} onPress={props.onPress} onLongPress={props.onLongPress}
+                                    style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} accessible={props.accessible}
+                                    accessibilityLabel={props.accessibilityLabel}
+                                    accessibilityRole={props.accessibilityRole}
+                                    accessibilityState={props.accessibilityState}>
+                                    {props.children}
+                                </Pressable>
+                            </TutorialGlow>
                         ),
                     }}
                 />

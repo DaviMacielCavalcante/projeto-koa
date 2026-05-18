@@ -10,6 +10,7 @@ import { ScreenContainer } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
+import TutorialGlow from '../../components/TutorialGlow';
 
 const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR', 'NFA-e'];
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
@@ -89,21 +90,23 @@ export default function Inicio() {
 
     return (
         <ScreenContainer variant="cream">
-            <View ref={greetRef} style={[styles.greetCard, zonaAtiva === 'greet' && { backgroundColor: colors.highlight }]}>
-                <View style={styles.avatar}>
-                    <Ionicons name="person" size={22} color={colors.tealDark} />
+            <TutorialGlow active={zonaAtiva === 'greet'} borderRadius={22} style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 12 }}>
+                <View ref={greetRef} style={[styles.greetCard, { marginHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
+                    <View style={styles.avatar}>
+                        <Ionicons name="person" size={22} color={colors.tealDark} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.greetLabel}>Bom dia,</Text>
+                        <Text style={styles.greetName}>{nomeUsuario}</Text>
+                    </View>
+                    <TouchableOpacity
+                        onPress={() => router.push('/perfil')}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <Ionicons name="pencil" size={18} color="rgba(255,255,255,0.7)" />
+                    </TouchableOpacity>
                 </View>
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.greetLabel}>Bom dia,</Text>
-                    <Text style={styles.greetName}>{nomeUsuario}</Text>
-                </View>
-                <TouchableOpacity
-                    onPress={() => router.push('/perfil')}
-                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                    <Ionicons name="pencil" size={18} color="rgba(255,255,255,0.7)" />
-                </TouchableOpacity>
-            </View>
+            </TutorialGlow>
 
             <Text style={styles.sectionTitle}>Seus Documentos</Text>
 
@@ -120,26 +123,25 @@ export default function Inicio() {
                         red: colors.statusRed,
                         grey: colors.statusGrey,
                     }[doc.status];
+                    const destaque = zonaAtiva === 'docs' || zonaAtiva === 'cores';
 
                     return (
-                        <TouchableOpacity
-                            key={doc.nome}
-                            style={[
-                                styles.docCard,
-                                (zonaAtiva === 'docs' || zonaAtiva === 'cores') && styles.docCardDestaque,
-                            ]}
-                            activeOpacity={0.85}
-                            onPress={() => router.push('/documento/' + doc.nome)}
-                        >
-                            <View style={[styles.docCardBarra, { backgroundColor: barColor }]} />
-                            <View style={styles.docCardConteudo}>
-                                <Text style={styles.docCardNome}>{doc.nome}</Text>
-                                <Text style={styles.docCardSubtitulo}>{STATUS_SUBTITLE[doc.status]}</Text>
-                            </View>
-                            <View style={styles.docCardDireita}>
-                                <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
-                            </View>
-                        </TouchableOpacity>
+                        <TutorialGlow key={doc.nome} active={destaque} borderRadius={18}>
+                            <TouchableOpacity
+                                style={styles.docCard}
+                                activeOpacity={0.85}
+                                onPress={() => router.push('/documento/' + doc.nome)}
+                            >
+                                <View style={[styles.docCardBarra, { backgroundColor: barColor }]} />
+                                <View style={styles.docCardConteudo}>
+                                    <Text style={styles.docCardNome}>{doc.nome}</Text>
+                                    <Text style={styles.docCardSubtitulo}>{STATUS_SUBTITLE[doc.status]}</Text>
+                                </View>
+                                <View style={styles.docCardDireita}>
+                                    <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
+                                </View>
+                            </TouchableOpacity>
+                        </TutorialGlow>
                     );
                 })}
 
