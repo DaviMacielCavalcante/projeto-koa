@@ -57,14 +57,14 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     {
         zone: 'doc-hero',
         titulo: 'Dentro de um documento',
-        texto: 'Vamos ver como funciona a tela do ITR. O ícone e o nome do documento ficam aqui no topo.',
+        texto: 'Aqui você vê o nome do documento e a sua situação atual — se está em dia, vencendo ou vencido.',
         calloutPos: 'below',
         navigateTo: '/documento/ITR',
     },
     {
         zone: 'doc-status',
-        titulo: 'Situação do documento',
-        texto: 'Este círculo mostra se o seu ITR está em dia, vencendo ou vencido. A cor muda conforme a situação.',
+        titulo: 'Imagem do documento',
+        texto: 'Esta é a imagem de referência do documento. Toque nela para ampliar e ver como ele se parece.',
         calloutPos: 'below',
     },
     {
