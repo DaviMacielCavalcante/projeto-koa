@@ -72,7 +72,7 @@ export const inicioStyles = StyleSheet.create({
         paddingBottom: 24,
     },
     grid: {
-        flex: 1,
+        flexGrow: 1,
         paddingHorizontal: 16,
         gap: 10,
         paddingBottom: 100,

@@ -9,15 +9,8 @@ import AudioPlayer from '../../components/AudioPlayer';
 import { DocumentTypeIcon, GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors, statusGradients } from '../../design/theme';
-import { detalheDocumentoStyles as styles, docImagemModalStyles as modalStyles } from '../../styles/detalheDocumentoStyles';
+import { detalheDocumentoStyles as styles } from '../../styles/detalheDocumentoStyles';
 import { documentMeta, isDocumentType } from '../../src/constants/documents';
-
-const IMAGENS_DOC: Partial<Record<string, any>> = {
-    CAF:  require('../../assets/docs/CAF.png'),
-    CAR:  require('../../assets/docs/car.png'),
-    CCIR: require('../../assets/docs/CCIR.png'),
-    ITR:  require('../../assets/docs/ITR.png'),
-};
 
 type DocumentoStatus = 'active' | 'expiring_soon' | 'expired' | null;
 
@@ -56,27 +49,24 @@ function statusTexto(doc: Documento | null, docStatus: DocStatus): { big: string
 
 export default function DetalheDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
-    const { registrarRef } = useTutorial();
+    const { registrarRef, zonaAtiva } = useTutorial();
     const heroRef = useRef<View>(null);
     const statusRef = useRef<View>(null);
     const acoesRef = useRef<View>(null);
-
     const [documento, setDocumento] = useState<Documento | null>(null);
     const [loading, setLoading] = useState(true);
-    const [avisoNfae, setAvisoNfae] = useState(false);
-    const [fotoVisivel, setFotoVisivel] = useState(false);
-    const [imagemVisivel, setImagemVisivel] = useState(false);
-    const [avisoDependencia, setAvisoDependencia] = useState<string | null>(null);
-    const [dependenciaCumprida, setDependenciaCumprida] = useState(true);
-
-    const DEPENDENCIAS: Partial<Record<string, string>> = { CAF: 'CCIR', CAR: 'CAF' };
-    const imagemDoc = IMAGENS_DOC[tipo];
 
     useEffect(() => {
         registrarRef('doc-hero', heroRef);
         registrarRef('doc-status', statusRef);
         registrarRef('doc-acoes', acoesRef);
     }, []);
+    const [avisoNfae, setAvisoNfae] = useState(false);
+    const [fotoVisivel, setFotoVisivel] = useState(false);
+    const [avisoDependencia, setAvisoDependencia] = useState<string | null>(null);
+    const [dependenciaCumprida, setDependenciaCumprida] = useState(true);
+
+    const DEPENDENCIAS: Partial<Record<string, string>> = { CAF: 'CCIR', CAR: 'CAF' };
 
     const documentType = tipo && isDocumentType(tipo) ? tipo : null;
     const meta = documentType ? documentMeta[documentType] : null;
@@ -128,28 +118,19 @@ export default function DetalheDocumento() {
         <ScreenContainer variant="gold">
             <TopBar leftIcon="arrow-back" />
 
-            <View ref={heroRef} style={styles.top}>
+            <View ref={heroRef} style={[styles.top, zonaAtiva === 'doc-hero' && { backgroundColor: colors.highlight, borderRadius: 20, paddingVertical: 12, marginHorizontal: 12 }]}>
                 {documentType ? (
                     <View style={styles.heroIconWrap}>
                         <DocumentTypeIcon type={documentType} size={104} />
                     </View>
                 ) : null}
+
                 <Text style={styles.titulo}>{tipo}</Text>
                 <Text style={styles.subtitulo}>{meta?.fullName ?? tipo}</Text>
-            </View>
 
-            {imagemDoc ? (
-                <TouchableOpacity
-                    style={styles.imagemContainer}
-                    activeOpacity={0.95}
-                    onPress={() => setImagemVisivel(true)}
-                >
-                    <Image source={imagemDoc} style={styles.imagemReferencia} resizeMode="contain" />
-                </TouchableOpacity>
-            ) : (
-                <View ref={statusRef} style={styles.semImagem}>
+                <View ref={statusRef}>
                     <LinearGradient
-                        colors={[...statusGradients[docStatus]]}
+                        colors={zonaAtiva === 'doc-status' ? [colors.highlight, colors.highlightDeep] : [...statusGradients[docStatus]]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={styles.statusCircle}
@@ -158,7 +139,15 @@ export default function DetalheDocumento() {
                         <Text style={styles.statusSub}>{sub}</Text>
                     </LinearGradient>
                 </View>
-            )}
+
+                <Text style={styles.descricao}>{meta?.description ?? ''}</Text>
+
+                {documento?.expiration_date ? (
+                    <Text style={styles.validade}>
+                        Validade: {new Date(documento.expiration_date).toLocaleDateString('pt-BR')}
+                    </Text>
+                ) : null}
+            </View>
 
             {avisoDependencia && (
                 <View style={styles.bannnerDep}>
@@ -172,7 +161,7 @@ export default function DetalheDocumento() {
                 </View>
             )}
 
-            <View ref={acoesRef} style={styles.acoes}>
+            <View ref={acoesRef} style={[styles.acoes, zonaAtiva === 'doc-acoes' && { backgroundColor: colors.highlight, borderRadius: 20, marginHorizontal: 12 }]}>
                 {documento?.file_url ? (
                     <GradientButton
                         label="Ver foto salva"
@@ -201,12 +190,6 @@ export default function DetalheDocumento() {
                 />
             </View>
 
-            <AudioPlayer
-                source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
-                autoPlay={false}
-                style={styles.player}
-            />
-
             <Modal visible={fotoVisivel} transparent animationType="fade">
                 <TouchableOpacity style={styles.avisoFundo} activeOpacity={1} onPress={() => setFotoVisivel(false)}>
                     <Image source={{ uri: documento?.file_url ?? '' }} style={{ width: '90%', height: '75%' }} resizeMode="contain" />
@@ -216,14 +199,11 @@ export default function DetalheDocumento() {
                 </TouchableOpacity>
             </Modal>
 
-            <Modal visible={imagemVisivel} transparent animationType="fade">
-                <TouchableOpacity style={modalStyles.fundo} activeOpacity={1} onPress={() => setImagemVisivel(false)}>
-                    <Image source={imagemDoc} style={modalStyles.imagem} resizeMode="contain" />
-                    <TouchableOpacity style={modalStyles.fechar} onPress={() => setImagemVisivel(false)}>
-                        <Ionicons name="close-circle" size={48} color="#fff" />
-                    </TouchableOpacity>
-                </TouchableOpacity>
-            </Modal>
+            <AudioPlayer
+                source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
+                autoPlay={false}
+                style={styles.player}
+            />
 
             <Modal visible={avisoNfae} transparent animationType="fade">
                 <View style={styles.avisoFundo}>
@@ -234,7 +214,7 @@ export default function DetalheDocumento() {
                         <Text style={styles.avisoTitulo}>Cuidado antes de continuar</Text>
                         <Text style={styles.avisoTexto}>
                             Antes de fazer uma nota fiscal, confira bem os dados — nome, quantidade e valor do que você vai vender.{'\n\n'}
-                            Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.
+                            Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.{'\n\n'}
                         </Text>
                         <TouchableOpacity style={styles.avisoBtn} onPress={() => { setAvisoNfae(false); router.push('/nfae-form'); }}>
                             <Text style={styles.avisoBtnTexto}>Entendi, continuar</Text>
