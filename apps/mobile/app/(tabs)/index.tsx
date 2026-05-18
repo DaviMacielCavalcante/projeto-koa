@@ -142,6 +142,21 @@ export default function Inicio() {
                         </TouchableOpacity>
                     );
                 })}
+
+                <TouchableOpacity
+                    style={styles.educationalCard}
+                    activeOpacity={0.85}
+                    onPress={() => router.push('/roadmap')}
+                >
+                    <View style={styles.educationalIcon}>
+                        <Ionicons name="book" size={22} color={colors.white} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.educationalTitle}>Aprender sobre os documentos</Text>
+                        <Text style={styles.educationalSub}>Estude no seu ritmo</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
+                </TouchableOpacity>
             </ScrollView>
 
             <AudioPlayer
@@ -152,4 +167,3 @@ export default function Inicio() {
         </ScreenContainer>
     );
 }
-
