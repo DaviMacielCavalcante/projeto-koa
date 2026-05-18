@@ -5,12 +5,13 @@ import { inicioStyles as styles } from '../../styles/inicioStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
-import { ScreenContainer, DocCircle, AudioCircle } from '../../design/components';
+import { DocCircle, ScreenContainer } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
 
 const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR', 'NFA-e'];
+
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
 
 const STATUS_SUBTITLE: Record<DocStatus, string> = {
@@ -129,6 +130,7 @@ export default function Inicio() {
                 autoPlay={false}
                 style={styles.playerFixed}
             />
+
         </ScreenContainer>
     );
 }
