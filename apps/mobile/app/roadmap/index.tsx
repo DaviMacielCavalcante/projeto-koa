@@ -2,10 +2,11 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ScreenContainer, TopBar } from '../../design/components';
+import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { seedEducationalContentsIfEmpty } from '../../src/db/seedEducationalContents';
+import { useTutorial } from '../../src/contexts/TutorialContext';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import { listarConcluidosDoUsuario } from '../../src/services/progress';
 import { roadmapStyles as styles } from '../../styles/roadmapStyles';
@@ -19,8 +20,14 @@ type ContentRow = {
 
 export default function Roadmap() {
     const { isPracticeMode, practiceLidos } = usePracticeMode();
+    const { iniciar: iniciarTutorial } = useTutorial();
     const [topics, setTopics] = useState<ContentRow[]>([]);
     const [readIds, setReadIds] = useState<Set<string>>(new Set());
+
+    function abrirTutorial() {
+        router.replace('/(tabs)');
+        iniciarTutorial();
+    }
 
     useFocusEffect(
         useCallback(() => {
@@ -53,6 +60,14 @@ export default function Roadmap() {
                 <Text style={styles.subtitulo}>
                     Aprenda sobre os documentos no seu ritmo
                 </Text>
+            </View>
+
+            <View style={styles.tutorialBtnWrap}>
+                <GradientButton
+                    label="Tutorial do app"
+                    variant="teal"
+                    onPress={abrirTutorial}
+                />
             </View>
 
             {topics.length === 0 ? (

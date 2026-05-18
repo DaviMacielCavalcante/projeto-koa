@@ -38,6 +38,10 @@ export const roadmapStyles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 6,
     },
+    tutorialBtnWrap: {
+        paddingHorizontal: 24,
+        paddingBottom: 8,
+    },
     scrollContent: {
         paddingBottom: 60,
     },
