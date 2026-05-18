@@ -5,7 +5,7 @@ import { inicioStyles as styles } from '../../styles/inicioStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
-import { ScreenContainer } from '../../design/components';
+import { DocCircle, ScreenContainer } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
@@ -81,49 +81,48 @@ export default function Inicio() {
 
     return (
         <ScreenContainer variant="cream">
-            <View style={styles.greetCard}>
-                <View style={styles.avatar}>
-                    <Ionicons name="person" size={22} color={colors.tealDark} />
-                </View>
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.greetLabel}>Bom dia,</Text>
-                    <Text style={styles.greetName}>{nomeUsuario}</Text>
-                </View>
-            </View>
-
-            <Text style={styles.sectionTitle}>Seus Documentos</Text>
-
             <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={styles.grid}
+                contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {docs.map((doc) => {
-                    const barColor = {
-                        green: colors.statusGreen,
-                        yellow: colors.statusYellow,
-                        red: colors.statusRed,
-                        grey: colors.statusGrey,
-                    }[doc.status];
+                <View style={styles.greetCard}>
+                    <View style={styles.avatar}>
+                        <Ionicons name="person" size={22} color={colors.tealDark} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.greetLabel}>Bom dia,</Text>
+                        <Text style={styles.greetName}>{nomeUsuario}</Text>
+                    </View>
+                </View>
 
-                    return (
-                        <TouchableOpacity
+                <Text style={styles.sectionTitle}>Seus Documentos</Text>
+
+                <View style={styles.grid}>
+                    {docs.map((doc) => (
+                        <DocCircle
                             key={doc.nome}
-                            style={styles.docCard}
-                            activeOpacity={0.85}
+                            name={doc.nome}
+                            subtitle={STATUS_SUBTITLE[doc.status]}
+                            status={doc.status}
                             onPress={() => router.push('/documento/' + doc.nome)}
-                        >
-                            <View style={[styles.docCardBarra, { backgroundColor: barColor }]} />
-                            <View style={styles.docCardConteudo}>
-                                <Text style={styles.docCardNome}>{doc.nome}</Text>
-                                <Text style={styles.docCardSubtitulo}>{STATUS_SUBTITLE[doc.status]}</Text>
-                            </View>
-                            <View style={styles.docCardDireita}>
-                                <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
-                            </View>
-                        </TouchableOpacity>
-                    );
-                })}
+                        />
+                    ))}
+                </View>
+
+                <TouchableOpacity
+                    style={styles.educationalCard}
+                    activeOpacity={0.85}
+                    onPress={() => router.push('/roadmap')}
+                >
+                    <View style={styles.educationalIcon}>
+                        <Ionicons name="book" size={22} color={colors.white} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.educationalTitle}>Aprender sobre os documentos</Text>
+                        <Text style={styles.educationalSub}>Estude no seu ritmo</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
+                </TouchableOpacity>
             </ScrollView>
 
             <AudioPlayer
