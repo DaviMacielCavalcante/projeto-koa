@@ -6,11 +6,18 @@ import { ActivityIndicator, Text, View, Modal, Image, TouchableOpacity } from 'r
 import { useTutorial } from '../../src/contexts/TutorialContext';
 import { Ionicons } from '@expo/vector-icons';
 import AudioPlayer from '../../components/AudioPlayer';
-import { DocumentTypeIcon, GradientButton, ScreenContainer, TopBar } from '../../design/components';
+import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors, statusGradients } from '../../design/theme';
-import { detalheDocumentoStyles as styles } from '../../styles/detalheDocumentoStyles';
+import { detalheDocumentoStyles as styles, docImagemModalStyles as modalStyles } from '../../styles/detalheDocumentoStyles';
 import { documentMeta, isDocumentType } from '../../src/constants/documents';
+
+const IMAGENS_DOC: Partial<Record<string, any>> = {
+    CAF:  require('../../assets/docs/CAF.png'),
+    CAR:  require('../../assets/docs/car.png'),
+    CCIR: require('../../assets/docs/CCIR.png'),
+    ITR:  require('../../assets/docs/ITR.png'),
+};
 
 type DocumentoStatus = 'active' | 'expiring_soon' | 'expired' | null;
 
@@ -63,6 +70,8 @@ export default function DetalheDocumento() {
     }, []);
     const [avisoNfae, setAvisoNfae] = useState(false);
     const [fotoVisivel, setFotoVisivel] = useState(false);
+    const [imagemVisivel, setImagemVisivel] = useState(false);
+    const imagemDoc = IMAGENS_DOC[tipo];
     const [avisoDependencia, setAvisoDependencia] = useState<string | null>(null);
     const [dependenciaCumprida, setDependenciaCumprida] = useState(true);
 
@@ -118,13 +127,8 @@ export default function DetalheDocumento() {
         <ScreenContainer variant="gold">
             <TopBar leftIcon="arrow-back" />
 
-            <View ref={heroRef} style={[styles.top, zonaAtiva === 'doc-hero' && { backgroundColor: colors.highlight, borderRadius: 20, paddingVertical: 12, marginHorizontal: 12 }]}>
-                {documentType ? (
-                    <View style={styles.heroIconWrap}>
-                        <DocumentTypeIcon type={documentType} size={104} />
-                    </View>
-                ) : null}
-
+            {/* Cabeçalho: título + badge de status */}
+            <View ref={heroRef} style={[styles.top, zonaAtiva === 'doc-hero' && { backgroundColor: colors.highlight, borderRadius: 20, paddingVertical: 8, marginHorizontal: 12 }]}>
                 <Text style={styles.titulo}>{tipo}</Text>
                 <Text style={styles.subtitulo}>{meta?.fullName ?? tipo}</Text>
 
@@ -133,15 +137,39 @@ export default function DetalheDocumento() {
                         colors={zonaAtiva === 'doc-status' ? [colors.highlight, colors.highlightDeep] : [...statusGradients[docStatus]]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
+                        style={styles.statusBadgeSmall}
+                    >
+                        <Text style={styles.statusBadgeTexto}>{big} · {sub}</Text>
+                    </LinearGradient>
+                </View>
+            </View>
+
+            {/* Imagem do documento — ocupa o espaço principal */}
+            {imagemDoc ? (
+                <TouchableOpacity
+                    style={styles.imagemWrap}
+                    onPress={() => setImagemVisivel(true)}
+                    activeOpacity={0.9}
+                >
+                    <Image source={imagemDoc} style={styles.imagemHeroFull} resizeMode="contain" />
+                </TouchableOpacity>
+            ) : (
+                <View style={styles.semImagemWrap}>
+                    <LinearGradient
+                        colors={[...statusGradients[docStatus]]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
                         style={styles.statusCircle}
                     >
                         <Text style={styles.statusBig}>{big}</Text>
                         <Text style={styles.statusSub}>{sub}</Text>
                     </LinearGradient>
                 </View>
+            )}
 
+            {/* Descrição e validade */}
+            <View style={styles.descricaoWrap}>
                 <Text style={styles.descricao}>{meta?.description ?? ''}</Text>
-
                 {documento?.expiration_date ? (
                     <Text style={styles.validade}>
                         Validade: {new Date(documento.expiration_date).toLocaleDateString('pt-BR')}
@@ -195,6 +223,15 @@ export default function DetalheDocumento() {
                     <Image source={{ uri: documento?.file_url ?? '' }} style={{ width: '90%', height: '75%' }} resizeMode="contain" />
                     <TouchableOpacity style={{ position: 'absolute', top: 52, right: 20 }} onPress={() => setFotoVisivel(false)}>
                         <Ionicons name="close-circle" size={52} color="#fff" />
+                    </TouchableOpacity>
+                </TouchableOpacity>
+            </Modal>
+
+            <Modal visible={imagemVisivel} transparent animationType="fade">
+                <TouchableOpacity style={modalStyles.fundo} activeOpacity={1} onPress={() => setImagemVisivel(false)}>
+                    <Image source={imagemDoc} style={modalStyles.imagem} resizeMode="contain" />
+                    <TouchableOpacity style={modalStyles.fechar} onPress={() => setImagemVisivel(false)}>
+                        <Ionicons name="close-circle" size={48} color="#fff" />
                     </TouchableOpacity>
                 </TouchableOpacity>
             </Modal>

@@ -140,4 +140,60 @@ export const detalheDocumentoStyles = StyleSheet.create({
         fontSize: sizes.body,
         color: colors.inkMute,
     },
+    imagemHero: {
+        width: '100%',
+        height: 160,
+        borderRadius: 16,
+        marginVertical: 8,
+    },
+    statusBadgeSmall: {
+        borderRadius: 20,
+        paddingHorizontal: 16,
+        paddingVertical: 6,
+        marginTop: 8,
+    },
+    statusBadgeTexto: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.bodySm,
+        color: colors.white,
+        letterSpacing: 0.3,
+    },
+    imagemWrap: {
+        flex: 1,
+        marginHorizontal: 16,
+        marginBottom: 4,
+    },
+    imagemHeroFull: {
+        width: '100%',
+        height: '100%',
+    },
+    semImagemWrap: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    descricaoWrap: {
+        paddingHorizontal: 22,
+        alignItems: 'center',
+        gap: 4,
+        paddingBottom: 4,
+    },
+});
+
+export const docImagemModalStyles = StyleSheet.create({
+    fundo: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.92)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    imagem: {
+        width: '90%',
+        height: '75%',
+    },
+    fechar: {
+        position: 'absolute',
+        top: 48,
+        right: 20,
+    },
 });
