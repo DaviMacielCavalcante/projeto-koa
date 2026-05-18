@@ -1,11 +1,11 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useState, useCallback } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { inicioStyles as styles } from '../../styles/inicioStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
-import { ScreenContainer, DocCircle, AudioCircle } from '../../design/components';
+import { ScreenContainer } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
@@ -93,18 +93,38 @@ export default function Inicio() {
 
             <Text style={styles.sectionTitle}>Seus Documentos</Text>
 
-            <View style={styles.grid}>
-                {docs.map((doc) => (
-                    <DocCircle
-                        key={doc.nome}
-                        name={doc.nome}
-                        subtitle={STATUS_SUBTITLE[doc.status]}
-                        status={doc.status}
-                        onPress={() => router.push('/documento/' + doc.nome)}
-                    />
-                ))}
+            <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.grid}
+                showsVerticalScrollIndicator={false}
+            >
+                {docs.map((doc) => {
+                    const barColor = {
+                        green: colors.statusGreen,
+                        yellow: colors.statusYellow,
+                        red: colors.statusRed,
+                        grey: colors.statusGrey,
+                    }[doc.status];
 
-            </View>
+                    return (
+                        <TouchableOpacity
+                            key={doc.nome}
+                            style={styles.docCard}
+                            activeOpacity={0.85}
+                            onPress={() => router.push('/documento/' + doc.nome)}
+                        >
+                            <View style={[styles.docCardBarra, { backgroundColor: barColor }]} />
+                            <View style={styles.docCardConteudo}>
+                                <Text style={styles.docCardNome}>{doc.nome}</Text>
+                                <Text style={styles.docCardSubtitulo}>{STATUS_SUBTITLE[doc.status]}</Text>
+                            </View>
+                            <View style={styles.docCardDireita}>
+                                <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
+            </ScrollView>
 
             <AudioPlayer
                 source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}

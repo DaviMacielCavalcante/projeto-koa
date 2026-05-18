@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { router } from 'expo-router';
-import { View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Alert, ActivityIndicator } from 'react-native';
 import { ajudaStyles as styles } from '../../styles/ajudaStyles';
 import uuid from 'react-native-uuid';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
+import auth from '@react-native-firebase/auth';
 import { ScreenContainer, GradientButton, AudioCircle } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
@@ -15,7 +16,32 @@ export default function Ajuda() {
     const { isPracticeMode, enterPracticeMode, exitPracticeMode } = usePracticeMode();
     const [confirmando, setConfirmando] = useState(false);
     const [contador, setContador] = useState(5);
+    const [apagando, setApagando] = useState(false);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    async function apagarTodosDados() {
+        setApagando(true);
+        try {
+            await Notifications.cancelAllScheduledNotificationsAsync();
+
+            for (const tabela of ['documents', 'properties', 'users', 'educational_contents', 'user_content_progress', 'sync_queue']) {
+                await agricultoresDb?.runAsync(`DELETE FROM ${tabela}`).catch(() => {});
+            }
+
+            for (const chave of ['last_active', 'onboarding_done', 'onboarding_progress']) {
+                await SecureStore.deleteItemAsync(chave).catch(() => {});
+            }
+
+            await auth().signOut().catch(() => {});
+
+            fecharModal();
+            router.replace('/');
+        } catch {
+            Alert.alert('Erro', 'Não foi possível apagar todos os dados.');
+            setApagando(false);
+            fecharModal();
+        }
+    }
 
     useEffect(() => {
         if (confirmando) {

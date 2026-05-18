@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenContainer, GradientButton, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 
-type ItemLevar = { icone: keyof typeof Ionicons.glyphMap; label: string };
+type ItemLevar = { icone: keyof typeof Ionicons.glyphMap; label: string; critico?: boolean };
 type Passo = { numero: number; texto: string };
 type Opcao = { titulo: string; icone: keyof typeof Ionicons.glyphMap; linhas: string[] };
 
@@ -74,7 +74,7 @@ const GUIAS: Record<string, GuiaInfo> = {
             { numero: 5, texto: 'Crie uma conta na Central do Proprietário no SICAR/PA. Por lá você recebe avisos, envia documentos e acompanha se o seu CAR está ativo, pendente ou suspenso' },
         ],
         levar: [
-            { icone: 'document', label: 'CCIR válido e atualizado (emitido pelo INCRA)' },
+            { icone: 'document', label: 'CCIR válido e atualizado (emitido pelo INCRA) — contém o Código do Imóvel Rural', critico: true },
             { icone: 'home', label: 'Escritura, contrato de cessão de posse ou título definitivo' },
             { icone: 'card', label: 'CPF ou CNPJ do proprietário/possuidor' },
             { icone: 'navigate', label: 'Coordenadas GPS da propriedade (latitude/longitude)' },
@@ -108,8 +108,8 @@ const GUIAS: Record<string, GuiaInfo> = {
             { numero: 4, texto: 'Apresente presencialmente ou envie pelo site' },
         ],
         levar: [
-            { icone: 'document', label: 'Escritura ou matrícula do imóvel' },
-            { icone: 'calendar', label: 'Matrícula atualizada (validade de 30 dias)' },
+            { icone: 'document', label: 'Escritura ou matrícula do imóvel', critico: true },
+            { icone: 'calendar', label: 'Matrícula atualizada (validade de 30 dias)', critico: true },
             { icone: 'card', label: 'CPF' },
         ],
         telefone: INCRA_TEL,
@@ -135,7 +135,7 @@ const GUIAS: Record<string, GuiaInfo> = {
         ],
         levar: [
             { icone: 'card', label: 'CPF' },
-            { icone: 'document', label: 'CCIR atualizado' },
+            { icone: 'document', label: 'CCIR atualizado — contém o Código do Imóvel Rural', critico: true },
             { icone: 'home', label: 'Dados da propriedade: área total, município e uso do solo' },
         ],
         telefone: EMATER_TEL,
@@ -210,11 +210,26 @@ export default function GuiaDocumento() {
                 <View style={styles.card}>
                     <Text style={styles.cardTitulo}>O que levar</Text>
                     {guia.levar.map((item, i) => (
-                        <View key={item.label} style={[styles.item, i === guia.levar.length - 1 && { borderBottomWidth: 0 }]}>
-                            <View style={styles.itemIcone}>
-                                <Ionicons name={item.icone} size={22} color={colors.tealDark} />
+                        <View
+                            key={item.label}
+                            style={[
+                                styles.item,
+                                i === guia.levar.length - 1 && { borderBottomWidth: 0 },
+                                item.critico && styles.itemCritico,
+                            ]}
+                        >
+                            <View style={[styles.itemIcone, item.critico && styles.itemIconeCritico]}>
+                                <Ionicons name={item.icone} size={22} color={item.critico ? colors.orangeDark : colors.tealDark} />
                             </View>
-                            <Text style={styles.itemTexto}>{item.label}</Text>
+                            <View style={{ flex: 1 }}>
+                                <Text style={[styles.itemTexto, item.critico && styles.itemTextoCritico]}>{item.label}</Text>
+                                {item.critico && (
+                                    <Text style={styles.itemTagCritico}>Importante</Text>
+                                )}
+                            </View>
+                            {item.critico && (
+                                <Ionicons name="warning" size={16} color={colors.orangeMid} />
+                            )}
                         </View>
                     ))}
                 </View>

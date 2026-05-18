@@ -25,6 +25,7 @@ type Documento = {
     type: string;
     expiration_date: string | null;
     status: DocumentoStatus;
+    file_url: string | null;
 };
 
 function resolverStatus(doc: Documento | null): DocStatus {
@@ -127,17 +128,22 @@ export default function DetalheDocumento() {
             )}
 
             <View style={styles.acoes}>
+                {documento?.file_url ? (
+                    <GradientButton
+                        label="Ver foto salva"
+                        variant="gold"
+                        onPress={() => setFotoVisivel(true)}
+                    />
+                ) : null}
                 <GradientButton
                     label="Como consigo?"
                     variant="teal"
-                    align="flex-start"
                     onPress={() => router.push(`/guia/${tipo}`)}
                 />
-                <GradientButton label="Tenho duvida" variant="orange" align="flex-start" />
+                <GradientButton label="Tenho duvida" variant="orange" onPress={() => setDuvidaVisivel(true)} />
                 <GradientButton
                     label="Ja tenho, quero guardar"
                     variant="red"
-                    align="flex-start"
                     onPress={() => router.push(`/camera/${tipo}`)}
                 />
             </View>

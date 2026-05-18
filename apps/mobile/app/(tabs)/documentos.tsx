@@ -1,140 +1,166 @@
 import { useState, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Modal, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, Image, TextInput, StyleSheet, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { documentosTabStyles as styles } from '../../styles/documentosTabStyles';
 import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
-import { DocumentTypeIcon, ScreenContainer } from '../../design/components';
-import { colors } from '../../design/theme';
+import { ScreenContainer } from '../../design/components';
+import { colors, fonts, sizes } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
-import { DOCUMENT_TYPES, documentMeta, type DocumentType } from '../../src/constants/documents';
-import { practiceDataAccess } from '../../src/db/practiceDataAccess';
-import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 
-export type DocRow = { type: DocumentType; file_url: string | null; status: string | null };
+type DocRow = { id: string; type: string; file_url: string | null };
 
-export default function Documentos() {
-    const { isPracticeMode, practicePhotos } = usePracticeMode();
+export default function Outros() {
     const [docs, setDocs] = useState<DocRow[]>([]);
     const [fotoVisivel, setFotoVisivel] = useState<string | null>(null);
+    const [modalAdicionar, setModalAdicionar] = useState(false);
+    const [nomeNovo, setNomeNovo] = useState('');
     const insets = useSafeAreaInsets();
 
     useFocusEffect(
         useCallback(() => {
-            const mapa: Partial<Record<DocumentType, DocRow>> = {};
             async function carregar() {
-                const rows = isPracticeMode
-                    ? await practiceDataAccess.getDocuments(true)
-                    : await agricultoresDb?.getAllAsync<DocRow>(
-                        `SELECT type, file_url, status FROM documents
-                         WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
-                         GROUP BY type
-                         HAVING created_at = MAX(created_at)`
-                    );
-                rows?.forEach((r) => (mapa[r.type] = r));
-                setDocs(DOCUMENT_TYPES.map((tipo) => mapa[tipo] ?? { type: tipo, file_url: null, status: null }));
-            }
-            if (isPracticeMode) {
-                setDocs(
-                    DOCUMENT_TYPES.map((tipo) => ({
-                        ...(mapa[tipo] ?? {
-                            type: tipo,
-                            file_url: null,
-                            status: null,
-                        }),
-                        file_url: practicePhotos[tipo] ?? mapa[tipo]?.file_url ?? null,
-                    }))
+                const rows = await agricultoresDb?.getAllAsync<DocRow>(
+                    `SELECT id, type, file_url FROM documents
+                     WHERE type NOT IN ('CAF','CAR','CCIR','ITR','NFA-e')
+                     GROUP BY type
+                     HAVING created_at = MAX(created_at)
+                     ORDER BY created_at DESC`
                 );
-            } else {
-                setDocs(
-                    DOCUMENT_TYPES.map(
-                        (tipo) =>
-                            mapa[tipo] ?? {
-                                type: tipo,
-                                file_url: null,
-                                status: null,
-                            }
-                    )
-                );
+                setDocs(rows ?? []);
             }
             carregar();
-        }, [isPracticeMode, practicePhotos])
+        }, [])
     );
+
+    async function deletarDocumento(id: string, tipo: string) {
+        Alert.alert(
+            'Apagar documento',
+            `Tem certeza que quer apagar "${tipo}"?`,
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                {
+                    text: 'Apagar',
+                    style: 'destructive',
+                    onPress: async () => {
+                        await agricultoresDb?.runAsync('DELETE FROM documents WHERE id = ?', [id]);
+                        setDocs(prev => prev.filter(d => d.id !== id));
+                    },
+                },
+            ]
+        );
+    }
+
+    function confirmarAdicionar() {
+        const nome = nomeNovo.trim();
+        if (!nome) {
+            Alert.alert('Atenção', 'Digite o nome do documento.');
+            return;
+        }
+        setModalAdicionar(false);
+        setNomeNovo('');
+        router.push(`/camera/${encodeURIComponent(nome)}`);
+    }
 
     return (
         <ScreenContainer variant="cream">
-            <Text style={styles.titulo}>Meus Documentos</Text>
+            <View style={styles.header}>
+                <Text style={styles.titulo}>Outros Documentos</Text>
+                <TouchableOpacity style={styles.botaoAdicionar} onPress={() => setModalAdicionar(true)}>
+                    <Ionicons name="add" size={22} color={colors.white} />
+                </TouchableOpacity>
+            </View>
             <Text style={styles.subtitulo}>
-                Toque no desenho do documento para abrir os detalhes ou ver o que ainda falta.
+                Guarde cópias de outros documentos importantes, como certidões, contratos e autorizações.
             </Text>
 
-            <FlatList
-                data={docs}
-                keyExtractor={(item) => item.type}
-                numColumns={2}
-                columnWrapperStyle={styles.linha}
-                contentContainerStyle={[
-                    styles.lista,
-                    { paddingTop: 8, paddingBottom: Math.max(insets.bottom + 128, 148) },
-                ]}
-                renderItem={({ item }) => (
-                    <View style={styles.card}>
-                        <TouchableOpacity
-                            activeOpacity={0.88}
-                            onPress={() => router.push(`/documento/${item.type}`)}
-                            style={styles.cardPressable}
-                        >
-                            <View style={[styles.cardIconeWrap, { backgroundColor: documentMeta[item.type].cardColor }]}>
-                                <DocumentTypeIcon type={item.type} size={72} />
+            {docs.length === 0 ? (
+                <View style={styles.vazio}>
+                    <View style={styles.vazioIcone}>
+                        <Ionicons name="documents-outline" size={48} color={colors.tealMid} />
+                    </View>
+                    <Text style={styles.vazioTitulo}>Nenhum documento ainda</Text>
+                    <Text style={styles.vazioTexto}>
+                        Toque no "+" para adicionar certidões, contratos ou qualquer outro documento importante.
+                    </Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={docs}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: Math.max(insets.bottom + 128, 148), gap: 10 }}
+                    renderItem={({ item }) => (
+                        <View style={styles.card}>
+                            <View style={styles.cardIcone}>
+                                <Ionicons name="document-text-outline" size={26} color={colors.tealDark} />
                             </View>
-
-                            <Text style={styles.itemTipo}>{item.type}</Text>
-                            <Text style={styles.itemNome}>{documentMeta[item.type].fullName}</Text>
-
-                            <View style={styles.statusRow}>
-                                <View
-                                    style={[
-                                        styles.statusDot,
-                                        { backgroundColor: item.file_url ? colors.tealMid : colors.greyLight },
-                                    ]}
-                                />
-                                <Text style={styles.itemStatus}>
-                                    {item.file_url ? 'Foto guardada' : 'Ainda sem foto'}
+                            <View style={styles.cardInfo}>
+                                <Text style={styles.cardNome}>{item.type}</Text>
+                                <Text style={styles.cardStatus}>
+                                    {item.file_url ? 'Foto guardada' : 'Sem foto'}
                                 </Text>
                             </View>
-                        </TouchableOpacity>
-
-                        <View style={styles.cardFooter}>
-                            <Text style={styles.abrirTexto}>Abrir documento</Text>
-                            {item.file_url ? (
-                                <TouchableOpacity
-                                    style={styles.botaoVer}
-                                    onPress={() => setFotoVisivel(item.file_url)}
-                                >
-                                    <Ionicons name="eye-outline" size={18} color={colors.white} />
+                            <View style={styles.cardAcoes}>
+                                {item.file_url && (
+                                    <TouchableOpacity style={styles.btnVer} onPress={() => setFotoVisivel(item.file_url)}>
+                                        <Ionicons name="eye-outline" size={18} color={colors.white} />
+                                    </TouchableOpacity>
+                                )}
+                                <TouchableOpacity style={styles.btnCamera} onPress={() => router.push(`/camera/${encodeURIComponent(item.type)}`)}>
+                                    <Ionicons name="camera-outline" size={18} color={colors.tealDark} />
                                 </TouchableOpacity>
-                            ) : (
-                                <Ionicons name="chevron-forward" size={18} color={colors.tealDark} />
-                            )}
+                                <TouchableOpacity style={styles.btnDeletar} onPress={() => deletarDocumento(item.id, item.type)}>
+                                    <Ionicons name="trash-outline" size={18} color={colors.redMid} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-                )}
-            />
+                    )}
+                />
+            )}
 
+            {/* Modal — adicionar documento */}
+            <Modal visible={modalAdicionar} transparent animationType="slide">
+                <TouchableOpacity style={styles.modalFundo} activeOpacity={1} onPress={() => setModalAdicionar(false)}>
+                    <TouchableOpacity style={styles.modalCard} activeOpacity={1}>
+                        <Text style={styles.modalTitulo}>Nome do documento</Text>
+                        <Text style={styles.modalSubtitulo}>Ex: Contrato de arrendamento, Certidão de nascimento...</Text>
+                        <TextInput
+                            style={styles.input}
+                            value={nomeNovo}
+                            onChangeText={setNomeNovo}
+                            placeholder="Nome do documento"
+                            placeholderTextColor={colors.greyLight}
+                            autoCapitalize="words"
+                            autoFocus
+                        />
+                        <TouchableOpacity
+                            style={[styles.btnConfirmar, !nomeNovo.trim() && { opacity: 0.4 }]}
+                            onPress={confirmarAdicionar}
+                            disabled={!nomeNovo.trim()}
+                        >
+                            <Text style={styles.btnConfirmarTexto}>Tirar foto</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.btnCancelar} onPress={() => { setModalAdicionar(false); setNomeNovo(''); }}>
+                            <Text style={styles.btnCancelarTexto}>Cancelar</Text>
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </TouchableOpacity>
+            </Modal>
+
+            {/* Modal — ver foto */}
             <Modal visible={!!fotoVisivel} transparent animationType="fade">
-                <View style={styles.modalFundo}>
-                    <Image source={{ uri: fotoVisivel ?? '' }} style={styles.modalFoto} resizeMode="contain" />
-                    <TouchableOpacity style={styles.modalFechar} onPress={() => setFotoVisivel(null)}>
+                <TouchableOpacity style={styles.fotoFundo} activeOpacity={1} onPress={() => setFotoVisivel(null)}>
+                    <Image source={{ uri: fotoVisivel ?? '' }} style={styles.fotoImagem} resizeMode="contain" />
+                    <TouchableOpacity style={styles.fotoFechar} onPress={() => setFotoVisivel(null)}>
                         <Ionicons name="close-circle" size={52} color="#fff" />
                     </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
             </Modal>
 
             <AudioPlayer
                 source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
                 autoPlay={false}
-                style={[styles.player, { bottom: Math.max(insets.bottom + 86, 98) }]}
+                style={{ position: 'absolute', right: 24, bottom: Math.max(insets.bottom + 86, 98) }}
             />
         </ScreenContainer>
     );

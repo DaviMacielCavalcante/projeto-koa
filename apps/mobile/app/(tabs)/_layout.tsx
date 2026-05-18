@@ -1,10 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PracticeModeIndicator from '../../components/PracticeModeIndicator';
 import { colors } from '../../design/theme';
 
 export default function TabsLayout() {
+    const insets = useSafeAreaInsets();
     return (
         <View style={{ flex: 1 }}>
             <PracticeModeIndicator />
@@ -14,8 +16,8 @@ export default function TabsLayout() {
                     tabBarActiveTintColor: colors.tealDark,
                     tabBarInactiveTintColor: colors.grey,
                     tabBarStyle: {
-                        height: 72,
-                        paddingBottom: 10,
+                        height: 72 + insets.bottom,
+                        paddingBottom: 10 + insets.bottom,
                         paddingTop: 6,
                         backgroundColor: colors.creamLight,
                         borderTopColor: colors.creamDeep,
