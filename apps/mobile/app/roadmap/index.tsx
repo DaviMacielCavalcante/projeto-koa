@@ -44,7 +44,7 @@ export default function Roadmap() {
         <ScreenContainer variant="cream">
             <TopBar leftIcon="arrow-back" dark />
             <View style={styles.header}>
-                <Text style={styles.titulo}>Roadmap</Text>
+                <Text style={styles.titulo}>Trilha do agricultor</Text>
                 <Text style={styles.subtitulo}>
                     Aprenda sobre os documentos no seu ritmo
                 </Text>
