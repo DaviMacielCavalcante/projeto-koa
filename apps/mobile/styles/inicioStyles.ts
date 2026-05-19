@@ -73,9 +73,32 @@ export const inicioStyles = StyleSheet.create({
     },
     grid: {
         flexGrow: 1,
-        paddingHorizontal: 16,
         gap: 10,
         paddingBottom: 100,
+    },
+    docsRow: {
+        flexDirection: 'row',
+        alignItems: 'stretch',
+    },
+    docsColumn: {
+        flex: 60,
+        paddingLeft: 16,
+        paddingRight: 5,
+        gap: 10,
+    },
+    wallpaperColumn: {
+        flex: 40,
+        overflow: 'hidden',
+        position: 'relative',
+    },
+    wallpaperImage: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: undefined,
+        height: undefined,
     },
     // Card de documento
     docCard: {
