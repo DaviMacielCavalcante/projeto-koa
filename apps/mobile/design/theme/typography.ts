@@ -6,6 +6,8 @@ export const fonts = {
   bodyMedium: 'Inter_500Medium',
   bodySemi: 'Inter_600SemiBold',
   bodyBold: 'Inter_700Bold',
+  mono: 'Inconsolata_400Regular',
+  monoSemi: 'Inconsolata_600SemiBold',
 };
 
 export const sizes = {

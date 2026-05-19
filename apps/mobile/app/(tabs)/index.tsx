@@ -152,7 +152,7 @@ export default function Inicio() {
                     <View style={styles.wallpaperColumn} pointerEvents="none">
                         <Image source={WALLPAPER_HOME} style={styles.wallpaperImage} resizeMode="cover" />
                         <LinearGradient
-                            colors={['rgba(242,232,210,1)', 'rgba(242,232,210,0.35)']}
+                            colors={['rgba(232,220,196,1)', 'rgba(232,220,196,0.35)']}
                             locations={[0, 1]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}

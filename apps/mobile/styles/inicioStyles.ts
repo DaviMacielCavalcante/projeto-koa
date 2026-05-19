@@ -25,7 +25,7 @@ export const inicioStyles = StyleSheet.create({
         opacity: 0.85,
     },
     greetName: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.white,
     },
@@ -34,6 +34,7 @@ export const inicioStyles = StyleSheet.create({
         fontSize: sizes.md,
         color: colors.tealDark,
         textAlign: 'center',
+        paddingTop: 15,
         paddingBottom: 10,
     },
     educationalCard: {
@@ -57,13 +58,13 @@ export const inicioStyles = StyleSheet.create({
         justifyContent: 'center',
     },
     educationalTitle: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: 15,
         color: colors.tealDark,
         fontWeight: '700',
     },
     educationalSub: {
-        fontFamily: fonts.body,
+        fontFamily: fonts.mono,
         fontSize: sizes.tiny,
         color: colors.inkMute,
         marginTop: 2,
@@ -123,7 +124,7 @@ export const inicioStyles = StyleSheet.create({
         paddingHorizontal: 14,
     },
     docCardNome: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.tealDark,
     },
