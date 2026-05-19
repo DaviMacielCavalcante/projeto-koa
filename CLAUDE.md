@@ -79,9 +79,9 @@ pnpm --filter backend typecheck
 
 **Authentication**: Firebase Auth with phone number OTP (SMS). Session tokens stored via `expo-secure-store`. Auto-lock timeout required (RNF18).
 
-**Offline-first**: SQLite (`expo-sqlite`) is the source of truth for all local data. Every write goes to SQLite first and is also appended to a `sync_queue` table (with `sincronizado = 0`). A `SyncService` processes the queue against Firestore whenever connectivity is restored. Firestore is only used as the remote backend (auth, storage, and sync target) — not as the local cache.
+**Offline-first**: SQLite (`expo-sqlite`) is the source of truth for all local data. Writes should go through `saveAndEnqueue` in `src/db/operations.ts`, which writes to the target table and appends to `sync_queue`. `src/services/sync.ts` consumes the queue on reconnect (NetInfo subscriber wired in `app/_layout.tsx`). Firestore is only the remote backend (auth, storage, sync target) — not a local cache. Heads-up: a couple of call sites (e.g. `app/camera/[tipo].tsx:78`) still insert directly without enqueueing — refactor through `saveAndEnqueue` when touching them.
 
-**Photo pipeline**: expo-camera → expo-image-manipulator (resize + compress to 0.75, strip EXIF/GPS) → URI saved in SQLite `documentos` table with `sincronizado = 0` → upload to Firebase Storage on reconnect, then update `foto_storage_url` and `sincronizado = 1`. Always strip GPS metadata (LGPD/privacy requirement).
+**Photo pipeline**: expo-camera → expo-image-manipulator (resize to 800px width + JPEG compress 0.75; re-encode strips EXIF/GPS) → URI saved in SQLite `documents.file_url` with `sincronizado = 0` and an `update` row in `sync_queue` → on reconnect, `sync.ts` runs `storage().ref('documents/<id>').putFile(uri)`, then updates `documents.storage_url` and sets `sincronizado = 1`. Always strip GPS metadata (LGPD/privacy requirement).
 
 **Audio**: All instructions are narrated in Portuguese with a Paraense regional accent. Every screen has an `AudioPlayer` component (expo-av) in a fixed position, with autoPlay only on first visit (flag tracked in SQLite). Audio files are MP3 64kbps, bundled in `apps/mobile/assets/`.
 
@@ -91,7 +91,11 @@ pnpm --filter backend typecheck
 
 **Practice mode**: Uses in-memory React state only — never touches SQLite or Firestore. Visually differentiated with a border/background indicator.
 
-**LGPD compliance**: Consent requested via audio during onboarding and recorded in SQLite. Full data deletion (SQLite DB, Storage files, Firestore docs, Auth account, secure store, scheduled notifications) available from the help screen.
+**LGPD compliance**: Consent requested via audio during onboarding and recorded in SQLite. Full data deletion (SQLite DB, Storage files, Firestore docs, Auth account, secure store, scheduled notifications) available from the help screen. Current state of this flow (audit 2026-05-19): the help-screen button exists and `apagarTodosDados` covers SQLite + SecureStore + signOut + cancel notifications, but (a) the modal confirm button at `app/(tabs)/ajuda.tsx:149` is wired to `fecharModal` instead of `apagarTodosDados`, and (b) Firestore docs, Storage files, and `auth().currentUser.delete()` are not yet covered. Consent itself is only persisted as `onboarding_done='1'` in SecureStore — the `users.consentimento_lgpd` column is currently never set.
+
+**Tutorial system**: `src/contexts/TutorialContext.tsx` drives a guided overlay (`components/TutorialOverlay.tsx`) that walks the user through home → tabs → document detail. Each highlighted region uses `<TutorialGlow>` (`components/TutorialGlow.tsx`) — a pulsing teal halo backed by `src/hooks/useGlowPulse.ts`. Entry points: onboarding final step, Ajuda tab ("Tutorial do app"), and the trilha ("Tutorial do app" button below the subtitle).
+
+**Roadmap / Trilha do agricultor**: `app/roadmap/index.tsx` renders the path of 5 educational topics, seeded into `educational_contents` via `src/db/seedEducationalContentsIfEmpty`. Rich body content currently lives as a JS object in `src/data/roadmapContent.ts` (not migrated into the `body` column). Per-user completion lives in `user_content_progress` and is filtered by `auth().currentUser.uid` (`src/services/progress.ts`); practice mode keeps a parallel in-memory `Set` via `PracticeModeContext`.
 
 **Shared types**: Domain types reused between mobile and backend (e.g. `Farmer`) live in `packages/shared/src/index.ts`. Import as `import type { Farmer } from '@agri-docs/shared'`. Add new shared types here instead of redefining per workspace.
 
