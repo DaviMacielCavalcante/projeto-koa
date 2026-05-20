@@ -111,14 +111,13 @@ export default function Inicio() {
                 </View>
             </TutorialGlow>
 
-            <Text style={styles.sectionTitle}>Seus Documentos</Text>
-
             <ScrollView
                 ref={docsRef as any}
                 style={{ flex: 1 }}
                 contentContainerStyle={styles.grid}
                 showsVerticalScrollIndicator={false}
             >
+                <Text style={styles.sectionTitle}>Seus Documentos</Text>
                 <View style={styles.docsRow}>
                     <View style={styles.docsColumn}>
                         {docs.map((doc) => {
