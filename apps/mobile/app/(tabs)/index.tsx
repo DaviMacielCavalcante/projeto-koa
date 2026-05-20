@@ -12,6 +12,7 @@ import { DocStatus } from '../../design/components/DocCircle';
 import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
 import TutorialGlow from '../../components/TutorialGlow';
+import BotaoConexao from '../../components/BotaoConexao';
 
 const WALLPAPER_HOME = require('../../assets/images/WallpaperHome.jpg');
 const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR', 'NFA-e'];
@@ -176,6 +177,8 @@ export default function Inicio() {
                     </View>
                     <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
                 </TouchableOpacity>
+
+                <BotaoConexao />
             </ScrollView>
 
             <AudioPlayer
