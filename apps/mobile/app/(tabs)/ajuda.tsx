@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { router } from 'expo-router';
-import { View, Text, TouchableOpacity, Modal, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
 import { ajudaStyles as styles } from '../../styles/ajudaStyles';
-import uuid from 'react-native-uuid';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import auth from '@react-native-firebase/auth';
@@ -11,18 +10,15 @@ import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import { useTutorial } from '../../src/contexts/TutorialContext';
-import { agendarAlertas } from '../../src/services/notificacoes';
 
 export default function Ajuda() {
     const { isPracticeMode, enterPracticeMode, exitPracticeMode } = usePracticeMode();
     const { iniciar: iniciarTutorial } = useTutorial();
     const [confirmando, setConfirmando] = useState(false);
     const [contador, setContador] = useState(5);
-    const [apagando, setApagando] = useState(false);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     async function apagarTodosDados() {
-        setApagando(true);
         try {
             await Notifications.cancelAllScheduledNotificationsAsync();
 
@@ -40,7 +36,6 @@ export default function Ajuda() {
             router.replace('/');
         } catch {
             Alert.alert('Erro', 'Não foi possível apagar todos os dados.');
-            setApagando(false);
             fecharModal();
         }
     }
@@ -63,25 +58,6 @@ export default function Ajuda() {
     function fecharModal() {
         setConfirmando(false);
         setContador(5);
-    }
-
-    async function testarNotificacaoDireta() {
-        await Notifications.scheduleNotificationAsync({
-            content: { title: 'Teste direto', body: 'Se aparecer, notificações funcionam.', data: { tipo: 'CAF' } },
-            trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 5, repeats: false },
-        });
-        Alert.alert('Aguarde', 'Notificação agendada para 5 segundos.');
-    }
-
-    async function inserirDocumentoTeste() {
-        const agora = new Date().toISOString();
-        const venceEm5Dias = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString();
-        await agricultoresDb?.runAsync(
-            `INSERT OR REPLACE INTO documents (id, type, status, expiration_date, sincronizado, created_at, updated_at) VALUES (?, 'CAF', 'expiring_soon', ?, 0, ?, ?)`,
-            [uuid.v4() as string, venceEm5Dias, agora, agora]
-        );
-        await agendarAlertas();
-        Alert.alert('Teste', 'CAF inserido (vence em 5 dias). Notificação agendada para 10s.');
     }
 
     return (
