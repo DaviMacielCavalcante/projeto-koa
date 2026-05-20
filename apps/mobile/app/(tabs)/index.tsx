@@ -1,6 +1,7 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTutorial } from '../../src/contexts/TutorialContext';
 import { inicioStyles as styles } from '../../styles/inicioStyles';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +13,7 @@ import { colors } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
 import TutorialGlow from '../../components/TutorialGlow';
 
+const WALLPAPER_HOME = require('../../assets/images/WallpaperHome.jpg');
 const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR', 'NFA-e'];
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
 
@@ -116,34 +118,49 @@ export default function Inicio() {
                 contentContainerStyle={styles.grid}
                 showsVerticalScrollIndicator={false}
             >
-                {docs.map((doc) => {
-                    const barColor = {
-                        green: colors.statusGreen,
-                        yellow: colors.statusYellow,
-                        red: colors.statusRed,
-                        grey: colors.statusGrey,
-                    }[doc.status];
-                    const destaque = zonaAtiva === 'docs' || zonaAtiva === 'cores';
+                <View style={styles.docsRow}>
+                    <View style={styles.docsColumn}>
+                        {docs.map((doc) => {
+                            const barColor = {
+                                green: colors.statusGreen,
+                                yellow: colors.statusYellow,
+                                red: colors.statusRed,
+                                grey: colors.statusGrey,
+                            }[doc.status];
+                            const destaque = zonaAtiva === 'docs' || zonaAtiva === 'cores';
 
-                    return (
-                        <TutorialGlow key={doc.nome} active={destaque} borderRadius={18}>
-                            <TouchableOpacity
-                                style={styles.docCard}
-                                activeOpacity={0.85}
-                                onPress={() => router.push('/documento/' + doc.nome)}
-                            >
-                                <View style={[styles.docCardBarra, { backgroundColor: barColor }]} />
-                                <View style={styles.docCardConteudo}>
-                                    <Text style={styles.docCardNome}>{doc.nome}</Text>
-                                    <Text style={styles.docCardSubtitulo}>{STATUS_SUBTITLE[doc.status]}</Text>
-                                </View>
-                                <View style={styles.docCardDireita}>
-                                    <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
-                                </View>
-                            </TouchableOpacity>
-                        </TutorialGlow>
-                    );
-                })}
+                            return (
+                                <TutorialGlow key={doc.nome} active={destaque} borderRadius={18}>
+                                    <TouchableOpacity
+                                        style={styles.docCard}
+                                        activeOpacity={0.85}
+                                        onPress={() => router.push('/documento/' + doc.nome)}
+                                    >
+                                        <View style={[styles.docCardBarra, { backgroundColor: barColor }]} />
+                                        <View style={styles.docCardConteudo}>
+                                            <Text style={styles.docCardNome}>{doc.nome}</Text>
+                                            <Text style={styles.docCardSubtitulo}>{STATUS_SUBTITLE[doc.status]}</Text>
+                                        </View>
+                                        <View style={styles.docCardDireita}>
+                                            <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
+                                        </View>
+                                    </TouchableOpacity>
+                                </TutorialGlow>
+                            );
+                        })}
+                    </View>
+                    <View style={styles.wallpaperColumn} pointerEvents="none">
+                        <Image source={WALLPAPER_HOME} style={styles.wallpaperImage} resizeMode="cover" />
+                        <LinearGradient
+                            colors={['rgba(242,232,210,1)', 'rgba(242,232,210,0.35)']}
+                            locations={[0, 1]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={StyleSheet.absoluteFill}
+                            pointerEvents="none"
+                        />
+                    </View>
+                </View>
 
                 <TouchableOpacity
                     style={styles.educationalCard}

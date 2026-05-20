@@ -32,7 +32,7 @@ export const roadmapStyles = StyleSheet.create({
         textAlign: 'center',
     },
     subtitulo: {
-        fontFamily: fonts.body,
+        fontFamily: fonts.mono,
         fontSize: sizes.bodySm,
         color: colors.inkMute,
         textAlign: 'center',

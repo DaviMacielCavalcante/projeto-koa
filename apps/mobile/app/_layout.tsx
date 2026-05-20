@@ -3,6 +3,7 @@ import { useEffect, useState} from 'react';
 import { ActivityIndicator, BackHandler } from 'react-native';
 import { useFonts, PlayfairDisplay_700Bold, PlayfairDisplay_900Black, PlayfairDisplay_400Regular_Italic } from '@expo-google-fonts/playfair-display';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { Inconsolata_400Regular, Inconsolata_600SemiBold } from '@expo-google-fonts/inconsolata';
 import * as SecureStore from 'expo-secure-store';
 import * as Notifications from 'expo-notifications';
 import { initDb } from '../src/db/index'
@@ -35,6 +36,8 @@ export default function RootLayout() {
         Inter_500Medium,
         Inter_600SemiBold,
         Inter_700Bold,
+        Inconsolata_400Regular,
+        Inconsolata_600SemiBold,
     });
 
     useEffect(() => {

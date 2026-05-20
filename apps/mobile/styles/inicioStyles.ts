@@ -25,7 +25,7 @@ export const inicioStyles = StyleSheet.create({
         opacity: 0.85,
     },
     greetName: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.white,
     },
@@ -34,6 +34,7 @@ export const inicioStyles = StyleSheet.create({
         fontSize: sizes.md,
         color: colors.tealDark,
         textAlign: 'center',
+        paddingTop: 15,
         paddingBottom: 10,
     },
     educationalCard: {
@@ -57,13 +58,13 @@ export const inicioStyles = StyleSheet.create({
         justifyContent: 'center',
     },
     educationalTitle: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: 15,
         color: colors.tealDark,
         fontWeight: '700',
     },
     educationalSub: {
-        fontFamily: fonts.body,
+        fontFamily: fonts.mono,
         fontSize: sizes.tiny,
         color: colors.inkMute,
         marginTop: 2,
@@ -73,9 +74,32 @@ export const inicioStyles = StyleSheet.create({
     },
     grid: {
         flexGrow: 1,
-        paddingHorizontal: 16,
         gap: 10,
         paddingBottom: 100,
+    },
+    docsRow: {
+        flexDirection: 'row',
+        alignItems: 'stretch',
+    },
+    docsColumn: {
+        flex: 60,
+        paddingLeft: 16,
+        paddingRight: 5,
+        gap: 10,
+    },
+    wallpaperColumn: {
+        flex: 40,
+        overflow: 'hidden',
+        position: 'relative',
+    },
+    wallpaperImage: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: undefined,
+        height: undefined,
     },
     // Card de documento
     docCard: {
@@ -100,7 +124,7 @@ export const inicioStyles = StyleSheet.create({
         paddingHorizontal: 14,
     },
     docCardNome: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.tealDark,
     },
