@@ -97,6 +97,18 @@ async function initDb() {
         updated_at TEXT)
     `);
 
+    // Certificado Digital A1 do agricultor. Guarda no máximo um por vez.
+    // A senha do .pfx não fica aqui — vai para o expo-secure-store (ver src/db/certificado.ts).
+    await agricultoresDb.execAsync(`
+        CREATE TABLE IF NOT EXISTS certificado_digital(
+        id TEXT PRIMARY KEY,
+        arquivo_nome TEXT,
+        validade TEXT,
+        enviado_at TEXT,
+        created_at TEXT,
+        updated_at TEXT)
+    `);
+
 }
 
 export {agricultoresDb, initDb};
