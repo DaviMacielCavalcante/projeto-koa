@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenContainer } from '../../design/components';
 import { colors } from '../../design/theme';
 import { listarNotas, excluirNota, type NotaFiscal } from '../../src/db/notasFiscais';
+import { obterCertificado, type Certificado } from '../../src/db/certificado';
 import { notasStyles as styles } from '../../styles/notasStyles';
 
 function formatarData(iso: string): string {
@@ -26,12 +27,15 @@ function resumo(total: number, pendentes: number): string {
 
 export default function Notas() {
     const [notas, setNotas] = useState<NotaFiscal[]>([]);
+    const [certificado, setCertificado] = useState<Certificado | null>(null);
     const insets = useSafeAreaInsets();
 
     useFocusEffect(
         useCallback(() => {
             async function carregar() {
-                setNotas(await listarNotas());
+                const [lista, cert] = await Promise.all([listarNotas(), obterCertificado()]);
+                setNotas(lista);
+                setCertificado(cert);
             }
             carregar();
         }, [])
@@ -59,6 +63,8 @@ export default function Notas() {
                 <Text style={styles.titulo}>Notas Fiscais</Text>
                 <Text style={styles.subtitulo}>{resumo(notas.length, pendentes)}</Text>
             </View>
+
+            <CardCertificado certificado={certificado} />
 
             {notas.length === 0 ? (
                 <View style={styles.vazio}>
@@ -151,5 +157,63 @@ function CardNota({
                 <Ionicons name="trash-outline" size={18} color={colors.greyLight} />
             </TouchableOpacity>
         </TouchableOpacity>
+    );
+}
+
+function CardCertificado({ certificado }: { certificado: Certificado | null }) {
+    if (!certificado) {
+        return (
+            <View style={[styles.certCard, styles.certCardPendente]}>
+                <View style={styles.certTopo}>
+                    <View style={[styles.certIcone, styles.certIconePendente]}>
+                        <Ionicons name="shield-outline" size={22} color={colors.orangeDark} />
+                    </View>
+                    <View style={styles.certInfo}>
+                        <Text style={[styles.certTitulo, { color: colors.orangeDark }]}>
+                            Certificado pendente
+                        </Text>
+                        <Text style={styles.certTexto}>
+                            Envie seu Certificado Digital A1 para poder emitir notas fiscais.
+                        </Text>
+                    </View>
+                </View>
+                <TouchableOpacity
+                    style={styles.certBotao}
+                    activeOpacity={0.85}
+                    onPress={() => router.push('/certificado')}
+                >
+                    <Ionicons name="cloud-upload-outline" size={18} color={colors.white} />
+                    <Text style={styles.certBotaoTexto}>Enviar certificado</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    return (
+        <View style={[styles.certCard, styles.certCardAtivo]}>
+            <View style={styles.certTopo}>
+                <View style={[styles.certIcone, styles.certIconeAtivo]}>
+                    <Ionicons name="shield-checkmark" size={22} color={colors.tealDark} />
+                </View>
+                <View style={styles.certInfo}>
+                    <Text style={[styles.certTitulo, { color: colors.tealDark }]}>
+                        Certificado ativo
+                    </Text>
+                    <Text style={styles.certTexto} numberOfLines={1}>
+                        {certificado.arquivo_nome}
+                    </Text>
+                    <Text style={styles.certValidade}>
+                        Válido até {formatarData(certificado.validade)}
+                    </Text>
+                </View>
+                <TouchableOpacity
+                    style={styles.certTrocar}
+                    onPress={() => router.push('/certificado')}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                    <Text style={styles.certTrocarTexto}>Trocar</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 }

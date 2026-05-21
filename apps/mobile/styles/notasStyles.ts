@@ -149,4 +149,87 @@ export const notasStyles = StyleSheet.create({
         fontSize: sizes.body,
         color: colors.white,
     },
+
+    certCard: {
+        marginHorizontal: 16,
+        marginTop: 4,
+        marginBottom: 8,
+        borderRadius: 18,
+        padding: 14,
+        gap: 12,
+    },
+    certCardPendente: {
+        backgroundColor: 'rgba(232,117,60,0.12)',
+        borderWidth: 1,
+        borderColor: 'rgba(168,69,30,0.22)',
+    },
+    certCardAtivo: {
+        backgroundColor: colors.white,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+        elevation: 2,
+    },
+    certTopo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    certIcone: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    certIconePendente: {
+        backgroundColor: 'rgba(201,95,46,0.18)',
+    },
+    certIconeAtivo: {
+        backgroundColor: 'rgba(31,122,122,0.12)',
+    },
+    certInfo: { flex: 1, gap: 2 },
+    certTitulo: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.body,
+    },
+    certTexto: {
+        fontFamily: fonts.body,
+        fontSize: sizes.caption,
+        color: colors.inkMute,
+        lineHeight: 17,
+    },
+    certValidade: {
+        fontFamily: fonts.bodyMedium,
+        fontSize: sizes.micro,
+        color: colors.inkSoft,
+        marginTop: 1,
+    },
+    certBotao: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        minHeight: 56,
+        backgroundColor: colors.orangeDark,
+        borderRadius: 12,
+        paddingVertical: 10,
+    },
+    certBotaoTexto: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.bodySm,
+        color: colors.white,
+    },
+    certTrocar: {
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 10,
+        backgroundColor: 'rgba(31,122,122,0.10)',
+    },
+    certTrocarTexto: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.caption,
+        color: colors.tealMid,
+    },
 });
