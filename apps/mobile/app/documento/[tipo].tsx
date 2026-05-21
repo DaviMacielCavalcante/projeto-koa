@@ -69,7 +69,6 @@ export default function DetalheDocumento() {
         registrarRef('doc-status', statusRef);
         registrarRef('doc-acoes', acoesRef);
     }, []);
-    const [avisoNfae, setAvisoNfae] = useState(false);
     const [fotoVisivel, setFotoVisivel] = useState(false);
     const [imagemVisivel, setImagemVisivel] = useState(false);
     const imagemDoc = IMAGENS_DOC[tipo];
@@ -213,18 +212,11 @@ export default function DetalheDocumento() {
                         onPress={() => router.push(`/guia/${tipo}`)}
                     />
                     <GradientButton label="Tenho duvida" variant="orange" onPress={() => router.push(`/faq/${tipo}`)} />
-                    {tipo === 'NFA-e' && (
-                        <GradientButton
-                            label="Ver notas salvas"
-                            variant="teal"
-                            onPress={() => router.push('/nfae-lista')}
-                        />
-                    )}
                     <GradientButton
-                        label={tipo === 'NFA-e' ? 'Preencher dados da nota' : 'Guardar foto do documento'}
+                        label="Guardar foto do documento"
                         variant="red"
-                        disabled={!dependenciaCumprida && tipo !== 'NFA-e'}
-                        onPress={() => tipo === 'NFA-e' ? setAvisoNfae(true) : router.push(`/camera/${tipo}`)}
+                        disabled={!dependenciaCumprida}
+                        onPress={() => router.push(`/camera/${tipo}`)}
                     />
                 </View>
             </TutorialGlow>
@@ -252,27 +244,6 @@ export default function DetalheDocumento() {
                 autoPlay={false}
                 style={styles.player}
             />
-
-            <Modal visible={avisoNfae} transparent animationType="fade">
-                <View style={styles.avisoFundo}>
-                    <View style={styles.avisoCard}>
-                        <View style={styles.avisoIcone}>
-                            <Ionicons name="warning" size={32} color={colors.white} />
-                        </View>
-                        <Text style={styles.avisoTitulo}>Cuidado antes de continuar</Text>
-                        <Text style={styles.avisoTexto}>
-                            Antes de fazer uma nota fiscal, confira bem os dados — nome, quantidade e valor do que você vai vender.{'\n\n'}
-                            Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.{'\n\n'}
-                        </Text>
-                        <TouchableOpacity style={styles.avisoBtn} onPress={() => { setAvisoNfae(false); router.push('/nfae-form'); }}>
-                            <Text style={styles.avisoBtnTexto}>Entendi, continuar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.avisoBtnVoltar} onPress={() => setAvisoNfae(false)}>
-                            <Text style={styles.avisoBtnVoltarTexto}>Voltar</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
         </ScreenContainer>
     );
 }

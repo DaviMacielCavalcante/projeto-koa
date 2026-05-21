@@ -27,7 +27,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     {
         zone: 'docs',
         titulo: 'Seus documentos',
-        texto: 'Estes são seus 5 documentos principais. Toque em qualquer um para ver detalhes, tirar foto ou saber como conseguir.',
+        texto: 'Estes são seus 4 documentos principais. Toque em qualquer um para ver detalhes, tirar foto ou saber como conseguir.',
         calloutPos: 'below',
     },
     {

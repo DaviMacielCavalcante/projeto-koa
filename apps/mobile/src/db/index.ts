@@ -76,19 +76,8 @@ async function initDb() {
         created_at TEXT)
     `);
 
-    await agricultoresDb.execAsync(`
-        CREATE TABLE IF NOT EXISTS nfae_rascunhos(
-        id TEXT PRIMARY KEY,
-        produtor_cnpj TEXT,
-        produtor_endereco TEXT,
-        comprador_nome TEXT,
-        comprador_doc TEXT,
-        descricao TEXT,
-        valor TEXT,
-        natureza TEXT,
-        created_at TEXT,
-        updated_at TEXT)
-    `);
+    // Tabela antiga de rascunhos de NFA-e — substituída por notas_fiscais.
+    await agricultoresDb.execAsync(`DROP TABLE IF EXISTS nfae_rascunhos`);
 
     await agricultoresDb.execAsync(`
         CREATE TABLE IF NOT EXISTS notas_fiscais(

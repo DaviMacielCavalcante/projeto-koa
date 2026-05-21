@@ -54,7 +54,6 @@ function IlustracaoTour({ index }: { index: number }) {
             { label: 'CCIR',  cor: colors.orangeMid },
             { label: 'CAF',   cor: colors.tealDark },
             { label: 'CAR',   cor: colors.goldDark },
-            { label: 'NFA-e', cor: colors.tealMid },
         ];
         return (
             <View style={il.cardsWrap}>
@@ -123,7 +122,7 @@ type Etapa = 'boas_vindas' | 'lgpd' | 'perfil' | 'tour' | 'pratica';
 
 const TOUR_SLIDES = [
     { icon: 'leaf' as const,          titulo: 'Pra começar',   corpo: 'Esse app é teu auxiliar pros documentos da roça. Tudo num lugar só.' },
-    { icon: 'document-text' as const, titulo: 'Os 5 papéis',   corpo: 'Aqui tu cuida de tudo: CAF, CAR, CCIR, ITR e NFA-e.' },
+    { icon: 'document-text' as const, titulo: 'Os 4 papéis',   corpo: 'Aqui tu cuida de tudo: CAF, CAR, CCIR e ITR.' },
     { icon: 'camera' as const,        titulo: 'Tira foto',     corpo: 'Tu fotografa o documento e a gente guarda pra ti com segurança.' },
     { icon: 'notifications' as const, titulo: 'A gente avisa', corpo: 'Quando faltar 30 dias pra vencer, tu é avisado pelo celular.' },
 ];

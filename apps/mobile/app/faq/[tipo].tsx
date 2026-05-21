@@ -80,24 +80,6 @@ const FAQ: Record<string, PerguntaItem[]> = {
             resposta: 'Não precisa de renovação periódica, mas pode ser necessário retificá-lo se a análise indicar inconsistências.',
         },
     ],
-    'NFA-e': [
-        {
-            pergunta: 'Para que serve a NFA-e?',
-            resposta: 'Para emitir nota fiscal na venda dos seus produtos rurais. Muitos compradores, prefeituras e programas governamentais exigem a nota.',
-        },
-        {
-            pergunta: 'É difícil emitir?',
-            resposta: 'Precisa ter os dados do comprador, descrição do produto e valor. Neste app você organiza esses dados antes de ir ao sistema da SEFA-PA.',
-        },
-        {
-            pergunta: 'Preciso da NFA-e para toda venda?',
-            resposta: 'Depende do comprador. Para PAA, PNAE, supermercados e empresas geralmente é exigida.',
-        },
-        {
-            pergunta: 'Preciso ter o CAF para emitir?',
-            resposta: 'Sim. Você precisa estar cadastrado como produtor rural e ter o CAF ou DAP para emitir a nota fiscal avulsa.',
-        },
-    ],
 };
 
 function ItemFaq({ item }: { item: PerguntaItem }) {

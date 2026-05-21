@@ -24,5 +24,4 @@ export const mockDocuments: MockDocument[] = [
     { id: 'doc-2', type: 'CAR',   status: 'expired',       expiration_date: '2025-05-06', file_url: null },
     { id: 'doc-3', type: 'CCIR',  status: 'expiring_soon', expiration_date: '2026-05-20', file_url: null },
     { id: 'doc-4', type: 'ITR',   status: null,            expiration_date: null,         file_url: null },
-    { id: 'doc-5', type: 'NFA-e', status: 'active',        expiration_date: '2026-11-06', file_url: null },
 ];
