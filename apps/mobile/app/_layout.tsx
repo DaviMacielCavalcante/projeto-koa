@@ -9,6 +9,7 @@ import * as Notifications from 'expo-notifications';
 import { initDb } from '../src/db/index'
 import auth from '@react-native-firebase/auth';
 import { syncQueue } from '../src/services/sync';
+import { processarFilaEmissao } from '../src/services/emissaoNfae';
 import { configurarNotificacoes, agendarAlertas } from '../src/services/notificacoes';
 import * as NetInfo from '@react-native-community/netinfo';
 import { PracticeModeProvider } from '../src/contexts/PracticeMode';
@@ -74,7 +75,10 @@ export default function RootLayout() {
         () => {
             const unsubscribe = NetInfo.addEventListener(
                 (state) => {
-                    if (state.isConnected) syncQueue()
+                    if (state.isConnected) {
+                        syncQueue()
+                        processarFilaEmissao()
+                    }
                 }
             )
             return () => unsubscribe()
