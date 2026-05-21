@@ -90,6 +90,24 @@ async function initDb() {
         updated_at TEXT)
     `);
 
+    await agricultoresDb.execAsync(`
+        CREATE TABLE IF NOT EXISTS notas_fiscais(
+        id TEXT PRIMARY KEY,
+        produtor_cnpj TEXT,
+        produtor_endereco TEXT,
+        comprador_nome TEXT,
+        comprador_doc TEXT,
+        descricao TEXT,
+        valor TEXT,
+        natureza TEXT,
+        status TEXT,
+        numero_nota TEXT,
+        chave_acesso TEXT,
+        emitida_at TEXT,
+        created_at TEXT,
+        updated_at TEXT)
+    `);
+
 }
 
 export {agricultoresDb, initDb};
