@@ -80,7 +80,10 @@ export default function Notas() {
                 <FlatList
                     data={notas}
                     keyExtractor={(item) => item.id}
-                    contentContainerStyle={[styles.lista, { paddingBottom: insets.bottom + 160 }]}
+                    contentContainerStyle={[
+                        styles.lista,
+                        { paddingBottom: insets.bottom + (certificado ? 160 : 196) },
+                    ]}
                     renderItem={({ item }) => (
                         <CardNota
                             nota={item}
@@ -91,14 +94,25 @@ export default function Notas() {
                 />
             )}
 
-            <TouchableOpacity
-                style={[styles.botaoEmitir, { bottom: insets.bottom + 84 }]}
-                activeOpacity={0.85}
-                onPress={() => router.push('/nfae-form')}
-            >
-                <Ionicons name="add-circle" size={22} color={colors.white} />
-                <Text style={styles.botaoEmitirTexto}>Emitir nova nota</Text>
-            </TouchableOpacity>
+            <View style={[styles.rodapeEmitir, { bottom: insets.bottom + 84 }]}>
+                {!certificado && (
+                    <View style={styles.dicaCertificado}>
+                        <Ionicons name="alert-circle" size={14} color={colors.orangeDark} />
+                        <Text style={styles.dicaCertificadoTexto}>
+                            Envie seu certificado primeiro
+                        </Text>
+                    </View>
+                )}
+                <TouchableOpacity
+                    style={[styles.botaoEmitir, !certificado && styles.botaoEmitirDesabilitado]}
+                    activeOpacity={0.85}
+                    disabled={!certificado}
+                    onPress={() => router.push('/nfae-form')}
+                >
+                    <Ionicons name="add-circle" size={22} color={colors.white} />
+                    <Text style={styles.botaoEmitirTexto}>Emitir nova nota</Text>
+                </TouchableOpacity>
+            </View>
         </ScreenContainer>
     );
 }

@@ -126,10 +126,13 @@ export const notasStyles = StyleSheet.create({
         textAlign: 'center',
         lineHeight: 22,
     },
-    botaoEmitir: {
+    rodapeEmitir: {
         position: 'absolute',
         left: 20,
         right: 20,
+        gap: 8,
+    },
+    botaoEmitir: {
         minHeight: 56,
         flexDirection: 'row',
         alignItems: 'center',
@@ -144,10 +147,31 @@ export const notasStyles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 6,
     },
+    botaoEmitirDesabilitado: {
+        backgroundColor: colors.greyLight,
+        shadowOpacity: 0,
+        elevation: 0,
+    },
     botaoEmitirTexto: {
         fontFamily: fonts.bodySemi,
         fontSize: sizes.body,
         color: colors.white,
+    },
+    dicaCertificado: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignSelf: 'center',
+        gap: 6,
+        backgroundColor: 'rgba(232,117,60,0.14)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 14,
+    },
+    dicaCertificadoTexto: {
+        fontFamily: fonts.bodyMedium,
+        fontSize: sizes.caption,
+        color: colors.orangeDark,
     },
 
     certCard: {
