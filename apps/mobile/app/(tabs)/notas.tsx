@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList, Alert } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenContainer } from '../../design/components';
@@ -28,7 +27,6 @@ function resumo(total: number, pendentes: number): string {
 export default function Notas() {
     const [notas, setNotas] = useState<NotaFiscal[]>([]);
     const [certificado, setCertificado] = useState<Certificado | null>(null);
-    const insets = useSafeAreaInsets();
 
     useFocusEffect(
         useCallback(() => {
@@ -82,7 +80,7 @@ export default function Notas() {
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={[
                         styles.lista,
-                        { paddingBottom: insets.bottom + (certificado ? 160 : 196) },
+                        { paddingBottom: certificado ? 88 : 124 },
                     ]}
                     renderItem={({ item }) => (
                         <CardNota
@@ -94,7 +92,7 @@ export default function Notas() {
                 />
             )}
 
-            <View style={[styles.rodapeEmitir, { bottom: insets.bottom + 84 }]}>
+            <View style={[styles.rodapeEmitir, { bottom: 12 }]}>
                 {!certificado && (
                     <View style={styles.dicaCertificado}>
                         <Ionicons name="alert-circle" size={14} color={colors.orangeDark} />
