@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import { colors, fonts, sizes } from '../design/theme';
 
 export const detalheDocumentoStyles = StyleSheet.create({
-    top: { paddingHorizontal: 22, alignItems: 'center', paddingTop: 4 },
+    top: { paddingHorizontal: 22, alignItems: 'center', paddingTop: 4, paddingBottom: 12 },
     heroIconWrap: {
         padding: 10,
         borderRadius: 32,
