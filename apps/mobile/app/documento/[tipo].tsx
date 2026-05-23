@@ -20,6 +20,12 @@ const IMAGENS_DOC: Partial<Record<string, any>> = {
     ITR:  require('../../assets/docs/ITR.png'),
 };
 
+const AUDIOS_DOC: Partial<Record<string, any>> = {
+    CAR:  require('../../assets/audio/car.mp3'),
+    CCIR: require('../../assets/audio/ccir.mp3'),
+    ITR:  require('../../assets/audio/itr.mp3'),
+};
+
 type DocumentoStatus = 'active' | 'expiring_soon' | 'expired' | null;
 
 type Documento = {
@@ -247,11 +253,13 @@ export default function DetalheDocumento() {
                 </TouchableOpacity>
             </Modal>
 
-            <AudioPlayer
-                source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
-                autoPlay={false}
-                style={styles.player}
-            />
+            {AUDIOS_DOC[tipo] && (
+                <AudioPlayer
+                    source={AUDIOS_DOC[tipo]}
+                    autoPlay={false}
+                    style={styles.player}
+                />
+            )}
 
             <Modal visible={avisoNfae} transparent animationType="fade">
                 <View style={styles.avisoFundo}>

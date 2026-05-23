@@ -16,6 +16,22 @@ import { TutorialProvider } from '../src/contexts/TutorialContext';
 import TutorialOverlay from '../components/TutorialOverlay';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+// Suprime o erro nativo do ExoPlayer durante hot reload em desenvolvimento
+if (__DEV__) {
+    const originalHandler = ErrorUtils.getGlobalHandler();
+    ErrorUtils.setGlobalHandler((error, isFatal) => {
+        const msg = error?.message ?? '';
+        if (
+            msg.includes('Player is accessed on the wrong thread') ||
+            msg.includes('wrong thread') ||
+            msg.includes('ExoPlayer')
+        ) {
+            return;
+        }
+        originalHandler(error, isFatal);
+    });
+}
+
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
         shouldShowBanner: true,
