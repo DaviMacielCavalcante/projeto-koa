@@ -72,10 +72,6 @@ export default function DetalheDocumento() {
     const [fotoVisivel, setFotoVisivel] = useState(false);
     const [imagemVisivel, setImagemVisivel] = useState(false);
     const imagemDoc = IMAGENS_DOC[tipo];
-    const [avisoDependencia, setAvisoDependencia] = useState<string | null>(null);
-    const [dependenciaCumprida, setDependenciaCumprida] = useState(true);
-
-    const DEPENDENCIAS: Partial<Record<string, string>> = { CAF: 'CCIR', CAR: 'CAF' };
 
     const documentType = tipo && isDocumentType(tipo) ? tipo : null;
     const meta = documentType ? documentMeta[documentType] : null;
@@ -90,20 +86,6 @@ export default function DetalheDocumento() {
                         [tipo]
                     );
                     setDocumento(result ?? null);
-
-                    const dep = DEPENDENCIAS[tipo];
-                    if (dep) {
-                        const depDoc = await agricultoresDb?.getFirstAsync<{ id: string }>(
-                            'SELECT id FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
-                            [dep]
-                        );
-                        const cumprida = !!depDoc;
-                        setDependenciaCumprida(cumprida);
-                        setAvisoDependencia(cumprida ? null : dep);
-                    } else {
-                        setDependenciaCumprida(true);
-                        setAvisoDependencia(null);
-                    }
                 } finally {
                     setLoading(false);
                 }
@@ -185,18 +167,6 @@ export default function DetalheDocumento() {
                 ) : null}
             </View>
 
-            {avisoDependencia && (
-                <View style={styles.bannnerDep}>
-                    <Ionicons name="lock-closed" size={16} color={colors.orangeDark} />
-                    <Text style={styles.bannerDepTexto}>
-                        Para guardar a foto do {tipo} você precisa primeiro registrar o{' '}
-                        <Text style={styles.bannerDepLink} onPress={() => router.push(`/documento/${avisoDependencia}`)}>
-                            {avisoDependencia}
-                        </Text>.
-                    </Text>
-                </View>
-            )}
-
             <TutorialGlow active={zonaAtiva === 'doc-acoes'} borderRadius={20} style={{ marginHorizontal: 12, marginTop: 'auto' as const }}>
                 <View ref={acoesRef} style={[styles.acoes, { marginTop: 0 }]}>
                     {documento?.file_url ? (
@@ -215,7 +185,6 @@ export default function DetalheDocumento() {
                     <GradientButton
                         label="Guardar foto do documento"
                         variant="red"
-                        disabled={!dependenciaCumprida}
                         onPress={() => router.push(`/camera/${tipo}`)}
                     />
                 </View>
