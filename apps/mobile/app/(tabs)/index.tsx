@@ -15,7 +15,7 @@ import TutorialGlow from '../../components/TutorialGlow';
 import BotaoConexao from '../../components/BotaoConexao';
 
 const WALLPAPER_HOME = require('../../assets/images/WallpaperHome.jpg');
-const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR', 'NFA-e'];
+const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR'];
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
 
 
@@ -79,7 +79,7 @@ export default function Inicio() {
 
                 const rows = await agricultoresDb?.getAllAsync<DocRow>(
                     `SELECT type, status, expiration_date FROM documents
-                     WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
+                     WHERE type IN ('CAF','CAR','CCIR','ITR')
                      GROUP BY type
                      HAVING created_at = MAX(created_at)`
                 );

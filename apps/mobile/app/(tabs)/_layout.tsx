@@ -12,12 +12,12 @@ export default function TabsLayout() {
     const insets = useSafeAreaInsets();
     const { registrarRef, zonaAtiva } = useTutorial();
     const outrosRef = useRef<View>(null);
-    const avisosRef = useRef<View>(null);
+    const notasRef = useRef<View>(null);
     const ajudaRef = useRef<View>(null);
 
     useEffect(() => {
         registrarRef('tab-outros', outrosRef);
-        registrarRef('tab-avisos', avisosRef);
+        registrarRef('tab-notas', notasRef);
         registrarRef('tab-ajuda', ajudaRef);
     }, []);
 
@@ -72,13 +72,13 @@ export default function TabsLayout() {
                     }}
                 />
                 <Tabs.Screen
-                    name="avisos"
+                    name="notas"
                     options={{
-                        title: 'Avisos',
-                        tabBarIcon: ({ color }) => <Ionicons name="notifications-outline" color={color} size={24} />,
+                        title: 'Notas',
+                        tabBarIcon: ({ color }) => <Ionicons name="receipt-outline" color={color} size={24} />,
                         tabBarButton: (props) => (
-                            <TutorialGlow active={zonaAtiva === 'tab-avisos'} borderRadius={16} inset={-4} style={props.style as any}>
-                                <Pressable ref={avisosRef} onPress={props.onPress} onLongPress={props.onLongPress}
+                            <TutorialGlow active={zonaAtiva === 'tab-notas'} borderRadius={16} inset={-4} style={props.style as any}>
+                                <Pressable ref={notasRef} onPress={props.onPress} onLongPress={props.onLongPress}
                                     style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} accessible={props.accessible}
                                     accessibilityLabel={props.accessibilityLabel}
                                     accessibilityRole={props.accessibilityRole}

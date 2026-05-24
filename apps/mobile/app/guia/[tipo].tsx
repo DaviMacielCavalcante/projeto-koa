@@ -141,26 +141,6 @@ const GUIAS: Record<string, GuiaInfo> = {
         telefone: EMATER_TEL,
     },
 
-    'NFA-e': {
-        onde: [
-            {
-                titulo: 'Online',
-                icone: 'globe',
-                linhas: ['Portal da SEFA-PA (Secretaria da Fazenda do Pará)'],
-            },
-            {
-                titulo: 'Presencial',
-                icone: 'business',
-                linhas: ['Escritório da EMATER em Moju pode orientar', HORARIO_PADRAO],
-            },
-        ],
-        levar: [
-            { icone: 'card', label: 'CPF' },
-            { icone: 'document', label: 'CAF ou DAP' },
-            { icone: 'storefront', label: 'Dados do comprador' },
-        ],
-        telefone: EMATER_TEL,
-    },
 };
 
 export default function GuiaDocumento() {

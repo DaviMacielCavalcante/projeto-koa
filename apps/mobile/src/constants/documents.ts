@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../design/theme';
 
-export const DOCUMENT_TYPES = ['CAF', 'CAR', 'CCIR', 'ITR', 'NFA-e'] as const;
+export const DOCUMENT_TYPES = ['CAF', 'CAR', 'CCIR', 'ITR'] as const;
 
 export type DocumentType = (typeof DOCUMENT_TYPES)[number];
 export type DocumentIconName = keyof typeof Ionicons.glyphMap;
@@ -81,20 +81,6 @@ export const documentMeta: Record<DocumentType, DocumentMeta> = {
             { name: 'document-text-outline', size: 36, color: colors.orangeMid, top: 14, left: 14, opacity: 0.24 },
             { name: 'cash-outline', size: 28, color: colors.redMid, top: 20, left: 11 },
             { name: 'calendar-outline', size: 20, color: colors.tealDark, top: 35, left: 36 },
-        ],
-    },
-    'NFA-e': {
-        shortLabel: 'NFA-e',
-        fullName: 'Nota Fiscal Avulsa Eletronica',
-        description: 'Usada para emitir notas na venda dos seus produtos.',
-        accent: colors.redMid,
-        cardColor: '#F0D5D0',
-        iconBackground: '#FFF4F2',
-        iconBorder: '#E6B8AE',
-        iconLayers: [
-            { name: 'receipt-outline', size: 36, color: colors.redMid, top: 14, left: 14, opacity: 0.28 },
-            { name: 'print-outline', size: 24, color: colors.tealDark, top: 19, left: 12 },
-            { name: 'checkmark-done-outline', size: 18, color: colors.goldDark, top: 37, left: 38 },
         ],
     },
 };

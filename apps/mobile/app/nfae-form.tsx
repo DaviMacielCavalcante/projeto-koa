@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import uuid from 'react-native-uuid';
 import { ScreenContainer, GradientButton, TopBar } from '../design/components';
 import { colors, fonts, sizes } from '../design/theme';
-import { agricultoresDb } from '../src/db/index';
+import { criarNotaPendente } from '../src/db/notasFiscais';
+import { processarFilaEmissao } from '../src/services/emissaoNfae';
 
 type Etapa = 'produtor' | 'comprador' | 'operacao' | 'resumo';
 
@@ -20,7 +20,7 @@ const TITULOS: Record<Etapa, string> = {
 
 export default function NfaeForm() {
     const [etapa, setEtapa] = useState<Etapa>('produtor');
-    const [salvando, setSalvando] = useState(false);
+    const [emitindo, setEmitindo] = useState(false);
 
     const [produtorCnpj, setProdutorCnpj] = useState('');
     const [produtorEndereco, setProdutorEndereco] = useState('');
@@ -61,22 +61,36 @@ export default function NfaeForm() {
         else router.back();
     }
 
-    async function salvar() {
-        setSalvando(true);
+    function emitir() {
+        Alert.alert(
+            'Emitir nota fiscal',
+            'Confira bem os dados. Depois de emitida, a nota não pode ser alterada.',
+            [
+                { text: 'Revisar', style: 'cancel' },
+                { text: 'Emitir', onPress: confirmarEmissao },
+            ]
+        );
+    }
+
+    async function confirmarEmissao() {
+        setEmitindo(true);
         try {
-            const agora = new Date().toISOString();
-            const novoId = uuid.v4() as string;
-            await agricultoresDb?.runAsync(
-                `INSERT OR REPLACE INTO nfae_rascunhos
-                 (id, produtor_cnpj, produtor_endereco, comprador_nome, comprador_doc, descricao, valor, natureza, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [novoId, produtorCnpj, produtorEndereco, compradorNome, compradorDoc, descricao, valor, natureza, agora, agora]
-            );
-            router.replace({ pathname: '/nfae-preview', params: { id: novoId } });
+            const id = await criarNotaPendente({
+                produtor_cnpj: produtorCnpj,
+                produtor_endereco: produtorEndereco,
+                comprador_nome: compradorNome,
+                comprador_doc: compradorDoc,
+                descricao,
+                valor,
+                natureza,
+            });
+            // Se houver internet, a nota já é emitida aqui; sem internet,
+            // ela fica pendente e é emitida sozinha quando a conexão voltar.
+            await processarFilaEmissao();
+            router.replace({ pathname: '/nfae-preview', params: { id } });
         } catch {
-            Alert.alert('Erro', 'Não foi possível salvar os dados.');
-        } finally {
-            setSalvando(false);
+            Alert.alert('Erro', 'Não foi possível registrar a nota. Tente de novo.');
+            setEmitindo(false);
         }
     }
 
@@ -180,7 +194,7 @@ export default function NfaeForm() {
                         <View style={styles.avisoResumo}>
                             <Ionicons name="information-circle" size={18} color={colors.goldLight} />
                             <Text style={styles.avisoResumoTexto}>
-                                Verifique todos os dados antes de salvar. Use essas informações na hora de emitir a nota no sistema da SEFA-PA.
+                                Confira tudo com atenção. Ao tocar em "Emitir nota", a nota é registrada e não poderá mais ser alterada.
                             </Text>
                         </View>
                     </View>
@@ -198,10 +212,10 @@ export default function NfaeForm() {
                     />
                 ) : (
                     <GradientButton
-                        label={salvando ? 'Salvando...' : 'Salvar dados'}
+                        label={emitindo ? 'Emitindo...' : 'Emitir nota'}
                         variant="cream"
-                        onPress={salvar}
-                        disabled={salvando}
+                        onPress={emitir}
+                        disabled={emitindo}
                         style={{ width: '100%' }}
                     />
                 )}

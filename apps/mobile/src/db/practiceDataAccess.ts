@@ -13,7 +13,7 @@ export const practiceDataAccess = {
         if (isPracticeMode) return mockDocuments;
         const docs = await agricultoresDb?.getAllAsync<DocRow>(
             `SELECT type, file_url, status FROM documents
-                WHERE type IN ('CAF','CAR','CCIR','ITR','NFA-e')
+                WHERE type IN ('CAF','CAR','CCIR','ITR')
                 GROUP BY type
                 HAVING created_at = MAX(created_at)`
         );

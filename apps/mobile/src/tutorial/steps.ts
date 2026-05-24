@@ -2,7 +2,7 @@ export type TutorialZone =
     | 'greet'
     | 'docs'
     | 'cores'
-    | 'tab-avisos'
+    | 'tab-notas'
     | 'tab-outros'
     | 'tab-ajuda'
     | 'doc-hero'
@@ -27,7 +27,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     {
         zone: 'docs',
         titulo: 'Seus documentos',
-        texto: 'Estes são seus 5 documentos principais. Toque em qualquer um para ver detalhes, tirar foto ou saber como conseguir.',
+        texto: 'Estes são seus 4 documentos principais. Toque em qualquer um para ver detalhes, tirar foto ou saber como conseguir.',
         calloutPos: 'below',
     },
     {
@@ -37,9 +37,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
         calloutPos: 'below',
     },
     {
-        zone: 'tab-avisos',
-        titulo: 'Aba Avisos',
-        texto: 'Aqui você recebe alertas quando um documento está perto de vencer. Não ignore!',
+        zone: 'tab-notas',
+        titulo: 'Aba Nota Fiscal',
+        texto: 'Aqui você emite a nota fiscal das suas vendas e acompanha todas as notas já emitidas.',
         calloutPos: 'above',
     },
     {

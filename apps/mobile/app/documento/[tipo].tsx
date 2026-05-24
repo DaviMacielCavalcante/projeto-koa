@@ -75,7 +75,6 @@ export default function DetalheDocumento() {
         registrarRef('doc-status', statusRef);
         registrarRef('doc-acoes', acoesRef);
     }, []);
-    const [avisoNfae, setAvisoNfae] = useState(false);
     const [fotoVisivel, setFotoVisivel] = useState(false);
     const [imagemVisivel, setImagemVisivel] = useState(false);
     const imagemDoc = IMAGENS_DOC[tipo];
@@ -219,18 +218,11 @@ export default function DetalheDocumento() {
                         onPress={() => router.push(`/guia/${tipo}`)}
                     />
                     <GradientButton label="Tenho duvida" variant="orange" onPress={() => router.push(`/faq/${tipo}`)} />
-                    {tipo === 'NFA-e' && (
-                        <GradientButton
-                            label="Ver notas salvas"
-                            variant="teal"
-                            onPress={() => router.push('/nfae-lista')}
-                        />
-                    )}
                     <GradientButton
-                        label={tipo === 'NFA-e' ? 'Preencher dados da nota' : 'Guardar foto do documento'}
+                        label="Guardar foto do documento"
                         variant="red"
-                        disabled={!dependenciaCumprida && tipo !== 'NFA-e'}
-                        onPress={() => tipo === 'NFA-e' ? setAvisoNfae(true) : router.push(`/camera/${tipo}`)}
+                        disabled={!dependenciaCumprida}
+                        onPress={() => router.push(`/camera/${tipo}`)}
                     />
                 </View>
             </TutorialGlow>
@@ -281,6 +273,11 @@ export default function DetalheDocumento() {
                     </View>
                 </View>
             </Modal>
+            <AudioPlayer
+                source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
+                autoPlay={false}
+                style={styles.player}
+            />
         </ScreenContainer>
     );
 }

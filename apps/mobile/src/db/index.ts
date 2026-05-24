@@ -76,8 +76,11 @@ async function initDb() {
         created_at TEXT)
     `);
 
+    // Tabela antiga de rascunhos de NFA-e — substituída por notas_fiscais.
+    await agricultoresDb.execAsync(`DROP TABLE IF EXISTS nfae_rascunhos`);
+
     await agricultoresDb.execAsync(`
-        CREATE TABLE IF NOT EXISTS nfae_rascunhos(
+        CREATE TABLE IF NOT EXISTS notas_fiscais(
         id TEXT PRIMARY KEY,
         produtor_cnpj TEXT,
         produtor_endereco TEXT,
@@ -86,6 +89,22 @@ async function initDb() {
         descricao TEXT,
         valor TEXT,
         natureza TEXT,
+        status TEXT,
+        numero_nota TEXT,
+        chave_acesso TEXT,
+        emitida_at TEXT,
+        created_at TEXT,
+        updated_at TEXT)
+    `);
+
+    // Certificado Digital A1 do agricultor. Guarda no máximo um por vez.
+    // A senha do .pfx não fica aqui — vai para o expo-secure-store (ver src/db/certificado.ts).
+    await agricultoresDb.execAsync(`
+        CREATE TABLE IF NOT EXISTS certificado_digital(
+        id TEXT PRIMARY KEY,
+        arquivo_nome TEXT,
+        validade TEXT,
+        enviado_at TEXT,
         created_at TEXT,
         updated_at TEXT)
     `);
