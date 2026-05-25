@@ -154,6 +154,37 @@ export const detalheDocumentoStyles = StyleSheet.create({
         gap: 4,
         paddingBottom: 4,
     },
+    botao: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        backgroundColor: colors.creamLight,
+        borderRadius: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        minHeight: 56,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.06,
+        shadowRadius: 4,
+        elevation: 1,
+    },
+    botaoDesabilitado: {
+        opacity: 0.5,
+    },
+    botaoIcone: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    botaoLabel: {
+        flex: 1,
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.body,
+        color: colors.ink,
+    },
 });
 
 export const docImagemModalStyles = StyleSheet.create({

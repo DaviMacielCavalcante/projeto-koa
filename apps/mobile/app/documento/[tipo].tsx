@@ -7,7 +7,7 @@ import { useTutorial } from '../../src/contexts/TutorialContext';
 import { Ionicons } from '@expo/vector-icons';
 import AudioPlayer from '../../components/AudioPlayer';
 import TutorialGlow from '../../components/TutorialGlow';
-import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
+import { ScreenContainer, TopBar } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors, statusGradients } from '../../design/theme';
 import { detalheDocumentoStyles as styles, docImagemModalStyles as modalStyles } from '../../styles/detalheDocumentoStyles';
@@ -170,21 +170,29 @@ export default function DetalheDocumento() {
             <TutorialGlow active={zonaAtiva === 'doc-acoes'} borderRadius={20} style={{ marginHorizontal: 12, marginTop: 'auto' as const }}>
                 <View ref={acoesRef} style={[styles.acoes, { marginTop: 0 }]}>
                     {documento?.file_url ? (
-                        <GradientButton
+                        <BotaoCompacto
+                            icone="image"
+                            cor={colors.goldMid}
                             label="Ver foto salva"
-                            variant="gold"
                             onPress={() => setFotoVisivel(true)}
                         />
                     ) : null}
-                    <GradientButton
+                    <BotaoCompacto
+                        icone="map-outline"
+                        cor={colors.tealMid}
                         label="Como conseguir"
-                        variant="teal"
                         onPress={() => router.push(`/guia/${tipo}`)}
                     />
-                    <GradientButton label="Tenho duvida" variant="orange" onPress={() => router.push(`/faq/${tipo}`)} />
-                    <GradientButton
+                    <BotaoCompacto
+                        icone="help-circle-outline"
+                        cor={colors.orangeMid}
+                        label="Tenho duvida"
+                        onPress={() => router.push(`/faq/${tipo}`)}
+                    />
+                    <BotaoCompacto
+                        icone="camera"
+                        cor={colors.redMid}
                         label="Guardar foto do documento"
-                        variant="red"
                         onPress={() => router.push(`/camera/${tipo}`)}
                     />
                 </View>
@@ -214,5 +222,27 @@ export default function DetalheDocumento() {
                 style={styles.player}
             />
         </ScreenContainer>
+    );
+}
+
+function BotaoCompacto({ icone, cor, label, onPress, disabled }: {
+    icone: keyof typeof Ionicons.glyphMap;
+    cor: string;
+    label: string;
+    onPress: () => void;
+    disabled?: boolean;
+}) {
+    return (
+        <TouchableOpacity
+            style={[styles.botao, disabled && styles.botaoDesabilitado]}
+            onPress={onPress}
+            disabled={disabled}
+            activeOpacity={0.85}
+        >
+            <View style={[styles.botaoIcone, { backgroundColor: cor }]}>
+                <Ionicons name={icone} size={20} color={colors.white} />
+            </View>
+            <Text style={styles.botaoLabel}>{label}</Text>
+        </TouchableOpacity>
     );
 }
