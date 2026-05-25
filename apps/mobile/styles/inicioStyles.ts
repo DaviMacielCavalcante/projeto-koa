@@ -58,10 +58,9 @@ export const inicioStyles = StyleSheet.create({
         justifyContent: 'center',
     },
     educationalTitle: {
-        fontFamily: fonts.mono,
+        fontFamily: fonts.monoSemi,
         fontSize: 15,
         color: colors.tealDark,
-        fontWeight: '700',
     },
     educationalSub: {
         fontFamily: fonts.mono,

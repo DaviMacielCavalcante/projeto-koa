@@ -13,10 +13,9 @@ export const roadmapDetailStyles = StyleSheet.create({
         marginBottom: 8,
     },
     titulo: {
-        fontFamily: fonts.mono,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.xxl,
         color: colors.tealDark,
-        fontWeight: '700',
         textAlign: 'center',
     },
     tituloConcluido: {
@@ -31,10 +30,9 @@ export const roadmapDetailStyles = StyleSheet.create({
         marginTop: 10,
     },
     categoriaBadgeText: {
-        fontFamily: fonts.body,
+        fontFamily: fonts.bodyBold,
         fontSize: sizes.bodySm,
         color: colors.white,
-        fontWeight: '700',
         letterSpacing: 0.5,
     },
     hero: {
@@ -74,10 +72,9 @@ export const roadmapDetailStyles = StyleSheet.create({
         flex: 1,
     },
     sectionTitle: {
-        fontFamily: fonts.mono,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.tealDark,
-        fontWeight: '700',
         marginBottom: 4,
     },
     sectionBody: {
@@ -107,10 +104,9 @@ export const roadmapDetailStyles = StyleSheet.create({
     },
     resumoText: {
         flex: 1,
-        fontFamily: fonts.mono,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.white,
-        fontWeight: '700',
         lineHeight: 24,
     },
     botao: {
