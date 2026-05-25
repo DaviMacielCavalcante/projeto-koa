@@ -194,7 +194,7 @@ export default function Onboarding() {
                 <TopBar leftIcon="home" dark={false} onLeftPress={() => router.replace('/(tabs)')} />
                 <View style={styles.centro}>
                     <IlustracaoBemVindo />
-                    <Text style={styles.titulo36}>Bem-vindo,{'\n'}parceiro!</Text>
+                    <Text style={styles.titulo36}>Bem-vindo,{'\n'}chefe!</Text>
                     <Text style={styles.corpoBranco}>
                         Tô falando com tu agora. Toca no áudio quando quiser ouvir de novo.
                     </Text>
