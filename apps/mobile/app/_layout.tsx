@@ -1,7 +1,7 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState} from 'react';
 import { ActivityIndicator, BackHandler } from 'react-native';
-import { useFonts, PlayfairDisplay_700Bold, PlayfairDisplay_900Black, PlayfairDisplay_400Regular_Italic } from '@expo-google-fonts/playfair-display';
+import { useFonts } from '@expo-google-fonts/inter';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Inconsolata_400Regular, Inconsolata_600SemiBold } from '@expo-google-fonts/inconsolata';
 import * as SecureStore from 'expo-secure-store';
@@ -46,9 +46,6 @@ export default function RootLayout() {
 
     const [dbReady, setDbReady] = useState(false);
     const [fontsLoaded] = useFonts({
-        PlayfairDisplay_700Bold,
-        PlayfairDisplay_900Black,
-        PlayfairDisplay_400Regular_Italic,
         Inter_400Regular,
         Inter_500Medium,
         Inter_600SemiBold,

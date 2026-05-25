@@ -1,7 +1,4 @@
 export const fonts = {
-  display: 'PlayfairDisplay_700Bold',
-  displayBlack: 'PlayfairDisplay_900Black',
-  displayItalic: 'PlayfairDisplay_400Regular_Italic',
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodySemi: 'Inter_600SemiBold',

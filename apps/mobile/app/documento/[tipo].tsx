@@ -179,7 +179,7 @@ export default function DetalheDocumento() {
                         <BotaoCompacto
                             icone="image"
                             cor={colors.goldMid}
-                            label="Ver foto salva"
+                            label="Ver documento salvo"
                             onPress={() => setFotoVisivel(true)}
                         />
                     ) : null}

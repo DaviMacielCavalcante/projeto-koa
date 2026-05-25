@@ -16,7 +16,6 @@
     "@agri-docs/shared": "workspace:*",
     "@expo-google-fonts/inconsolata": "^0.4.2",
     "@expo-google-fonts/inter": "^0.4.2",
-    "@expo-google-fonts/playfair-display": "^0.4.2",
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-community/netinfo": "^11.4.1",
