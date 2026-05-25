@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTutorial } from '../../src/contexts/TutorialContext';
 import { inicioStyles as styles } from '../../styles/inicioStyles';
@@ -26,7 +26,7 @@ const STATUS_SUBTITLE: Record<DocStatus, string> = {
     grey: 'faltando',
 };
 
-type DocRow = { type: string; status: string | null; expiration_date: string | null };
+type DocRow = { type: string; status: string | null; expiration_date: string | null; file_url: string | null };
 
 function calcularStatus(row: DocRow | null): DocStatus {
     if (!row) return 'grey';
@@ -56,9 +56,10 @@ export default function Inicio() {
     }, []);
 
     const [docs, setDocs] = useState(
-        TIPOS.map((nome) => ({ nome, status: 'grey' as DocStatus }))
+        TIPOS.map((nome) => ({ nome, status: 'grey' as DocStatus, fotoUrl: null as string | null }))
     );
     const [nomeUsuario, setNomeUsuario] = useState('Agricultor');
+    const [fotoVisivel, setFotoVisivel] = useState<string | null>(null);
 
     useFocusEffect(
         useCallback(() => {
@@ -68,7 +69,11 @@ export default function Inicio() {
                     setNomeUsuario(mockFarmer.name);
                     const mapa: Record<string, DocRow> = {};
                     mockDocuments.forEach(d => (mapa[d.type] = d as DocRow));
-                    setDocs(TIPOS.map((nome) => ({ nome, status: calcularStatus(mapa[nome] ?? null) })));
+                    setDocs(TIPOS.map((nome) => ({
+                        nome,
+                        status: calcularStatus(mapa[nome] ?? null),
+                        fotoUrl: mapa[nome]?.file_url ?? null,
+                    })));
                     return;
                 }
 
@@ -78,14 +83,18 @@ export default function Inicio() {
                 if (userRow?.name) setNomeUsuario(userRow.name);
 
                 const rows = await agricultoresDb?.getAllAsync<DocRow>(
-                    `SELECT type, status, expiration_date FROM documents
+                    `SELECT type, status, expiration_date, file_url FROM documents
                      WHERE type IN ('CAF','CAR','CCIR','ITR')
                      GROUP BY type
                      HAVING created_at = MAX(created_at)`
                 );
                 const mapa: Record<string, DocRow> = {};
                 rows?.forEach((r) => (mapa[r.type] = r));
-                setDocs(TIPOS.map((nome) => ({ nome, status: calcularStatus(mapa[nome] ?? null) })));
+                setDocs(TIPOS.map((nome) => ({
+                    nome,
+                    status: calcularStatus(mapa[nome] ?? null),
+                    fotoUrl: mapa[nome]?.file_url ?? null,
+                })));
             }
             carregarStatus();
         }, [isPracticeMode])
@@ -142,6 +151,14 @@ export default function Inicio() {
                                             <Text style={styles.docCardSubtitulo}>{STATUS_SUBTITLE[doc.status]}</Text>
                                         </View>
                                         <View style={styles.docCardDireita}>
+                                            {doc.fotoUrl && (
+                                                <TouchableOpacity
+                                                    onPress={() => setFotoVisivel(doc.fotoUrl)}
+                                                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                                >
+                                                    <Ionicons name="eye-outline" size={20} color={colors.tealDark} />
+                                                </TouchableOpacity>
+                                            )}
                                             <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
                                         </View>
                                     </TouchableOpacity>
@@ -194,6 +211,26 @@ export default function Inicio() {
                 autoPlay={false}
                 style={styles.playerFixed}
             />
+
+            <Modal visible={!!fotoVisivel} transparent animationType="fade">
+                <TouchableOpacity
+                    style={styles.fotoModalFundo}
+                    activeOpacity={1}
+                    onPress={() => setFotoVisivel(null)}
+                >
+                    <Image
+                        source={{ uri: fotoVisivel ?? '' }}
+                        style={styles.fotoModalImagem}
+                        resizeMode="contain"
+                    />
+                    <TouchableOpacity
+                        style={styles.fotoModalFechar}
+                        onPress={() => setFotoVisivel(null)}
+                    >
+                        <Ionicons name="close-circle" size={52} color="#fff" />
+                    </TouchableOpacity>
+                </TouchableOpacity>
+            </Modal>
         </ScreenContainer>
     );
 }

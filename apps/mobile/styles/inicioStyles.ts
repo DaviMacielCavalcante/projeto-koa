@@ -139,9 +139,25 @@ export const inicioStyles = StyleSheet.create({
         backgroundColor: colors.creamDeep,
     },
     docCardDireita: {
-        paddingHorizontal: 14,
+        flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        paddingHorizontal: 14,
+        gap: 10,
+    },
+    fotoModalFundo: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.92)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    fotoModalImagem: {
+        width: '90%',
+        height: '80%',
+    },
+    fotoModalFechar: {
+        position: 'absolute',
+        top: 48,
+        right: 20,
     },
     docCardStatus: {
         fontFamily: fonts.bodySemi,
