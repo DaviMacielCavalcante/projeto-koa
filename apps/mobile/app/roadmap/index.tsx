@@ -1,6 +1,7 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
@@ -55,11 +56,25 @@ export default function Roadmap() {
     return (
         <ScreenContainer variant="cream">
             <TopBar leftIcon="arrow-back" dark />
-            <View style={styles.header}>
-                <Text style={styles.titulo}>Trilha do agricultor</Text>
-                <Text style={styles.subtitulo}>
-                    Aprenda sobre os documentos no seu ritmo
-                </Text>
+            <View style={styles.headerCardWrap}>
+                <LinearGradient
+                    colors={[colors.white, colors.creamLight]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    style={styles.headerCard}
+                >
+                    <View style={styles.headerTexto}>
+                        <Text style={styles.titulo}>Trilha do agricultor</Text>
+                        <Text style={styles.subtitulo}>
+                            Aprenda sobre os documentos no seu ritmo
+                        </Text>
+                    </View>
+                    <Image
+                        source={require('../../assets/trophy-icon.png')}
+                        style={styles.headerTrofeu}
+                        resizeMode="contain"
+                    />
+                </LinearGradient>
             </View>
 
             <View style={styles.tutorialBtnWrap}>

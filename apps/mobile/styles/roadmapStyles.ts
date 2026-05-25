@@ -19,22 +19,40 @@ export const ANGLE_FROM_VERTICAL_DEG =
     (Math.atan2(HORIZ_DIST, STEP_HEIGHT) * 180) / Math.PI;
 
 export const roadmapStyles = StyleSheet.create({
-    header: {
-        paddingHorizontal: 24,
-        paddingTop: 8,
-        paddingBottom: 12,
+    headerCardWrap: {
+        marginHorizontal: 16,
+        marginTop: 8,
+        marginBottom: 12,
+        borderRadius: 22,
+        shadowColor: colors.tealDark,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.18,
+        shadowRadius: 10,
+        elevation: 4,
+    },
+    headerCard: {
+        borderRadius: 22,
+        padding: 18,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 14,
+    },
+    headerTexto: {
+        flex: 1,
+    },
+    headerTrofeu: {
+        width: 72,
+        height: 72,
     },
     titulo: {
         fontFamily: fonts.monoSemi,
         fontSize: sizes.xxl,
         color: colors.tealDark,
-        textAlign: 'center',
     },
     subtitulo: {
         fontFamily: fonts.mono,
         fontSize: sizes.bodySm,
         color: colors.inkMute,
-        textAlign: 'center',
         marginTop: 6,
     },
     tutorialBtnWrap: {
