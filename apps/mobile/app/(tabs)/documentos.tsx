@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 6,
     },
-    titulo: { fontFamily: fonts.displayBlack, fontSize: sizes.lg, color: colors.tealDark },
+    titulo: { fontFamily: fonts.monoSemi, fontSize: sizes.lg, color: colors.tealDark },
     botaoAdicionar: {
         width: 40, height: 40, borderRadius: 20,
         backgroundColor: colors.tealDark,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(31,122,122,0.1)',
         alignItems: 'center', justifyContent: 'center',
     },
-    vazioTitulo: { fontFamily: fonts.displayBlack, fontSize: sizes.md, color: colors.tealDark },
+    vazioTitulo: { fontFamily: fonts.monoSemi, fontSize: sizes.md, color: colors.tealDark },
     vazioTexto: { fontFamily: fonts.body, fontSize: sizes.body, color: colors.inkMute, textAlign: 'center', lineHeight: 22 },
     card: {
         flexDirection: 'row', alignItems: 'center',
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.creamLight, borderTopLeftRadius: 28, borderTopRightRadius: 28,
         padding: 24, gap: 12,
     },
-    modalTitulo: { fontFamily: fonts.displayBlack, fontSize: sizes.md, color: colors.tealDark },
+    modalTitulo: { fontFamily: fonts.monoSemi, fontSize: sizes.md, color: colors.tealDark },
     modalSubtitulo: { fontFamily: fonts.body, fontSize: sizes.caption, color: colors.inkMute },
     input: {
         backgroundColor: colors.white, borderRadius: 14, padding: 14,

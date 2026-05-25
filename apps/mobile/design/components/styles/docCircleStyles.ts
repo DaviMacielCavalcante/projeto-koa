@@ -18,6 +18,6 @@ export const docCircleStyles = StyleSheet.create({
         borderWidth: 2,
         borderColor: colors.white,
     },
-    name: { fontFamily: fonts.display, fontSize: sizes.bodySm, color: colors.white },
+    name: { fontFamily: fonts.mono, fontSize: sizes.bodySm, color: colors.white },
     subtitle: { fontFamily: fonts.body, fontSize: sizes.tiny, color: colors.white, opacity: 0.95, marginTop: 2 },
 });

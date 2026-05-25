@@ -14,7 +14,7 @@ import AudioPlayer from '../../components/AudioPlayer';
 import TutorialGlow from '../../components/TutorialGlow';
 import BotaoConexao from '../../components/BotaoConexao';
 
-const WALLPAPER_HOME = require('../../assets/images/WallpaperHome.jpg');
+const WALLPAPER_HOME = require('../../assets/images/WallpaperHome.png');
 const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR'];
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
 

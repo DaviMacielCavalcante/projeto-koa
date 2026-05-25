@@ -10,7 +10,7 @@ export const onboardingStyles = StyleSheet.create({
         gap: 18,
     },
     titulo36: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: 36,
         color: colors.white,
         textAlign: 'center',
@@ -54,7 +54,7 @@ export const onboardingStyles = StyleSheet.create({
         alignSelf: 'center',
     },
     lgpdTitulo: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: sizes.md,
         color: colors.ink,
         textAlign: 'center',
@@ -89,7 +89,7 @@ export const onboardingStyles = StyleSheet.create({
         marginBottom: 14,
     },
     perfilTitulo: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: sizes.md,
         color: colors.ink,
         marginBottom: 12,
@@ -137,7 +137,7 @@ export const onboardingStyles = StyleSheet.create({
         gap: 20,
     },
     tourTitulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: 28,
         color: colors.white,
         textAlign: 'center',
@@ -201,7 +201,7 @@ export const onboardingStyles = StyleSheet.create({
         alignItems: 'center',
     },
     praticaTitulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: 26,
         color: colors.tealDark,
     },
@@ -235,7 +235,7 @@ export const onboardingStyles = StyleSheet.create({
         alignItems: 'center', justifyContent: 'center',
     },
     praticaCardTitulo: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: sizes.md,
         color: colors.ink,
     },
@@ -393,6 +393,6 @@ export const onboardingIlStyles = StyleSheet.create({
         borderRadius: 12, padding: 10,
         alignItems: 'center', justifyContent: 'center', flex: 1,
     },
-    calNum: { fontFamily: fonts.displayBlack, fontSize: 40, color: colors.goldLight, lineHeight: 44 },
+    calNum: { fontFamily: fonts.monoSemi, fontSize: 40, color: colors.goldLight, lineHeight: 44 },
     calLabel: { fontFamily: fonts.bodyMedium, fontSize: 10, color: 'rgba(255,255,255,0.7)' },
 });

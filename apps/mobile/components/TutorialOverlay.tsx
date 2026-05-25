@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     calloutTitulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.tealDark,
     },

@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.white,
     },
     etapaTitulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.lg,
         color: colors.white,
         textAlign: 'center',

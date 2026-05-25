@@ -3,7 +3,7 @@ import { colors, fonts, sizes } from '../design/theme';
 
 export const documentosTabStyles = StyleSheet.create({
     titulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.lg,
         color: colors.tealDark,
         paddingHorizontal: 20,
@@ -48,7 +48,7 @@ export const documentosTabStyles = StyleSheet.create({
         marginBottom: 14,
     },
     itemTipo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.tealDark,
     },

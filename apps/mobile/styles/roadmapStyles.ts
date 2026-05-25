@@ -25,7 +25,7 @@ export const roadmapStyles = StyleSheet.create({
         paddingBottom: 12,
     },
     titulo: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: sizes.xxl,
         color: colors.tealDark,
         fontWeight: '700',
@@ -88,7 +88,7 @@ export const roadmapStyles = StyleSheet.create({
         borderColor: colors.tealDark,
     },
     nodeTitle: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: 13,
         color: colors.tealDark,
         fontWeight: '700',

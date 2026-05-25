@@ -3,7 +3,7 @@ import { colors, fonts, sizes } from '../design/theme';
 
 export const ajudaStyles = StyleSheet.create({
     titulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.lg,
         color: colors.tealDark,
         paddingHorizontal: 20,
@@ -36,6 +36,6 @@ export const ajudaStyles = StyleSheet.create({
         alignItems: 'center',
         gap: 14,
     },
-    modalTitulo: { fontFamily: fonts.displayBlack, fontSize: sizes.lg, color: colors.redDark },
+    modalTitulo: { fontFamily: fonts.monoSemi, fontSize: sizes.lg, color: colors.redDark },
     modalTexto: { fontFamily: fonts.body, fontSize: sizes.body, color: colors.inkSoft, textAlign: 'center', lineHeight: 22 },
 });

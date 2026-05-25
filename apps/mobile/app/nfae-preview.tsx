@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     valorNumero: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.xl,
         color: colors.tealDark,
     },

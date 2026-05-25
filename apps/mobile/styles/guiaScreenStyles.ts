@@ -3,7 +3,7 @@ import { colors, fonts, sizes } from '../design/theme';
 
 export const guiaScreenStyles = StyleSheet.create({
     content: { paddingHorizontal: 16, paddingBottom: 32, gap: 14 },
-    titulo: { fontFamily: fonts.displayBlack, fontSize: sizes.lg, color: colors.white, marginBottom: 4 },
+    titulo: { fontFamily: fonts.monoSemi, fontSize: sizes.lg, color: colors.white, marginBottom: 4 },
     card: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 18, padding: 16, gap: 4 },
     cardTitulo: { fontFamily: fonts.bodySemi, fontSize: sizes.body, color: colors.white, marginBottom: 8 },
     cardTexto: { fontFamily: fonts.body, fontSize: sizes.bodySm, color: 'rgba(255,255,255,0.85)' },

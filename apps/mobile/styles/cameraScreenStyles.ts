@@ -10,7 +10,7 @@ export const cameraScreenStyles = StyleSheet.create({
         gap: 16,
     },
     preparoTitulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.xl,
         color: colors.white,
         textAlign: 'center',
@@ -62,7 +62,7 @@ export const cameraScreenStyles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.45)',
     },
     previewContainer: { flex: 1, paddingHorizontal: 16, gap: 12 },
-    previewTitulo: { fontFamily: fonts.displayBlack, fontSize: sizes.lg, color: colors.white, textAlign: 'center' },
+    previewTitulo: { fontFamily: fonts.monoSemi, fontSize: sizes.lg, color: colors.white, textAlign: 'center' },
     previewFoto: { flex: 1, borderRadius: 18 },
     previewBotoes: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, paddingBottom: 32 },
     confirmacaoCentro: { flex: 1, alignItems: 'center', justifyContent: 'center' },
@@ -93,7 +93,7 @@ export const cameraScreenStyles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 4,
     },
-    confirmacaoTitulo: { fontFamily: fonts.displayBlack, fontSize: sizes.lg, color: colors.orangeMid, marginBottom: 8 },
+    confirmacaoTitulo: { fontFamily: fonts.monoSemi, fontSize: sizes.lg, color: colors.orangeMid, marginBottom: 8 },
     confirmacaoTexto: { fontFamily: fonts.body, fontSize: sizes.bodySm, color: colors.inkSoft, textAlign: 'center', lineHeight: 20 },
     confirmacaoBotao: { paddingHorizontal: 22, paddingBottom: 32, paddingTop: 16 },
 });

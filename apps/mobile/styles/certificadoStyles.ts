@@ -8,7 +8,7 @@ export const certificadoStyles = StyleSheet.create({
         gap: 16,
     },
     titulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.lg,
         color: colors.white,
     },

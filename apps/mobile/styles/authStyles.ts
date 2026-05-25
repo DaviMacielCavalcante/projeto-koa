@@ -10,7 +10,7 @@ export const loginStyles = StyleSheet.create({
         gap: 16,
     },
     titulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.xl,
         color: colors.white,
         letterSpacing: 1,
@@ -47,7 +47,7 @@ export const otpStyles = StyleSheet.create({
         gap: 16,
     },
     titulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.xl,
         color: colors.white,
         letterSpacing: 1,

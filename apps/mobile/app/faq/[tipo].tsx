@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     titulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.lg,
         color: colors.white,
         marginBottom: 4,

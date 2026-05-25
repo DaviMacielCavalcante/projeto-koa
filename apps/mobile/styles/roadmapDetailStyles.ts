@@ -13,7 +13,7 @@ export const roadmapDetailStyles = StyleSheet.create({
         marginBottom: 8,
     },
     titulo: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: sizes.xxl,
         color: colors.tealDark,
         fontWeight: '700',
@@ -74,7 +74,7 @@ export const roadmapDetailStyles = StyleSheet.create({
         flex: 1,
     },
     sectionTitle: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: sizes.md,
         color: colors.tealDark,
         fontWeight: '700',
@@ -107,7 +107,7 @@ export const roadmapDetailStyles = StyleSheet.create({
     },
     resumoText: {
         flex: 1,
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: sizes.md,
         color: colors.white,
         fontWeight: '700',

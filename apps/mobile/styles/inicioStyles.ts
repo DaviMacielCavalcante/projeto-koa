@@ -30,7 +30,7 @@ export const inicioStyles = StyleSheet.create({
         color: colors.white,
     },
     sectionTitle: {
-        fontFamily: fonts.display,
+        fontFamily: fonts.mono,
         fontSize: sizes.md,
         color: colors.tealDark,
         textAlign: 'center',
@@ -168,7 +168,7 @@ export const inicioModalStyles = StyleSheet.create({
         padding: 20,
     },
     titulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.xl,
         color: colors.white,
         marginBottom: 16,

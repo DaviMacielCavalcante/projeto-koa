@@ -8,7 +8,7 @@ export const notasStyles = StyleSheet.create({
         paddingBottom: 12,
     },
     titulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.lg,
         color: colors.tealDark,
     },
@@ -115,7 +115,7 @@ export const notasStyles = StyleSheet.create({
         justifyContent: 'center',
     },
     vazioTitulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.tealDark,
     },

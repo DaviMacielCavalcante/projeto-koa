@@ -10,7 +10,7 @@ export const detalheDocumentoStyles = StyleSheet.create({
         marginBottom: 12,
     },
     titulo: {
-        fontFamily: fonts.displayBlack,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.xl,
         color: colors.white,
         letterSpacing: 0.5,
@@ -32,7 +32,7 @@ export const detalheDocumentoStyles = StyleSheet.create({
         shadowRadius: 12,
         elevation: 6,
     },
-    statusBig: { fontFamily: fonts.displayBlack, fontSize: sizes.lg, color: colors.white },
+    statusBig: { fontFamily: fonts.monoSemi, fontSize: sizes.lg, color: colors.white },
     statusSub: {
         fontFamily: fonts.bodyMedium,
         fontSize: sizes.tiny,
