@@ -167,9 +167,11 @@ export default function Inicio() {
                     activeOpacity={0.85}
                     onPress={() => router.push('/roadmap')}
                 >
-                    <View style={styles.educationalIcon}>
-                        <Ionicons name="book" size={22} color={colors.white} />
-                    </View>
+                    <Image
+                        source={require('../../assets/trilha-icon.png')}
+                        style={styles.educationalIcon}
+                        resizeMode="contain"
+                    />
                     <View style={{ flex: 1 }}>
                         <Text style={styles.educationalTitle}>Aprender sobre os documentos</Text>
                         <Text style={styles.educationalSub}>Estude no seu ritmo</Text>
