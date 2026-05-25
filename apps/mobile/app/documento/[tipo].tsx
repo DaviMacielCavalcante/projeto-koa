@@ -20,6 +20,12 @@ const IMAGENS_DOC: Partial<Record<string, any>> = {
     ITR:  require('../../assets/docs/ITR.png'),
 };
 
+const AUDIOS_DOC: Partial<Record<string, any>> = {
+    CAR:  require('../../assets/audio/car.mp3'),
+    CCIR: require('../../assets/audio/ccir.mp3'),
+    ITR:  require('../../assets/audio/itr.mp3'),
+};
+
 type DocumentoStatus = 'active' | 'expiring_soon' | 'expired' | null;
 
 type Documento = {
@@ -216,6 +222,34 @@ export default function DetalheDocumento() {
                 </TouchableOpacity>
             </Modal>
 
+            {AUDIOS_DOC[tipo] && (
+                <AudioPlayer
+                    source={AUDIOS_DOC[tipo]}
+                    autoPlay={false}
+                    style={styles.player}
+                />
+            )}
+
+            <Modal visible={avisoNfae} transparent animationType="fade">
+                <View style={styles.avisoFundo}>
+                    <View style={styles.avisoCard}>
+                        <View style={styles.avisoIcone}>
+                            <Ionicons name="warning" size={32} color={colors.white} />
+                        </View>
+                        <Text style={styles.avisoTitulo}>Cuidado antes de continuar</Text>
+                        <Text style={styles.avisoTexto}>
+                            Antes de fazer uma nota fiscal, confira bem os dados — nome, quantidade e valor do que você vai vender.{'\n\n'}
+                            Se tiver algo errado, você pode ter <Text style={styles.avisoDestaque}>problema com a fiscalização</Text> e ser obrigado a pagar <Text style={styles.avisoDestaque}>multa</Text>.{'\n\n'}
+                        </Text>
+                        <TouchableOpacity style={styles.avisoBtn} onPress={() => { setAvisoNfae(false); router.push('/nfae-form'); }}>
+                            <Text style={styles.avisoBtnTexto}>Entendi, continuar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.avisoBtnVoltar} onPress={() => setAvisoNfae(false)}>
+                            <Text style={styles.avisoBtnVoltarTexto}>Voltar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
             <AudioPlayer
                 source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
                 autoPlay={false}
