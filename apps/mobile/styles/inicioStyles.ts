@@ -37,17 +37,22 @@ export const inicioStyles = StyleSheet.create({
         paddingTop: 15,
         paddingBottom: 10,
     },
-    educationalCard: {
-        backgroundColor: colors.white,
+    educationalCardWrap: {
         marginHorizontal: 16,
         marginBottom: 12,
+        borderRadius: 22,
+        shadowColor: colors.tealDark,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.18,
+        shadowRadius: 10,
+        elevation: 4,
+    },
+    educationalCard: {
         borderRadius: 22,
         padding: 18,
         flexDirection: 'row',
         alignItems: 'center',
         gap: 14,
-        borderWidth: 1.5,
-        borderColor: colors.tealMid,
     },
     educationalIcon: {
         width: 64,

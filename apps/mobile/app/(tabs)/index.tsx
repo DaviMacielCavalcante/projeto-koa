@@ -163,20 +163,27 @@ export default function Inicio() {
                 </View>
 
                 <TouchableOpacity
-                    style={styles.educationalCard}
+                    style={styles.educationalCardWrap}
                     activeOpacity={0.85}
                     onPress={() => router.push('/roadmap')}
                 >
-                    <Image
-                        source={require('../../assets/trilha-icon.png')}
-                        style={styles.educationalIcon}
-                        resizeMode="contain"
-                    />
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.educationalTitle}>Aprender sobre os documentos</Text>
-                        <Text style={styles.educationalSub}>Estude no seu ritmo</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
+                    <LinearGradient
+                        colors={[colors.white, colors.creamLight]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
+                        style={styles.educationalCard}
+                    >
+                        <Image
+                            source={require('../../assets/trilha-icon.png')}
+                            style={styles.educationalIcon}
+                            resizeMode="contain"
+                        />
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.educationalTitle}>Aprender sobre os documentos</Text>
+                            <Text style={styles.educationalSub}>Estude no seu ritmo</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
+                    </LinearGradient>
                 </TouchableOpacity>
 
                 <BotaoConexao />
