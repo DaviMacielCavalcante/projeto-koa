@@ -30,7 +30,7 @@
 
 **Pronto e funcionando** (núcleo navegável):
 - Auth phone OTP + timeout de sessão (30 min idle)
-- SQLite com 7 tabelas (users, properties, documents, educational_contents, user_content_progress, sync_queue, nfae_rascunhos)
+- SQLite com 8 tabelas (users, properties, documents, educational_contents, user_content_progress, sync_queue, notas_fiscais, certificado_digital). A antiga `nfae_rascunhos` é dropada no init (`src/db/index.ts:80`)
 - Pipeline de fotos (resize 800px + JPEG compress 0.75 + sync queue → Storage)
 - Notificações locais com deep linking pro detalhe do documento
 - Tabs (Início, Outros, Avisos, Ajuda) + telas de detalhe, guia, FAQ, câmera, perfil, roadmap, NFA-e
@@ -39,6 +39,9 @@
 - Trilha do agricultor com progresso por usuário (`user_content_progress` + sync queue)
 - Tutorial guiado (TutorialOverlay + TutorialGlow com efeito de brilho teal pulsante)
 - Sync queue processada via NetInfo ao reconectar
+- **Emissão de NFA-e (mock)**: form em 4 etapas (`app/nfae-form.tsx`) → `criarNotaPendente` insere em `notas_fiscais` com status `pendente` → `processarFilaEmissao` (`src/services/emissaoNfae.ts`) emite com delay simulado 1.5s, gera número 6 dígitos + chave de acesso 44 dígitos. Reprocessa pendentes no NetInfo reconnect (mesma trigger do `syncQueue`)
+- **Certificado Digital A1 (mock)**: tela `/certificado` cadastra arquivo (nome simulado) + senha. Senha em `expo-secure-store` (`certificado_senha`), metadata em `certificado_digital`. Card fixo na aba Notas mostra status (pendente/ativo); botão "Emitir nova nota" desabilitado sem certificado
+- **Padronização de fontes** (maio/2026): Playfair Display removido. App usa Inter (corpo) + Inconsolata (mono/títulos). Pitfall conhecido: nunca combinar `fontFamily` com `fontWeight` (ver CLAUDE.md → Typography)
 
 **Bloqueios críticos pré-entrega**:
 1. **Bug na exclusão LGPD** (`app/(tabs)/ajuda.tsx:149`) — o botão "Apagar tudo" do modal de confirmação chama `fecharModal` em vez de `apagarTodosDados`. Função existe, está desconectada. UC10 é requisito de compliance.
