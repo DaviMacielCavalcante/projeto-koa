@@ -16,47 +16,6 @@ export type RoadmapTopicContent = {
 };
 
 export const roadmapContent: Record<string, RoadmapTopicContent> = {
-    CAF: {
-        category: 'CAF',
-        hero: 'O documento que prova que você é agricultor familiar',
-        sections: [
-            {
-                icon: 'information-circle',
-                title: 'O que é',
-                body:
-                    'É o papel que o governo usa pra reconhecer você como agricultor familiar. ' +
-                    'Substituiu a DAP (Declaração de Aptidão ao Pronaf) desde 2023.',
-            },
-            {
-                icon: 'ribbon',
-                title: 'Pra que serve',
-                body:
-                    'Com o CAF você consegue empréstimo do Pronaf, vende pra merenda escolar (PNAE), ' +
-                    'entra no PAA e tem direito à aposentadoria rural.',
-            },
-            {
-                icon: 'location',
-                title: 'Onde tirar',
-                body:
-                    'Procure a EMATER, o sindicato dos trabalhadores rurais ou uma cooperativa ' +
-                    'do seu município. Não tem custo.',
-            },
-            {
-                icon: 'document-text',
-                title: 'O que precisa levar',
-                body:
-                    'RG, CPF, comprovante de moradia, documento da terra (escritura, posse ou contrato) ' +
-                    'e dados da sua produção.',
-            },
-            {
-                icon: 'time',
-                title: 'Validade',
-                body: 'O CAF vale por 2 anos. Depois você renova com os mesmos documentos.',
-            },
-        ],
-        resumo: 'Sem CAF, nada de Pronaf nem de venda pro governo.',
-    },
-
     CAR: {
         category: 'CAR',
         hero: 'O registro ambiental da sua terra',
@@ -65,76 +24,92 @@ export const roadmapContent: Record<string, RoadmapTopicContent> = {
                 icon: 'information-circle',
                 title: 'O que é',
                 body:
-                    'É um cadastro feito pela internet que mostra como sua terra está dividida: ' +
-                    'mata, plantação, rio, pastagem.',
+                    'É o registro qualitativo da terra. Verifica como a área total está sendo usada: ' +
+                    'área produtiva, área de preservação permanente, área de vegetação nativa, ' +
+                    'área doméstica e outras.',
             },
             {
                 icon: 'ribbon',
-                title: 'Pra que serve',
+                title: 'Para que serve',
                 body:
-                    'É obrigatório por lei. Sem CAR você não consegue financiamento, não vende a terra ' +
-                    'e pode receber multa do órgão ambiental.',
+                    'Garante ao agricultor o direito de requerer benefícios e serviços, como ' +
+                    'financiamento rural, venda, doação ou transferência da titularidade do imóvel, ' +
+                    'e redução de taxas no Imposto sobre a Propriedade Territorial Rural (ITR).',
             },
             {
                 icon: 'location',
-                title: 'Onde tirar',
-                body:
-                    'No site car.gov.br, na SEMA do Amazonas ou pedindo ajuda na EMATER. ' +
-                    'Não paga nada.',
+                title: 'Como tirar',
+                body: 'O registro é feito online no site da SEMAS/PA.',
             },
             {
                 icon: 'document-text',
-                title: 'O que precisa levar',
+                title: 'O que precisa',
                 body:
-                    'CPF, documento da terra e o mapa da propriedade. A EMATER ou um técnico ' +
-                    'agrícola pode te ajudar a fazer o mapa.',
+                    'CCIR válido e atualizado (emitido pelo INCRA), documento de propriedade ' +
+                    '(escritura, contrato de cessão de posse ou título definitivo), CPF ou CNPJ ' +
+                    'do proprietário, coordenadas GPS da propriedade (latitude/longitude), planta, ' +
+                    'croqui ou mapa da área (se disponível) e dados dos confrontantes ' +
+                    '(nome e informações dos vizinhos).',
             },
             {
                 icon: 'time',
-                title: 'Validade',
+                title: 'Prazos',
                 body:
-                    'Não vence. Mas se mudar alguma coisa na terra (novo plantio, desmate, ' +
-                    'venda de parte), tem que atualizar.',
+                    'Após o registro, envie os dados requisitados pelo site em até 30 dias e ' +
+                    'acompanhe a análise até que seja deferido.',
+            },
+            {
+                icon: 'alert-circle',
+                title: 'Observação',
+                body:
+                    'Normalmente contrata-se uma empresa de consultoria ambiental para fazer ' +
+                    'o CAR, pois são necessários vários procedimentos técnicos.',
             },
         ],
-        resumo: 'Cadastrou uma vez, fica valendo. Não esquece de atualizar quando mudar a terra.',
+        resumo: 'Sem CAR não há financiamento, venda da terra nem redução de ITR.',
     },
 
     CCIR: {
         category: 'CCIR',
-        hero: 'O documento do INCRA pra sua terra',
+        hero: 'A identidade do seu imóvel rural',
         sections: [
             {
                 icon: 'information-circle',
                 title: 'O que é',
-                body: 'É o papel do INCRA que comprova o cadastro do seu imóvel rural.',
+                body:
+                    'É o Certificado de Cadastro do Imóvel Rural. Funciona como a identidade ' +
+                    'do imóvel.',
             },
             {
                 icon: 'ribbon',
-                title: 'Pra que serve',
+                title: 'Para que serve',
                 body:
-                    'Você precisa dele pra vender, doar, trocar ou hipotecar a terra. ' +
-                    'Também é exigido em financiamento e em inventário.',
+                    'Traz segurança jurídica, permite calcular corretamente o ITR, possibilita ' +
+                    'a venda ou transferência da terra e dá acesso a créditos rurais.',
             },
             {
                 icon: 'location',
-                title: 'Onde tirar',
+                title: 'Como tirar',
                 body:
-                    'Pelo site do INCRA (sncr.serpro.gov.br) ou indo no escritório do INCRA ' +
-                    'mais próximo da sua cidade.',
-            },
-            {
-                icon: 'document-text',
-                title: 'O que precisa levar',
-                body: 'Número do imóvel no INCRA e CPF do dono da terra.',
+                    'É emitido online no site sncr.serpro.gov.br. São necessários apenas: código ' +
+                    'do imóvel rural, estado e município onde se encontra o imóvel, e CPF do titular.',
             },
             {
                 icon: 'time',
-                title: 'Validade',
-                body: 'Vale por 1 ano. Você renova pagando a taxa anual do INCRA.',
+                title: 'Atualização',
+                body:
+                    'Precisa ser atualizado anualmente pelo mesmo site de emissão, com a ' +
+                    'atualização dos dados cadastrais e pagamento de uma taxa.',
+            },
+            {
+                icon: 'alert-circle',
+                title: 'Observação',
+                body:
+                    'Datas, prazos e valores são informados pelo próprio site no ato da ' +
+                    'emissão ou atualização.',
             },
         ],
-        resumo: 'Sem CCIR em dia, você não vende nem passa a terra pra ninguém.',
+        resumo: 'CCIR é a identidade da sua terra — atualize todo ano.',
     },
 
     ITR: {
@@ -144,79 +119,88 @@ export const roadmapContent: Record<string, RoadmapTopicContent> = {
             {
                 icon: 'information-circle',
                 title: 'O que é',
-                body: 'É um imposto que o dono da terra paga todo ano pra Receita Federal.',
+                body:
+                    'É o imposto que o produtor rural paga uma vez ao ano, conforme o calendário ' +
+                    'da Receita Federal. Não é um documento de registro, apenas o imposto sobre ' +
+                    'o imóvel.',
             },
             {
                 icon: 'ribbon',
-                title: 'Pra que serve',
+                title: 'Para que serve',
                 body:
-                    'Pra cumprir a lei. Quem não declara fica em débito com a Receita ' +
-                    'e pode perder direito a benefícios.',
-            },
-            {
-                icon: 'calendar',
-                title: 'Quando declarar',
-                body: 'A declaração é entregue todo ano, de agosto a setembro.',
+                    'Pagar o ITR mantém a propriedade regularizada, pois é um imposto federal ' +
+                    'obrigatório.',
             },
             {
                 icon: 'location',
-                title: 'Onde declarar',
+                title: 'Como pagar',
                 body:
-                    'Pelo programa do ITR no site da Receita Federal (gov.br/receitafederal) ' +
-                    'ou com a ajuda de um contador.',
+                    'Acesse o site da Receita Federal e procure o serviço de declaração do ITR ' +
+                    '(DITR). Preencha os documentos DIAC e DIAT para apuração da terra e cálculo ' +
+                    'do imposto. Envie a documentação pelo mesmo site e aguarde o boleto, que ' +
+                    'pode ser pago à vista ou parcelado.',
             },
             {
                 icon: 'help-circle',
-                title: 'Pode ter isenção',
+                title: 'Como é calculado',
                 body:
-                    'Pequena propriedade familiar com até 4 módulos fiscais pode ser isenta de pagar. ' +
-                    'Mas mesmo isento, você precisa declarar.',
+                    'O imposto não incide sobre a área total da propriedade, mas sobre o valor ' +
+                    'da terra nua tributável (VTN), que corresponde à área produtiva e de moradia. ' +
+                    'O valor varia progressivamente conforme a área e o grau de utilização da terra.',
+            },
+            {
+                icon: 'alert-circle',
+                title: 'Isenção',
+                body: 'No Pará, propriedades com menos de 50 hectares são isentas do ITR.',
             },
         ],
-        resumo: 'Mesmo isento, declare todo ano pra ficar regular com a Receita.',
+        resumo: 'Pagar o ITR todo ano mantém sua terra regular com a Receita.',
     },
 
     'NFA-e': {
-        category: 'NFA-e',
-        hero: 'A nota fiscal do agricultor familiar',
+        category: 'Nota Fiscal',
+        hero: 'O registro oficial das suas vendas e despesas',
         sections: [
             {
                 icon: 'information-circle',
                 title: 'O que é',
-                body:
-                    'É a nota fiscal eletrônica que o pequeno produtor usa cada vez ' +
-                    'que vende a produção.',
+                body: 'É o registro oficial de cada receita e despesa do agricultor.',
             },
             {
                 icon: 'ribbon',
-                title: 'Pra que serve',
+                title: 'Para que serve',
                 body:
-                    'Pra vender legalmente pra feiras, mercados, governo e outras pessoas. ' +
-                    'É o que comprova a sua renda como agricultor.',
-            },
-            {
-                icon: 'location',
-                title: 'Onde tirar',
-                body:
-                    'Pelo site da SEFAZ do Amazonas (sefaz.am.gov.br) ou indo numa agência ' +
-                    'de atendimento da SEFAZ.',
+                    'Serve como registro e comprovante das movimentações financeiras do ' +
+                    'agricultor, dando respaldo legal para declaração de imposto de renda e ' +
+                    'outras atividades comprobatórias.',
             },
             {
                 icon: 'document-text',
-                title: 'O que precisa ter',
+                title: 'Certificado digital',
                 body:
-                    'Inscrição estadual de produtor rural, CPF e os dados de cada venda: ' +
-                    'o que vendeu, pra quem, quanto pesou e por quanto.',
+                    'Para emitir a NFP-e, o produtor precisa de um certificado digital pago, ' +
+                    'que garante a validação da nota fiscal eletrônica pelas autoridades fiscais. ' +
+                    'Existem tipos diferentes de certificado, variando em validade e forma de ' +
+                    'armazenamento. Para comprar, acesse o site gov.br e pesquise por ' +
+                    '"certificado digital".',
+            },
+            {
+                icon: 'location',
+                title: 'Como emitir',
+                body:
+                    'O produtor precisa estar registrado no site da SEFA. Inicie a emissão, ' +
+                    'preencha as informações da nota e assine com o certificado digital. Envie ' +
+                    'a nota assinada para o site da SEFA, que devolverá a nota emitida ao produtor.',
             },
             {
                 icon: 'alert-circle',
-                title: 'Atenção',
+                title: 'Observação',
                 body:
-                    'Você precisa preencher uma NFA-e pra cada venda. Guarde o número da nota ' +
-                    'pra comprovar depois.',
+                    'Guarde todas as notas emitidas por pelo menos 5 anos, em caso de pedido de ' +
+                    'comprovação dos dados apresentados no imposto de renda pela Receita Federal.',
             },
         ],
-        resumo: 'Sem NFA-e, a venda não conta como produção legal.',
+        resumo: 'Sem certificado digital, sem nota fiscal — guarde tudo por 5 anos.',
     },
 };
 

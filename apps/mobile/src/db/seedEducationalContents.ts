@@ -6,7 +6,7 @@ const seed = [
     { title: 'O que é o CAR', category: 'CAR' },
     { title: 'O que é o CCIR', category: 'CCIR' },
     { title: 'O que é o ITR', category: 'ITR' },
-    { title: 'O que é a NFA-e', category: 'NFA-e' },
+    { title: 'O que é a Nota Fiscal', category: 'NFA-e' },
 ];
 
 export async function seedEducationalContentsIfEmpty(): Promise<void> {
