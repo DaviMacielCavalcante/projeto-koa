@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ImageBackground, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
@@ -97,6 +97,12 @@ export default function Roadmap() {
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
+                    <ImageBackground
+                        source={require('../../assets/images/leaves-roadmap-wallpaper.png')}
+                        resizeMode="repeat"
+                        style={styles.pathWallpaper}
+                        imageStyle={styles.pathWallpaperImage}
+                    >
                     <View style={styles.pathContainer}>
                         {topics.map((topic, i) => {
                             const isLeft = i % 2 === 0;
@@ -154,6 +160,7 @@ export default function Roadmap() {
                             );
                         })}
                     </View>
+                    </ImageBackground>
                 </ScrollView>
             )}
         </ScreenContainer>

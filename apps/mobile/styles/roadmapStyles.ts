@@ -62,6 +62,13 @@ export const roadmapStyles = StyleSheet.create({
     scrollContent: {
         paddingBottom: 60,
     },
+    pathWallpaper: {
+        width: '100%',
+        alignItems: 'center',
+    },
+    pathWallpaperImage: {
+        opacity: 0.7,
+    },
     pathContainer: {
         width: ROADMAP_CONTAINER_W,
         alignSelf: 'center',
