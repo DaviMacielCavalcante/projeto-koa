@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
 import { ajudaStyles as styles } from '../../styles/ajudaStyles';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
+import * as FileSystem from 'expo-file-system/legacy';
 import auth from '@react-native-firebase/auth';
 import { ScreenContainer, GradientButton, AudioCircle } from '../../design/components';
 import { colors } from '../../design/theme';
@@ -20,11 +21,22 @@ export default function Ajuda() {
         try {
             await Notifications.cancelAllScheduledNotificationsAsync();
 
-            for (const tabela of ['documents', 'properties', 'users', 'educational_contents', 'user_content_progress', 'sync_queue']) {
+            // Apaga os arquivos de foto do dispositivo antes de limpar as referências.
+            const fotos = await agricultoresDb?.getAllAsync<{ file_url: string | null }>(
+                'SELECT file_url FROM documents WHERE file_url IS NOT NULL'
+            );
+            for (const { file_url } of fotos ?? []) {
+                if (file_url?.startsWith('file://')) {
+                    await FileSystem.deleteAsync(file_url, { idempotent: true }).catch(() => {});
+                }
+            }
+
+            // Zera os dados do usuário; educational_contents é conteúdo do app e permanece.
+            for (const tabela of ['documents', 'properties', 'users', 'user_content_progress', 'sync_queue', 'notas_fiscais', 'certificado_digital']) {
                 await agricultoresDb?.runAsync(`DELETE FROM ${tabela}`).catch(() => {});
             }
 
-            for (const chave of ['last_active', 'onboarding_done', 'onboarding_progress']) {
+            for (const chave of ['last_active', 'onboarding_done', 'onboarding_progress', 'certificado_senha']) {
                 await SecureStore.deleteItemAsync(chave).catch(() => {});
             }
 
@@ -103,7 +115,7 @@ export default function Ajuda() {
                             label={contador > 0 ? `Apagar tudo (${contador})` : 'Apagar tudo'}
                             variant="red"
                             disabled={contador > 0}
-                            onPress={fecharModal}
+                            onPress={apagarTodosDados}
                             style={styles.botao}
                         />
                         <GradientButton
