@@ -2,14 +2,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { AudioCircle, GradientButton, ScreenContainer, TopBar } from '../../design/components';
+import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { getRoadmapContent } from '../../src/data/roadmapContent';
 import { isConcluido, marcarComoConcluido, desmarcarConcluido } from '../../src/services/progress';
 import { roadmapDetailStyles as styles } from '../../styles/roadmapDetailStyles';
+import AudioBubble from '../../components/AudioBubble';
 
 type ContentRow = { title: string; body: string | null; category: string | null };
+
+const AUDIO_POR_CATEGORIA: Record<string, number> = {
+    CAR: require('../../assets/audio/car.mp3'),
+    CCIR: require('../../assets/audio/ccir.mp3'),
+    ITR: require('../../assets/audio/itr.mp3'),
+};
 
 export default function RoadmapDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -42,15 +49,12 @@ export default function RoadmapDetail() {
     }
 
     const rich = getRoadmapContent(content?.category);
+    const audioSource = content?.category ? AUDIO_POR_CATEGORIA[content.category] : undefined;
 
     return (
         <ScreenContainer variant="cream">
-            <TopBar leftIcon="arrow-back" rightIcon="volume-high" dark />
+            <TopBar leftIcon="arrow-back" dark />
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <View style={styles.audioWrap}>
-                    <AudioCircle icon="volume-high" iconColor={colors.tealDark} size={88} />
-                </View>
-
                 <Text style={[styles.titulo, concluido && styles.tituloConcluido]}>
                     {content?.title ?? ''}
                 </Text>
@@ -59,6 +63,10 @@ export default function RoadmapDetail() {
                     <View style={styles.categoriaBadge}>
                         <Text style={styles.categoriaBadgeText}>{content.category}</Text>
                     </View>
+                ) : null}
+
+                {audioSource ? (
+                    <AudioBubble source={audioSource} style={styles.audioBubble} />
                 ) : null}
 
                 {rich ? (

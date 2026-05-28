@@ -7,10 +7,9 @@ export const roadmapDetailStyles = StyleSheet.create({
         paddingTop: 8,
         paddingBottom: 48,
     },
-    audioWrap: {
-        alignItems: 'center',
-        marginTop: 4,
-        marginBottom: 8,
+    audioBubble: {
+        marginTop: 18,
+        marginBottom: 4,
     },
     titulo: {
         fontFamily: fonts.monoSemi,
