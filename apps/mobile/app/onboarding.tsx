@@ -8,7 +8,6 @@ import auth from '@react-native-firebase/auth';
 import { ScreenContainer, GradientButton, TopBar, AudioCircle } from '../design/components';
 import { colors } from '../design/theme';
 import { agricultoresDb } from '../src/db/index';
-import { usePracticeMode } from '../src/hooks/usePracticeMode';
 import { useTutorial } from '../src/contexts/TutorialContext';
 
 // ─── ILUSTRAÇÕES ──────────────────────────────────────────────────────────────
@@ -156,7 +155,6 @@ async function concluirOnboarding(nome: string, lgpdConsentido: boolean) {
 }
 
 export default function Onboarding() {
-    const { enterPracticeMode } = usePracticeMode();
     const { iniciar: iniciarTutorial } = useTutorial();
     const [etapa, setEtapa] = useState<Etapa>('boas_vindas');
     const [nome, setNome] = useState('');
@@ -179,9 +177,8 @@ export default function Onboarding() {
         salvarProgresso(etapa, nome);
     }, [etapa, nome]);
 
-    async function irParaTabs(modoPratica = false) {
+    async function irParaTabs() {
         await concluirOnboarding(nome, lgpdConsentido);
-        if (modoPratica) enterPracticeMode();
         router.replace('/(tabs)');
     }
 

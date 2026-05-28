@@ -3,7 +3,6 @@ import { Tabs } from 'expo-router';
 import { useRef, useEffect } from 'react';
 import { View, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import PracticeModeIndicator from '../../components/PracticeModeIndicator';
 import TutorialGlow from '../../components/TutorialGlow';
 import { colors, fonts } from '../../design/theme';
 import { useTutorial } from '../../src/contexts/TutorialContext';
@@ -23,7 +22,6 @@ export default function TabsLayout() {
 
     return (
         <View style={{ flex: 1 }}>
-            <PracticeModeIndicator />
             <Tabs
                 screenOptions={{
                     headerShown: false,

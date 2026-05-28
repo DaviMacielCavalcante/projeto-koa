@@ -6,7 +6,6 @@ import { AudioCircle, GradientButton, ScreenContainer, TopBar } from '../../desi
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { getRoadmapContent } from '../../src/data/roadmapContent';
-import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import { isConcluido, marcarComoConcluido } from '../../src/services/progress';
 import { roadmapDetailStyles as styles } from '../../styles/roadmapDetailStyles';
 
@@ -14,7 +13,6 @@ type ContentRow = { title: string; body: string | null; category: string | null 
 
 export default function RoadmapDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
-    const { isPracticeMode, practiceLidos, marcarLidoPratica } = usePracticeMode();
     const [content, setContent] = useState<ContentRow | null>(null);
     const [concluido, setConcluido] = useState(false);
 
@@ -27,22 +25,14 @@ export default function RoadmapDetail() {
             );
             setContent(row ?? null);
 
-            if (isPracticeMode) {
-                setConcluido(practiceLidos.has(id));
-            } else {
-                setConcluido(await isConcluido(id));
-            }
+            setConcluido(await isConcluido(id));
         }
         carregar();
-    }, [id, isPracticeMode, practiceLidos]);
+    }, [id]);
 
     async function handleConcluir() {
         if (!id || concluido) return;
-        if (isPracticeMode) {
-            marcarLidoPratica(id);
-        } else {
-            await marcarComoConcluido(id);
-        }
+        await marcarComoConcluido(id);
         setConcluido(true);
     }
 

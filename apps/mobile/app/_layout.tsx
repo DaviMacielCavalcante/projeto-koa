@@ -12,7 +12,6 @@ import { syncQueue } from '../src/services/sync';
 import { processarFilaEmissao } from '../src/services/emissaoNfae';
 import { configurarNotificacoes, agendarAlertas } from '../src/services/notificacoes';
 import * as NetInfo from '@react-native-community/netinfo';
-import { PracticeModeProvider } from '../src/contexts/PracticeMode';
 import { TutorialProvider } from '../src/contexts/TutorialContext';
 import TutorialOverlay from '../components/TutorialOverlay';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -104,10 +103,8 @@ export default function RootLayout() {
     return (
         <SafeAreaProvider>
             <TutorialProvider>
-                <PracticeModeProvider>
-                    <Stack screenOptions={{ gestureEnabled: false, headerShown: false }} />
-                    <TutorialOverlay />
-                </PracticeModeProvider>
+                <Stack screenOptions={{ gestureEnabled: false, headerShown: false }} />
+                <TutorialOverlay />
             </TutorialProvider>
         </SafeAreaProvider>
     )

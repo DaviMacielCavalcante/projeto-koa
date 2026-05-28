@@ -8,11 +8,9 @@ import auth from '@react-native-firebase/auth';
 import { ScreenContainer, GradientButton, AudioCircle } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
-import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import { useTutorial } from '../../src/contexts/TutorialContext';
 
 export default function Ajuda() {
-    const { isPracticeMode, enterPracticeMode, exitPracticeMode } = usePracticeMode();
     const { iniciar: iniciarTutorial } = useTutorial();
     const [confirmando, setConfirmando] = useState(false);
     const [contador, setContador] = useState(5);
@@ -65,35 +63,18 @@ export default function Ajuda() {
             <Text style={styles.titulo}>Ajuda</Text>
 
             <View style={styles.content}>
-                {isPracticeMode ? (
-                    <GradientButton
-                        label="Sair do modo prática"
-                        variant="gold"
-                        onPress={exitPracticeMode}
-                        style={styles.botao}
-                    />
-                ) : (
-                    <GradientButton
-                        label="Rever apresentação"
-                        variant="teal"
-                        onPress={() => router.push('/onboarding')}
-                        style={styles.botao}
-                    />
-                )}
+                <GradientButton
+                    label="Rever apresentação"
+                    variant="teal"
+                    onPress={() => router.push('/onboarding')}
+                    style={styles.botao}
+                />
                 <GradientButton
                     label="Tutorial do app"
                     variant="teal"
                     onPress={() => { router.replace('/(tabs)'); iniciarTutorial(); }}
                     style={styles.botao}
                 />
-                {!isPracticeMode && (
-                    <GradientButton
-                        label="Modo Prática"
-                        variant="gold"
-                        onPress={enterPracticeMode}
-                        style={styles.botao}
-                    />
-                )}
                 <GradientButton
                     label="Apagar todos os meus dados"
                     variant="red"

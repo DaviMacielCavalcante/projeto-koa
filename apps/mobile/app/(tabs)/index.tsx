@@ -6,7 +6,6 @@ import { useTutorial } from '../../src/contexts/TutorialContext';
 import { inicioStyles as styles } from '../../styles/inicioStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
-import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import { ScreenContainer } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
 import { colors } from '../../design/theme';
@@ -44,7 +43,6 @@ function calcularStatus(row: DocRow | null): DocStatus {
 }
 
 export default function Inicio() {
-    const { isPracticeMode } = usePracticeMode();
     const { registrarRef, zonaAtiva } = useTutorial();
     const greetRef = useRef<View>(null);
     const docsRef = useRef<View>(null);
@@ -64,19 +62,6 @@ export default function Inicio() {
     useFocusEffect(
         useCallback(() => {
             async function carregarStatus() {
-                if (isPracticeMode) {
-                    const { mockFarmer, mockDocuments } = await import('../../src/mocks/practiceData');
-                    setNomeUsuario(mockFarmer.name);
-                    const mapa: Record<string, DocRow> = {};
-                    mockDocuments.forEach(d => (mapa[d.type] = d as DocRow));
-                    setDocs(TIPOS.map((nome) => ({
-                        nome,
-                        status: calcularStatus(mapa[nome] ?? null),
-                        fotoUrl: mapa[nome]?.file_url ?? null,
-                    })));
-                    return;
-                }
-
                 const userRow = await agricultoresDb?.getFirstAsync<{ name: string }>(
                     'SELECT name FROM users ORDER BY created_at DESC LIMIT 1'
                 );
@@ -97,7 +82,7 @@ export default function Inicio() {
                 })));
             }
             carregarStatus();
-        }, [isPracticeMode])
+        }, [])
     );
 
     return (

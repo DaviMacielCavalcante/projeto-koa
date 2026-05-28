@@ -8,7 +8,6 @@ import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { seedEducationalContentsIfEmpty } from '../../src/db/seedEducationalContents';
 import { useTutorial } from '../../src/contexts/TutorialContext';
-import { usePracticeMode } from '../../src/hooks/usePracticeMode';
 import { listarConcluidosDoUsuario } from '../../src/services/progress';
 import { roadmapStyles as styles } from '../../styles/roadmapStyles';
 
@@ -20,7 +19,6 @@ type ContentRow = {
 };
 
 export default function Roadmap() {
-    const { isPracticeMode, practiceLidos } = usePracticeMode();
     const { iniciar: iniciarTutorial } = useTutorial();
     const [topics, setTopics] = useState<ContentRow[]>([]);
     const [readIds, setReadIds] = useState<Set<string>>(new Set());
@@ -33,24 +31,18 @@ export default function Roadmap() {
     useFocusEffect(
         useCallback(() => {
             async function carregar() {
-                if (!isPracticeMode) {
-                    await seedEducationalContentsIfEmpty();
-                }
+                await seedEducationalContentsIfEmpty();
 
                 const contents = await agricultoresDb?.getAllAsync<ContentRow>(
                     'SELECT id, title, category, created_at FROM educational_contents ORDER BY created_at ASC'
                 );
                 setTopics(contents ?? []);
 
-                if (isPracticeMode) {
-                    setReadIds(practiceLidos);
-                } else {
-                    const concluidos = await listarConcluidosDoUsuario();
-                    setReadIds(concluidos);
-                }
+                const concluidos = await listarConcluidosDoUsuario();
+                setReadIds(concluidos);
             }
             carregar();
-        }, [isPracticeMode, practiceLidos])
+        }, [])
     );
 
     return (

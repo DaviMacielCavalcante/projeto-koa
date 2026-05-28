@@ -51,7 +51,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     {
         zone: 'tab-ajuda',
         titulo: 'Aba Ajuda',
-        texto: 'Aqui você pode rever este tutorial, alterar seu nome, entrar no modo prática e gerenciar seus dados.',
+        texto: 'Aqui você pode rever este tutorial, alterar seu nome e gerenciar seus dados.',
         calloutPos: 'above',
     },
     {

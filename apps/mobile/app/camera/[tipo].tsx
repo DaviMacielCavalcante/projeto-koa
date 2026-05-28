@@ -10,8 +10,6 @@ import { colors } from '../../design/theme';
 import { processAndSavePhoto } from '../../src/services/photo';
 import { agricultoresDb } from '../../src/db/index';
 import { agendarAlertas } from '../../src/services/notificacoes';
-import { usePracticeMode } from '../../src/hooks/usePracticeMode';
-import { mockDocuments } from '../../src/mocks/practiceData';
 
 type Etapa = 'preparo' | 'camera' | 'preview' | 'confirmacao';
 
@@ -26,7 +24,6 @@ export default function CameraDocumento() {
     const [etapa, setEtapa] = useState<Etapa>('preparo');
     const [permission, requestPermission] = useCameraPermissions();
     const [fotoUri, setFotoUri] = useState<string | null>(null);
-    const { isPracticeMode, setPracticePhoto } = usePracticeMode();
     const [salvando, setSalvando] = useState(false);
     const cameraRef = useRef<CameraView>(null);
     const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -56,17 +53,6 @@ export default function CameraDocumento() {
         if (!fotoUri) return;
         setSalvando(true);
         try {
-            if (isPracticeMode) {
-                const doc = mockDocuments.find(d => d.type === tipo);
-                if (doc) {
-                    doc.file_url = fotoUri;
-                    doc.status = 'active';
-                }
-                setPracticePhoto(tipo, fotoUri);
-                setEtapa('confirmacao');
-                return;
-            }
-
             let doc = await agricultoresDb?.getFirstAsync<{ id: string }>(
                 'SELECT id FROM documents WHERE type = ? ORDER BY created_at DESC LIMIT 1',
                 [tipo]
