@@ -194,58 +194,6 @@ export const onboardingStyles = StyleSheet.create({
         paddingBottom: 32,
         gap: 10,
     },
-    praticaHeader: {
-        paddingHorizontal: 24,
-        paddingTop: 8,
-        paddingBottom: 8,
-        alignItems: 'center',
-    },
-    praticaTitulo: {
-        fontFamily: fonts.monoSemi,
-        fontSize: 26,
-        color: colors.tealDark,
-    },
-    praticaSub: {
-        fontFamily: fonts.body,
-        fontSize: sizes.micro,
-        color: colors.inkMute,
-        marginTop: 4,
-    },
-    praticaLista: {
-        flex: 1,
-        paddingHorizontal: 18,
-        paddingTop: 16,
-        gap: 14,
-    },
-    praticaCard: {
-        backgroundColor: colors.creamLight,
-        borderRadius: 24,
-        padding: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 14,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    praticaIcone: {
-        width: 52, height: 52, borderRadius: 26,
-        alignItems: 'center', justifyContent: 'center',
-    },
-    praticaCardTitulo: {
-        fontFamily: fonts.mono,
-        fontSize: sizes.md,
-        color: colors.ink,
-    },
-    praticaCardSub: {
-        fontFamily: fonts.body,
-        fontSize: sizes.micro,
-        color: colors.inkMute,
-        marginTop: 2,
-        lineHeight: 16,
-    },
     // Botão voltar — sobre fundo colorido (lgpd, tour)
     botaoVoltarLink: {
         flexDirection: 'row',
@@ -260,7 +208,7 @@ export const onboardingStyles = StyleSheet.create({
         fontSize: sizes.body,
         color: 'rgba(255,255,255,0.8)',
     },
-    // Botão voltar — dentro de card claro (perfil, pratica)
+    // Botão voltar — dentro de card claro (perfil)
     botaoVoltarCard: {
         flexDirection: 'row',
         alignItems: 'center',

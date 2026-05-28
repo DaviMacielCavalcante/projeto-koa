@@ -8,7 +8,6 @@ import auth from '@react-native-firebase/auth';
 import { ScreenContainer, GradientButton, TopBar, AudioCircle } from '../design/components';
 import { colors } from '../design/theme';
 import { agricultoresDb } from '../src/db/index';
-import { useTutorial } from '../src/contexts/TutorialContext';
 
 // ─── ILUSTRAÇÕES ──────────────────────────────────────────────────────────────
 
@@ -117,7 +116,7 @@ function IlustracaoTour({ index }: { index: number }) {
 }
 
 
-type Etapa = 'boas_vindas' | 'lgpd' | 'perfil' | 'tour' | 'pratica';
+type Etapa = 'boas_vindas' | 'lgpd' | 'perfil' | 'tour';
 
 const TOUR_SLIDES = [
     { icon: 'leaf' as const,          titulo: 'Pra começar',   corpo: 'Esse app é teu auxiliar pros documentos da roça. Tudo num lugar só.' },
@@ -155,7 +154,6 @@ async function concluirOnboarding(nome: string, lgpdConsentido: boolean) {
 }
 
 export default function Onboarding() {
-    const { iniciar: iniciarTutorial } = useTutorial();
     const [etapa, setEtapa] = useState<Etapa>('boas_vindas');
     const [nome, setNome] = useState('');
     const [lgpdConsentido, setLgpdConsentido] = useState(false);
@@ -314,98 +312,41 @@ export default function Onboarding() {
     // ─────────────────────────────────────────
     // ETAPA 4: TOUR
     // ─────────────────────────────────────────
-    if (etapa === 'tour') {
-        const slide = TOUR_SLIDES[tourSlide];
-        const ultimo = tourSlide === TOUR_SLIDES.length - 1;
+    const slide = TOUR_SLIDES[tourSlide];
+    const ultimo = tourSlide === TOUR_SLIDES.length - 1;
 
-        return (
-            <ScreenContainer variant="orange">
-                <View style={styles.tourTopBar}>
-                    <TouchableOpacity onPress={() => setEtapa('pratica')} style={styles.tourPular}>
-                        <Text style={styles.tourPularTexto}>Pular</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.tourCentro}>
-                    <IlustracaoTour index={tourSlide} />
-                    <Text style={styles.tourTitulo}>{slide.titulo}</Text>
-                    <Text style={styles.tourCorpo}>{slide.corpo}</Text>
-                    <View style={styles.tourDots}>
-                        {TOUR_SLIDES.map((_, i) => (
-                            <View key={i} style={[styles.tourDot, i === tourSlide && styles.tourDotAtivo]} />
-                        ))}
-                    </View>
-                </View>
-                <View style={styles.tourRodape}>
-                    <TouchableOpacity
-                        style={styles.tourBotaoVoltar}
-                        onPress={() => tourSlide > 0 ? setTourSlide(t => t - 1) : setEtapa('perfil')}
-                    >
-                        <Ionicons name="arrow-back" size={18} color="rgba(255,255,255,0.9)" />
-                        <Text style={styles.tourBotaoVoltarTexto}>Voltar</Text>
-                    </TouchableOpacity>
-                    <GradientButton
-                        label={ultimo ? 'FINALIZAR' : 'PRÓXIMO →'}
-                        variant="red"
-                        onPress={() => ultimo ? setEtapa('pratica') : setTourSlide(t => t + 1)}
-                        style={{ flex: 1 }}
-                    />
-                </View>
-            </ScreenContainer>
-        );
-    }
-
-    // ─────────────────────────────────────────
-    // ETAPA 5: ESCOLHA (PRÁTICA / VALER)
-    // ─────────────────────────────────────────
     return (
-        <ScreenContainer variant="cream">
-            <TopBar leftIcon="arrow-back" dark onLeftPress={() => setEtapa('tour')} />
-            <View style={styles.praticaHeader}>
-                <Text style={styles.praticaTitulo}>Quer treinar?</Text>
-                <Text style={styles.praticaSub}>Pode brincar sem medo de errar</Text>
+        <ScreenContainer variant="orange">
+            <View style={styles.tourTopBar}>
+                <TouchableOpacity onPress={() => irParaTabs()} style={styles.tourPular}>
+                    <Text style={styles.tourPularTexto}>Pular</Text>
+                </TouchableOpacity>
             </View>
-            <View style={styles.praticaLista}>
-                <TouchableOpacity style={styles.praticaCard} activeOpacity={0.85} onPress={() => irParaTabs()}>
-                    <View style={[styles.praticaIcone, { backgroundColor: colors.tealDark }]}>
-                        <Ionicons name="leaf" size={26} color={colors.white} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.praticaCardTitulo}>Entrar pra valer</Text>
-                        <Text style={styles.praticaCardSub}>Já vou cadastrar meus documentos</Text>
-                    </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.praticaCard} activeOpacity={0.85} onPress={() => setEtapa('boas_vindas')}>
-                    <View style={[styles.praticaIcone, { backgroundColor: colors.redMid }]}>
-                        <Ionicons name="help-circle" size={26} color={colors.white} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.praticaCardTitulo}>Tô com dúvida</Text>
-                        <Text style={styles.praticaCardSub}>Ouvir a explicação de novo</Text>
-                    </View>
-                </TouchableOpacity>
-
+            <View style={styles.tourCentro}>
+                <IlustracaoTour index={tourSlide} />
+                <Text style={styles.tourTitulo}>{slide.titulo}</Text>
+                <Text style={styles.tourCorpo}>{slide.corpo}</Text>
+                <View style={styles.tourDots}>
+                    {TOUR_SLIDES.map((_, i) => (
+                        <View key={i} style={[styles.tourDot, i === tourSlide && styles.tourDotAtivo]} />
+                    ))}
+                </View>
+            </View>
+            <View style={styles.tourRodape}>
                 <TouchableOpacity
-                    style={styles.praticaCard}
-                    activeOpacity={0.85}
-                    onPress={() => { irParaTabs(); iniciarTutorial(); }}
+                    style={styles.tourBotaoVoltar}
+                    onPress={() => tourSlide > 0 ? setTourSlide(t => t - 1) : setEtapa('perfil')}
                 >
-                    <View style={[styles.praticaIcone, { backgroundColor: colors.tealMid }]}>
-                        <Ionicons name="map" size={26} color={colors.white} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.praticaCardTitulo}>Ver tutorial do app</Text>
-                        <Text style={styles.praticaCardSub}>Um guia rápido mostrando cada parte do app</Text>
-                    </View>
+                    <Ionicons name="arrow-back" size={18} color="rgba(255,255,255,0.9)" />
+                    <Text style={styles.tourBotaoVoltarTexto}>Voltar</Text>
                 </TouchableOpacity>
+                <GradientButton
+                    label={ultimo ? 'FINALIZAR' : 'PRÓXIMO →'}
+                    variant="red"
+                    onPress={() => ultimo ? irParaTabs() : setTourSlide(t => t + 1)}
+                    style={{ flex: 1 }}
+                />
             </View>
-            <TouchableOpacity
-                style={styles.botaoVoltarCard}
-                onPress={() => setEtapa('tour')}
-            >
-                <Ionicons name="arrow-back" size={16} color={colors.inkMute} />
-                <Text style={styles.botaoVoltarCardTexto}>Voltar</Text>
-            </TouchableOpacity>
         </ScreenContainer>
     );
 }
