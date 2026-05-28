@@ -6,7 +6,7 @@ import { AudioCircle, GradientButton, ScreenContainer, TopBar } from '../../desi
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { getRoadmapContent } from '../../src/data/roadmapContent';
-import { isConcluido, marcarComoConcluido } from '../../src/services/progress';
+import { isConcluido, marcarComoConcluido, desmarcarConcluido } from '../../src/services/progress';
 import { roadmapDetailStyles as styles } from '../../styles/roadmapDetailStyles';
 
 type ContentRow = { title: string; body: string | null; category: string | null };
@@ -30,10 +30,15 @@ export default function RoadmapDetail() {
         carregar();
     }, [id]);
 
-    async function handleConcluir() {
-        if (!id || concluido) return;
-        await marcarComoConcluido(id);
-        setConcluido(true);
+    async function handleToggleConcluido() {
+        if (!id) return;
+        if (concluido) {
+            await desmarcarConcluido(id);
+            setConcluido(false);
+        } else {
+            await marcarComoConcluido(id);
+            setConcluido(true);
+        }
     }
 
     const rich = getRoadmapContent(content?.category);
@@ -88,10 +93,9 @@ export default function RoadmapDetail() {
                 )}
 
                 <GradientButton
-                    label={concluido ? 'Concluído ✓' : 'Marcar como concluído'}
+                    label={concluido ? 'Desmarcar conclusão' : 'Marcar como concluído'}
                     variant="teal"
-                    onPress={handleConcluir}
-                    disabled={concluido}
+                    onPress={handleToggleConcluido}
                     style={styles.botao}
                 />
             </ScrollView>

@@ -40,6 +40,31 @@ export async function marcarComoConcluido(contentId: string): Promise<boolean> {
     return true;
 }
 
+export async function desmarcarConcluido(contentId: string): Promise<boolean> {
+    const userId = getCurrentUserId();
+    if (!userId || !agricultoresDb) return false;
+
+    const existente = await agricultoresDb.getFirstAsync<{ id: string }>(
+        'SELECT id FROM user_content_progress WHERE user_id = ? AND content_id = ?',
+        [userId, contentId]
+    );
+    if (!existente) return true;
+
+    await agricultoresDb.runAsync(
+        'DELETE FROM user_content_progress WHERE id = ?',
+        [existente.id]
+    );
+
+    const agora = new Date().toISOString();
+    await agricultoresDb.runAsync(
+        `INSERT INTO sync_queue (id, tabela, operacao, payload, created_at)
+         VALUES (?, 'user_content_progress', 'delete', ?, ?)`,
+        [String(uuid.v4()), JSON.stringify({ documentId: existente.id }), agora]
+    );
+
+    return true;
+}
+
 export async function listarConcluidosDoUsuario(): Promise<Set<string>> {
     const userId = getCurrentUserId();
     if (!userId || !agricultoresDb) return new Set();
