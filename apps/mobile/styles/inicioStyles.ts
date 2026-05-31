@@ -165,7 +165,6 @@ export const inicioStyles = StyleSheet.create({
     },
     playerFixed: {
         position: 'absolute',
-        bottom: 80,
         right: 24,
     },
 });

@@ -2,6 +2,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTutorial } from '../../src/contexts/TutorialContext';
 import { inicioStyles as styles } from '../../styles/inicioStyles';
 import { Ionicons } from '@expo/vector-icons';
@@ -46,6 +47,7 @@ function calcularStatus(row: DocRow | null): DocStatus {
 }
 
 export default function Inicio() {
+    const insets = useSafeAreaInsets();
     const { registrarRef, zonaAtiva } = useTutorial();
     const greetRef = useRef<View>(null);
     const docsRef = useRef<View>(null);
@@ -200,7 +202,7 @@ export default function Inicio() {
             <AudioPlayer
                 source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
                 autoPlay={false}
-                style={styles.playerFixed}
+                style={[styles.playerFixed, { bottom: Math.max(insets.bottom + 86, 98) }]}
             />
 
             <Modal visible={!!fotoVisivel} transparent animationType="fade">
