@@ -138,15 +138,17 @@ export default function Roadmap() {
                                                 />
                                             </View>
                                         </TouchableOpacity>
-                                        <Text
-                                            style={[
-                                                styles.nodeTitle,
-                                                isRead && styles.nodeTitleRead,
-                                            ]}
-                                            numberOfLines={2}
-                                        >
-                                            {topic.title}
-                                        </Text>
+                                        <View style={styles.nodeTitleWrap}>
+                                            <Text
+                                                style={[
+                                                    styles.nodeTitle,
+                                                    isRead && styles.nodeTitleRead,
+                                                ]}
+                                                numberOfLines={2}
+                                            >
+                                                {topic.title}
+                                            </Text>
+                                        </View>
                                     </View>
                                 </View>
                             );
