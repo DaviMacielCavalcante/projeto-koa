@@ -30,12 +30,15 @@ export const inicioStyles = StyleSheet.create({
         color: colors.white,
     },
     sectionTitle: {
-        fontFamily: fonts.mono,
+        fontFamily: fonts.monoSemi,
         fontSize: sizes.md,
         color: colors.tealDark,
         textAlign: 'center',
         paddingTop: 15,
         paddingBottom: 10,
+        textShadowColor: 'rgb(255, 255, 255)',
+        textShadowOffset: { width: 0.5, height: 0.5 },
+        textShadowRadius: 8,
     },
     educationalCardWrap: {
         marginHorizontal: 16,

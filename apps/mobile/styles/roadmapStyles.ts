@@ -119,6 +119,9 @@ export const roadmapStyles = StyleSheet.create({
         marginTop: 8,
         width: NODE_SIZE + 32,
         marginLeft: -16,
+        textShadowColor: 'rgb(255, 255, 255)',
+        textShadowOffset: { width: 0.5, height: 0.5 },
+        textShadowRadius: 8,
     },
     nodeTitleRead: {
         color: colors.statusGreen,
