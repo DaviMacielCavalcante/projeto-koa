@@ -3,6 +3,7 @@ import { agricultoresDb } from '../../src/db/index';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { ActivityIndicator, Text, View, Modal, Image, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTutorial } from '../../src/contexts/TutorialContext';
 import { Ionicons } from '@expo/vector-icons';
 import AudioPlayer from '../../components/AudioPlayer';
@@ -65,6 +66,7 @@ function statusTexto(doc: Documento | null, docStatus: DocStatus): { big: string
 
 export default function DetalheDocumento() {
     const { tipo } = useLocalSearchParams<{ tipo: string }>();
+    const insets = useSafeAreaInsets();
     const { registrarRef, zonaAtiva } = useTutorial();
     const heroRef = useRef<View>(null);
     const statusRef = useRef<View>(null);
@@ -228,7 +230,7 @@ export default function DetalheDocumento() {
                 <AudioPlayer
                     source={AUDIOS_DOC[tipo]}
                     autoPlay={false}
-                    style={styles.player}
+                    style={[styles.player, { bottom: 24 + insets.bottom }]}
                 />
             )}
         </ScreenContainer>
