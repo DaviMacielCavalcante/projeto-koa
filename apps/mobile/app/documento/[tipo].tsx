@@ -20,10 +20,12 @@ const IMAGENS_DOC: Partial<Record<string, any>> = {
     ITR:  require('../../assets/docs/ITR.png'),
 };
 
+// Placeholders temporários: usam o som de notificação até termos áudios
+// próprios de cada documento. Trocar cada require pelo áudio definitivo depois.
 const AUDIOS_DOC: Partial<Record<string, any>> = {
-    CAR:  require('../../assets/roadmap/audio/car.mp3'),
-    CCIR: require('../../assets/roadmap/audio/ccir.mp3'),
-    ITR:  require('../../assets/roadmap/audio/itr.mp3'),
+    CAR:  require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3'),
+    CCIR: require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3'),
+    ITR:  require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3'),
 };
 
 type DocumentoStatus = 'active' | 'expiring_soon' | 'expired' | null;
