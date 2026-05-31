@@ -16,6 +16,9 @@ import BotaoConexao from '../../components/BotaoConexao';
 const WALLPAPER_HOME = require('../../assets/images/WallpaperHome.png');
 const TIPOS = ['ITR', 'CCIR', 'CAF', 'CAR'];
 const TRINTA_DIAS = 30 * 24 * 60 * 60 * 1000;
+const CARD_W = 140;
+const CARD_GAP = 12;
+const CARD_SNAP = CARD_W + CARD_GAP;
 
 
 const STATUS_SUBTITLE: Record<DocStatus, string> = {
@@ -87,6 +90,17 @@ export default function Inicio() {
 
     return (
         <ScreenContainer variant="cream">
+            <View style={styles.screenBg} pointerEvents="none">
+                <Image source={WALLPAPER_HOME} style={StyleSheet.absoluteFill} resizeMode="cover" />
+                <LinearGradient
+                    colors={['rgba(242,232,210,0.92)', 'rgba(242,232,210,0.5)', 'rgba(242,232,210,0.88)']}
+                    locations={[0, 0.5, 1]}
+                    start={{ x: 0.5, y: 0 }}
+                    end={{ x: 0.5, y: 1 }}
+                    style={StyleSheet.absoluteFill}
+                />
+            </View>
+
             <TutorialGlow active={zonaAtiva === 'greet'} borderRadius={22} style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 12 }}>
                 <View ref={greetRef} style={[styles.greetCard, { marginHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
                     <View style={styles.avatar}>
@@ -112,57 +126,49 @@ export default function Inicio() {
                 showsVerticalScrollIndicator={false}
             >
                 <Text style={styles.sectionTitle}>Seus Documentos</Text>
-                <View style={styles.docsRow}>
-                    <View style={styles.docsColumn}>
-                        {docs.map((doc) => {
-                            const barColor = {
-                                green: colors.statusGreen,
-                                yellow: colors.statusYellow,
-                                red: colors.statusRed,
-                                grey: colors.statusGrey,
-                            }[doc.status];
-                            const destaque = zonaAtiva === 'docs' || zonaAtiva === 'cores';
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    decelerationRate="fast"
+                    snapToInterval={CARD_SNAP}
+                    snapToAlignment="start"
+                    contentContainerStyle={styles.carouselContent}
+                >
+                    {docs.map((doc) => {
+                        const barColor = {
+                            green: colors.statusGreen,
+                            yellow: colors.statusYellow,
+                            red: colors.statusRed,
+                            grey: colors.statusGrey,
+                        }[doc.status];
+                        const destaque = zonaAtiva === 'docs' || zonaAtiva === 'cores';
 
-                            return (
-                                <TutorialGlow key={doc.nome} active={destaque} borderRadius={18}>
-                                    <TouchableOpacity
-                                        style={styles.docCard}
-                                        activeOpacity={0.85}
-                                        onPress={() => router.push('/documento/' + doc.nome)}
-                                    >
-                                        <View style={[styles.docCardBarra, { backgroundColor: barColor }]} />
-                                        <View style={styles.docCardConteudo}>
-                                            <Text style={styles.docCardNome}>{doc.nome}</Text>
-                                            <Text style={styles.docCardSubtitulo}>{STATUS_SUBTITLE[doc.status]}</Text>
-                                        </View>
-                                        <View style={styles.docCardDireita}>
-                                            {doc.fotoUrl && (
-                                                <TouchableOpacity
-                                                    onPress={() => setFotoVisivel(doc.fotoUrl)}
-                                                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                                                >
-                                                    <Ionicons name="eye-outline" size={20} color={colors.tealDark} />
-                                                </TouchableOpacity>
-                                            )}
-                                            <Ionicons name="chevron-forward" size={20} color={colors.tealDark} />
-                                        </View>
-                                    </TouchableOpacity>
-                                </TutorialGlow>
-                            );
-                        })}
-                    </View>
-                    <View style={styles.wallpaperColumn} pointerEvents="none">
-                        <Image source={WALLPAPER_HOME} style={styles.wallpaperImage} resizeMode="cover" />
-                        <LinearGradient
-                            colors={['rgba(242,232,210,1)', 'rgba(242,232,210,0.35)']}
-                            locations={[0, 1]}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                            style={StyleSheet.absoluteFill}
-                            pointerEvents="none"
-                        />
-                    </View>
-                </View>
+                        return (
+                            <TutorialGlow key={doc.nome} active={destaque} borderRadius={18} style={styles.carouselItem}>
+                                <TouchableOpacity
+                                    style={styles.docCardSquare}
+                                    activeOpacity={0.85}
+                                    onPress={() => router.push('/documento/' + doc.nome)}
+                                >
+                                    {doc.fotoUrl && (
+                                        <TouchableOpacity
+                                            style={styles.docCardEye}
+                                            onPress={() => setFotoVisivel(doc.fotoUrl)}
+                                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                        >
+                                            <Ionicons name="eye-outline" size={20} color={colors.tealDark} />
+                                        </TouchableOpacity>
+                                    )}
+                                    <View style={styles.docCardSquareBody}>
+                                        <Text style={styles.docCardSquareNome}>{doc.nome}</Text>
+                                        <Text style={styles.docCardSquareSub}>{STATUS_SUBTITLE[doc.status]}</Text>
+                                    </View>
+                                    <View style={[styles.docCardStatusBar, { backgroundColor: barColor }]} />
+                                </TouchableOpacity>
+                            </TutorialGlow>
+                        );
+                    })}
+                </ScrollView>
 
                 <TouchableOpacity
                     style={styles.educationalCardWrap}

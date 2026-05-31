@@ -77,36 +77,28 @@ export const inicioStyles = StyleSheet.create({
         gap: 10,
         paddingBottom: 100,
     },
-    docsRow: {
-        flexDirection: 'row',
-        alignItems: 'stretch',
-    },
-    docsColumn: {
-        flex: 60,
-        paddingLeft: 16,
-        paddingRight: 5,
-        gap: 10,
-    },
-    wallpaperColumn: {
-        flex: 40,
-        overflow: 'hidden',
-        position: 'relative',
-    },
-    wallpaperImage: {
+    // Background absoluto da tela inteira
+    screenBg: {
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        width: undefined,
-        height: undefined,
     },
-    // Card de documento
-    docCard: {
+    // Carrossel horizontal de documentos
+    carouselContent: {
+        paddingHorizontal: 16,
+        paddingVertical: 6,
+    },
+    carouselItem: {
+        marginRight: 12,
+    },
+    // Card de documento (quadrado)
+    docCardSquare: {
+        width: 140,
+        height: 160,
         backgroundColor: colors.white,
         borderRadius: 18,
-        flexDirection: 'row',
-        alignItems: 'center',
         overflow: 'hidden',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 3 },
@@ -114,35 +106,35 @@ export const inicioStyles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 2,
     },
-    docCardBarra: {
-        width: 6,
-        alignSelf: 'stretch',
-    },
-    docCardConteudo: {
+    docCardSquareBody: {
         flex: 1,
-        paddingVertical: 14,
-        paddingHorizontal: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 10,
     },
-    docCardNome: {
+    docCardSquareNome: {
         fontFamily: fonts.monoSemi,
-        fontSize: sizes.md,
+        fontSize: 22,
         color: colors.tealDark,
+        textAlign: 'center',
+        letterSpacing: 1,
     },
-    docCardSubtitulo: {
+    docCardSquareSub: {
         fontFamily: fonts.body,
         fontSize: sizes.caption,
         color: colors.inkMute,
-        marginTop: 2,
+        marginTop: 4,
+        textAlign: 'center',
     },
-    docCardBloqueado: {
-        opacity: 0.55,
-        backgroundColor: colors.creamDeep,
+    docCardStatusBar: {
+        height: 12,
+        width: '100%',
     },
-    docCardDireita: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 14,
-        gap: 10,
+    docCardEye: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        zIndex: 2,
     },
     fotoModalFundo: {
         flex: 1,
