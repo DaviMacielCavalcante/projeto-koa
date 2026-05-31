@@ -3,10 +3,8 @@
     "allow": [
       "PowerShell(Move-Item *)",
       "Bash(pnpm --version)",
-      "Bash(bun --version)",
       "Bash(git mv *)",
       "Bash(git rm *)",
-      "Bash(bun init *)",
       "Bash(pnpm install *)",
       "Bash(pnpm list *)",
       "Bash(pnpm dev *)",

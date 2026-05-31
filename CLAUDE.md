@@ -8,25 +8,20 @@ Mobile app to assist family farmers in Jutaí with document regularization (CAF,
 
 ## Repo Layout
 
-pnpm monorepo (workspaces in `pnpm-workspace.yaml`). Don't look elsewhere — every source file lives in one of these:
+pnpm monorepo (workspaces in `pnpm-workspace.yaml`). The only workspace is the mobile app:
 
 - `apps/mobile/` — **the deliverable**. React Native + Expo app. Contains `App.tsx`, `index.ts` (Expo entry), `app.json`, `eas.json`, `google-services.json`, `assets/`, ESLint + Prettier config. Run all `expo`/`eas` commands from here (or via `pnpm --filter mobile`).
-- `apps/backend/` — Bun + Elysia HTTP server. Drizzle ORM over Postgres. Modular architecture under `src/modules/<name>/{domain,application,infra}` (see Backend Architecture below). Not deployed yet.
-- `packages/shared/` — `@agri-docs/shared`. Cross-workspace TypeScript types (e.g. `Farmer`). Source-only, no build step — consumed directly via `src/index.ts`.
 
-Root-only files: `todo_mvp.md` (phased task list), `conventions.md` (full coding/branch/PR rules), `CLAUDE.md`, `README.md`, `LICENSE`, `.gitmessage`, `.github/`.
+Root-only files: `todo_mvp.md` (phased task list), `conventions.md` (full coding/branch/PR rules), `DATABASE.md` (local SQLite schema), `CLAUDE.md`, `README.md`, `LICENSE`, `.gitmessage`, `.github/`.
 
 ## Package Manager
 
-**pnpm only** — never npm or yarn. `apps/backend` uses `bun` as its runtime, but dependencies are still installed via pnpm at the root.
-
-Internal packages are referenced as `"@agri-docs/shared": "workspace:*"` and already wired into both `apps/mobile` and `apps/backend`.
+**pnpm only** — never npm or yarn. All dependencies are installed via pnpm at the root.
 
 ## Stack
 
 - **Mobile**: React Native + TypeScript + Expo (managed workflow with development builds)
 - **Cloud services (Firebase)**: Firestore (remote sync target), Auth (phone OTP via SMS), Storage, Crashlytics
-- **API server**: Bun runtime + Elysia framework + Drizzle ORM + Postgres (driver: `postgres`). Password hashing via `Bun.password` (bcrypt, no native dep)
 - **Local DB**: expo-sqlite (no pending-op limit; custom sync layer pushes to Firestore on reconnect)
 - **Navigation**: React Navigation or Expo Router (decision pending in Phase 1)
 - **Camera/Audio/Notifications**: expo-camera, expo-av, expo-notifications, expo-image-manipulator
@@ -57,22 +52,6 @@ pnpm --filter mobile exec eas build --profile production --platform android
 # Mobile lint / format
 pnpm --filter mobile lint
 pnpm --filter mobile format
-
-# Backend dev server (Bun, hot reload, http://localhost:3000, docs at /swagger)
-pnpm --filter backend dev
-
-# Backend local Postgres via Docker (apps/backend/docker-compose.yml)
-pnpm --filter backend db:up          # start postgres container (named volume agri_docs_pg_data)
-pnpm --filter backend db:down        # stop container
-pnpm --filter backend db:logs        # tail postgres logs
-
-# Backend Drizzle migrations (requires DATABASE_URL in apps/backend/.env)
-pnpm --filter backend db:generate    # generate SQL from schemas
-pnpm --filter backend db:migrate     # apply pending migrations
-pnpm --filter backend db:studio      # open Drizzle Studio
-
-# Backend type-check
-pnpm --filter backend typecheck
 ```
 
 ## Key Architectural Decisions
@@ -101,35 +80,7 @@ pnpm --filter backend typecheck
 
 **Typography**: Two font families bundled via `@expo-google-fonts`: `Inter` (`fonts.body`, `bodyMedium`, `bodySemi`, `bodyBold`) for body/UI text, and `Inconsolata` (`fonts.mono`, `monoSemi`) for headings and emphasis. Defined in `apps/mobile/design/theme/typography.ts`, loaded in `app/_layout.tsx`. **Pitfall**: never combine `fontFamily` with `fontWeight` in styles — RN Google Fonts loads each weight as a separate font file (e.g. `Inter_700Bold`), so adding `fontWeight: '700'` to a style that already uses `fontFamily: fonts.mono` makes the OS look for a bold variant of *that exact filename*, fail, and silently fall back to the system default (Roboto on Android, SF on iOS). Pick the right named font instead (e.g. `fonts.monoSemi`, `fonts.bodyBold`). Playfair Display was removed in May 2026 — don't reintroduce serif fonts without a discussion.
 
-**Shared types**: Domain types reused between mobile and backend (e.g. `Farmer`) live in `packages/shared/src/index.ts`. Import as `import type { Farmer } from '@agri-docs/shared'`. Add new shared types here instead of redefining per workspace.
-
-## Backend Architecture (`apps/backend`)
-
-Entry chain: `index.ts` (root) → `src/app.ts` (Elysia setup + error mapper + listen) → `src/app.routes.ts` (Elysia with `prefix: '/v1'` registering each module's controller). Add new controllers via `.use(NewController)` in `src/app.routes.ts`. All app routes live under `/v1`.
-
-Modular clean architecture. Each domain lives in `src/modules/<name>/` split into:
-
-- `domain/` — Drizzle table schemas (`*.schema.ts`) and Elysia type schemas (`*.types.ts`).
-- `application/` — one usecase per file (`<verb>-<entity>.usecase.ts`). Pure business logic; throws domain errors.
-- `infra/` — `<entity>.repository.ts` (Drizzle queries) and `<entity>.controller.ts` (Elysia routes).
-
-Shared infrastructure in `src/shared/infra/`:
-
-- `databases/postgres.ts` — Drizzle `db` instance and `Transaction` type.
-- `generate-id.ts` — cuid2-based id generator (24 chars, see `ID_LENGHT`).
-- `import.schema.ts` — shared pgEnums (e.g. `userPlanEnum`) and constants.
-- `errors/{not-found,unauthorized,conflict}-error.ts` — typed exceptions mapped to HTTP codes by `src/app.ts` `onError`.
-- `base.controller.ts` — `createController({ prefix, tags })` decorates each Elysia controller with `validateToken`. **Stub** today (always returns admin); replace once a real auth module exists.
-
-Conventions:
-
-- Path alias `@/*` → `src/*` (configured in `tsconfig.json`). Always use `@/...` for cross-module imports.
-- Repositories return `*Public` types (without `password_hash` / sensitive fields). Never expose hashes in responses.
-- Use `Bun.password.hash(value, { algorithm: 'bcrypt', cost: 10 })` for password hashing — no `bcrypt` npm dep needed.
-- Drizzle migrations live in `apps/backend/drizzle/` (gitignored on first run; commit them once stable). Generate with `db:generate`, apply with `db:migrate`.
-- Local dev Postgres runs via `apps/backend/docker-compose.yml` (`db:up`/`db:down`). Defaults: user `agri`, password `agri`, db `agri_docs`, port `5434`. Data persisted in named volume `agri_docs_pg_data` — `docker compose down -v` wipes it. Replace with managed Postgres (Supabase/Neon/etc) by changing `DATABASE_URL` in `.env`.
-- Reference `apps/backend/DATABASE.md` for the canonical table schema (users, properties, documents, buyers, sales, educational_contents, user_content_progress).
-- Existing reference module: `src/modules/exemplo/` (template copied from another project; ignore the Redis bits — this stack is **not** using Redis).
+**Local SQLite schema**: All app data lives in `expo-sqlite`, with tables created as raw SQL in `apps/mobile/src/db/index.ts`. See `DATABASE.md` for the documented table reference (users, properties, documents, buyers, sales, educational_contents, user_content_progress).
 
 ## Firebase Setup
 

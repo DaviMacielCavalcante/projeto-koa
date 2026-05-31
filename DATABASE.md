@@ -1,6 +1,6 @@
 # 🗄️ Database — AgroDoc
 
-Documentação das tabelas do banco de dados local (SQLite via Drizzle ORM) e das tabelas sincronizadas com a nuvem para usuários premium.
+Documentação das tabelas do banco de dados local (SQLite via `expo-sqlite`) e das tabelas sincronizadas com a nuvem para usuários premium.
 
 ---
 
@@ -156,7 +156,5 @@ Apenas usuários com plano **premium** sincronizam dados com a nuvem. As tabelas
 
 ## 🛠️ Stack
 
-- **ORM:** Drizzle ORM
-- **Banco local:** SQLite (via `expo-sqlite`)
-- **Banco na nuvem:** Supabase ou Firebase (apenas premium)
-- **Migrações:** geradas automaticamente pelo Drizzle (não versionadas no repositório)
+- **Banco local:** SQLite (via `expo-sqlite`), tabelas criadas em SQL cru em `apps/mobile/src/db/index.ts`
+- **Banco na nuvem:** Firebase (Firestore, apenas premium)
