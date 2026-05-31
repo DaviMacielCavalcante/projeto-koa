@@ -203,8 +203,3 @@ export const roadmapContent: Record<string, RoadmapTopicContent> = {
         resumo: 'Sem certificado digital, sem nota fiscal — guarde tudo por 5 anos.',
     },
 };
-
-export function getRoadmapContent(category: string | null | undefined): RoadmapTopicContent | null {
-    if (!category) return null;
-    return roadmapContent[category] ?? null;
-}

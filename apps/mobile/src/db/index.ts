@@ -47,13 +47,38 @@ async function initDb() {
     `);
 
 
+    // educational_contents: o esquema antigo (com `body` plano, sem hero/resumo/position)
+    // é recriado. O conteúdo é estático e repovoado pelo seed, então recriar é seguro.
+    const eduCols = await agricultoresDb.getAllAsync<{ name: string }>(
+        `PRAGMA table_info(educational_contents)`
+    );
+    if (eduCols.length > 0 && !eduCols.some((c) => c.name === 'chapter')) {
+        await agricultoresDb.execAsync(`DROP TABLE IF EXISTS educational_contents`);
+    }
+
     await agricultoresDb.execAsync(`
         CREATE TABLE IF NOT EXISTS educational_contents(
-        id TEXT PRIMARY KEY, 
-        title TEXT, 
-        body TEXT, 
-        category TEXT,  
-        created_at TEXT, 
+        id TEXT PRIMARY KEY,
+        title TEXT,
+        category TEXT,
+        hero TEXT,
+        resumo TEXT,
+        chapter INTEGER,
+        position INTEGER,
+        created_at TEXT,
+        updated_at TEXT)
+    `);
+
+    // Seções de um conteúdo (relação 1→N com educational_contents).
+    await agricultoresDb.execAsync(`
+        CREATE TABLE IF NOT EXISTS content_sections(
+        id TEXT PRIMARY KEY,
+        content_id TEXT,
+        icon TEXT,
+        title TEXT,
+        body TEXT,
+        position INTEGER,
+        created_at TEXT,
         updated_at TEXT)
     `);
 

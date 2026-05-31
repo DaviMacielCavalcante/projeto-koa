@@ -96,16 +96,37 @@ Registro de vendas realizadas pelo agricultor.
 ---
 
 ### `educational_contents`
-Conteúdos educativos em texto, lidos pelo TTS nativo do Android.
+Tópicos educativos da trilha (ex: "O que é o CAR"). O corpo detalhado de cada tópico fica em `content_sections` (relação 1→N).
 
 | Coluna | Tipo | Descrição |
 |---|---|---|
-| id | UUID | Chave primária |
-| title | VARCHAR | Título do conteúdo |
-| body | TEXT | Texto que será lido pelo TTS |
-| category | VARCHAR | Categoria (ex: documentos, vendas) |
-| created_at | TIMESTAMP | Data de cadastro |
-| updated_at | TIMESTAMP | Data da última atualização |
+| id | TEXT | Chave primária — determinística (= category, ex: `CAR`) |
+| title | TEXT | Título do tópico, exibido no nó da trilha |
+| category | TEXT | Documento/chave (CAF, CAR, CCIR, ITR, NFA-e) |
+| hero | TEXT | Frase de destaque no topo da tela de detalhe |
+| resumo | TEXT | Frase-resumo no rodapé do conteúdo |
+| chapter | INTEGER | Capítulo do tópico (front exibe "Capítulo N") |
+| position | INTEGER | Ordem do tópico **dentro do capítulo** |
+| created_at | TEXT | Data de cadastro |
+| updated_at | TEXT | Data da última atualização |
+
+---
+
+### `content_sections`
+Seções que compõem o corpo de um tópico. Cada seção é um bloco **ícone + título + texto**.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| id | TEXT | Chave primária (ex: `CAR-0`) |
+| content_id | TEXT | FK → educational_contents |
+| icon | TEXT | Nome do ícone (Ionicons) |
+| title | TEXT | Título da seção (ex: "O que é") |
+| body | TEXT | Texto da seção |
+| position | INTEGER | Ordem da seção dentro do tópico |
+| created_at | TEXT | Data de cadastro |
+| updated_at | TEXT | Data da última atualização |
+
+> Conteúdo estático, populado pelo seed a partir de `apps/mobile/src/data/roadmapContent.ts`. Não sincroniza com a nuvem.
 
 ---
 
@@ -134,6 +155,7 @@ users
   │     └── buyers
   └── user_content_progress
         └── educational_contents
+              └── content_sections (content_id)
 ```
 
 ---
@@ -151,6 +173,7 @@ Apenas usuários com plano **premium** sincronizam dados com a nuvem. As tabelas
 | sales | ✅ |
 | user_content_progress | ✅ |
 | educational_contents | ❌ (conteúdo fixo, igual pra todos) |
+| content_sections | ❌ (conteúdo fixo, igual pra todos) |
 
 ---
 

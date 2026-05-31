@@ -5,12 +5,17 @@ import { ScrollView, Text, View } from 'react-native';
 import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
-import { getRoadmapContent } from '../../src/data/roadmapContent';
 import { isConcluido, marcarComoConcluido, desmarcarConcluido } from '../../src/services/progress';
 import { roadmapDetailStyles as styles } from '../../styles/roadmapDetailStyles';
 import AudioBubble from '../../components/AudioBubble';
 
-type ContentRow = { title: string; body: string | null; category: string | null };
+type ContentRow = {
+    title: string;
+    category: string | null;
+    hero: string | null;
+    resumo: string | null;
+};
+type SectionRow = { icon: string; title: string; body: string };
 
 const AUDIO_POR_CATEGORIA: Record<string, number> = {
     CAR: require('../../assets/audio/car.mp3'),
@@ -21,16 +26,23 @@ const AUDIO_POR_CATEGORIA: Record<string, number> = {
 export default function RoadmapDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const [content, setContent] = useState<ContentRow | null>(null);
+    const [sections, setSections] = useState<SectionRow[]>([]);
     const [concluido, setConcluido] = useState(false);
 
     useEffect(() => {
         async function carregar() {
             if (!id) return;
             const row = await agricultoresDb?.getFirstAsync<ContentRow>(
-                'SELECT title, body, category FROM educational_contents WHERE id = ?',
+                'SELECT title, category, hero, resumo FROM educational_contents WHERE id = ?',
                 [id]
             );
             setContent(row ?? null);
+
+            const secoes = await agricultoresDb?.getAllAsync<SectionRow>(
+                'SELECT icon, title, body FROM content_sections WHERE content_id = ? ORDER BY position ASC',
+                [id]
+            );
+            setSections(secoes ?? []);
 
             setConcluido(await isConcluido(id));
         }
@@ -48,7 +60,7 @@ export default function RoadmapDetail() {
         }
     }
 
-    const rich = getRoadmapContent(content?.category);
+    const temConteudo = sections.length > 0;
     const audioSource = content?.category ? AUDIO_POR_CATEGORIA[content.category] : undefined;
 
     return (
@@ -69,14 +81,18 @@ export default function RoadmapDetail() {
                     <AudioBubble source={audioSource} style={styles.audioBubble} />
                 ) : null}
 
-                {rich ? (
+                {temConteudo ? (
                     <>
-                        <Text style={styles.hero}>{rich.hero}</Text>
+                        {content?.hero ? <Text style={styles.hero}>{content.hero}</Text> : null}
 
-                        {rich.sections.map((section, i) => (
+                        {sections.map((section, i) => (
                             <View key={`${section.title}-${i}`} style={styles.sectionCard}>
                                 <View style={styles.sectionIconWrap}>
-                                    <Ionicons name={section.icon} size={22} color={colors.tealDark} />
+                                    <Ionicons
+                                        name={section.icon as keyof typeof Ionicons.glyphMap}
+                                        size={22}
+                                        color={colors.tealDark}
+                                    />
                                 </View>
                                 <View style={styles.sectionTextWrap}>
                                     <Text style={styles.sectionTitle}>{section.title}</Text>
@@ -85,12 +101,14 @@ export default function RoadmapDetail() {
                             </View>
                         ))}
 
-                        <View style={styles.resumoCard}>
-                            <View style={styles.resumoIconWrap}>
-                                <Ionicons name="bulb" size={22} color={colors.white} />
+                        {content?.resumo ? (
+                            <View style={styles.resumoCard}>
+                                <View style={styles.resumoIconWrap}>
+                                    <Ionicons name="bulb" size={22} color={colors.white} />
+                                </View>
+                                <Text style={styles.resumoText}>{content.resumo}</Text>
                             </View>
-                            <Text style={styles.resumoText}>{rich.resumo}</Text>
-                        </View>
+                        ) : null}
                     </>
                 ) : (
                     <View style={styles.placeholder}>

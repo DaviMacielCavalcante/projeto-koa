@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
-import { seedEducationalContentsIfEmpty } from '../../src/db/seedEducationalContents';
+import { seedEducationalContents } from '../../src/db/seedEducationalContents';
 import { useTutorial } from '../../src/contexts/TutorialContext';
 import { listarConcluidosDoUsuario } from '../../src/services/progress';
 import { roadmapStyles as styles } from '../../styles/roadmapStyles';
@@ -15,7 +15,8 @@ type ContentRow = {
     id: string;
     title: string;
     category: string | null;
-    created_at: string;
+    chapter: number | null;
+    position: number | null;
 };
 
 export default function Roadmap() {
@@ -31,10 +32,10 @@ export default function Roadmap() {
     useFocusEffect(
         useCallback(() => {
             async function carregar() {
-                await seedEducationalContentsIfEmpty();
+                await seedEducationalContents();
 
                 const contents = await agricultoresDb?.getAllAsync<ContentRow>(
-                    'SELECT id, title, category, created_at FROM educational_contents ORDER BY created_at ASC'
+                    'SELECT id, title, category, chapter, position FROM educational_contents ORDER BY chapter ASC, position ASC, created_at ASC'
                 );
                 setTopics(contents ?? []);
 
