@@ -107,8 +107,24 @@ Tópicos educativos da trilha (ex: "O que é o CAR"). O corpo detalhado de cada 
 | resumo | TEXT | Frase-resumo no rodapé do conteúdo |
 | chapter | INTEGER | Capítulo do tópico (front exibe "Capítulo N") |
 | position | INTEGER | Ordem do tópico **dentro do capítulo** |
+| audio_id | TEXT | FK → audios (nullable; NULL = tópico sem áudio) |
 | created_at | TEXT | Data de cadastro |
 | updated_at | TEXT | Data da última atualização |
+
+---
+
+### `audios`
+Áudios narrados de cada tópico. O arquivo em si é embutido no app; a coluna `file_key` é a **chave** que o código resolve via registro estático de `require()` (`apps/mobile/src/data/audioRegistry.ts`) — não é um caminho de arquivo real.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| id | TEXT | Chave primária (ex: `audio-CAR`) |
+| name | TEXT | Nome do áudio (default `'nome'` por enquanto) |
+| file_key | TEXT | Chave do asset no registro estático (ex: `car`) |
+| created_at | TEXT | Data de cadastro |
+| updated_at | TEXT | Data da última atualização |
+
+> Conteúdo estático, populado pelo seed. Não sincroniza com a nuvem.
 
 ---
 
@@ -155,7 +171,8 @@ users
   │     └── buyers
   └── user_content_progress
         └── educational_contents
-              └── content_sections (content_id)
+              ├── content_sections (content_id)
+              └── audios (audio_id)
 ```
 
 ---
@@ -174,6 +191,7 @@ Apenas usuários com plano **premium** sincronizam dados com a nuvem. As tabelas
 | user_content_progress | ✅ |
 | educational_contents | ❌ (conteúdo fixo, igual pra todos) |
 | content_sections | ❌ (conteúdo fixo, igual pra todos) |
+| audios | ❌ (conteúdo fixo, igual pra todos) |
 
 ---
 

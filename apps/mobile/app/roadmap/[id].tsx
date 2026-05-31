@@ -5,6 +5,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
+import { getAudioSource } from '../../src/data/audioRegistry';
 import { isConcluido, marcarComoConcluido, desmarcarConcluido } from '../../src/services/progress';
 import { roadmapDetailStyles as styles } from '../../styles/roadmapDetailStyles';
 import AudioBubble from '../../components/AudioBubble';
@@ -14,26 +15,22 @@ type ContentRow = {
     category: string | null;
     hero: string | null;
     resumo: string | null;
+    audio_id: string | null;
 };
 type SectionRow = { icon: string; title: string; body: string };
-
-const AUDIO_POR_CATEGORIA: Record<string, number> = {
-    CAR: require('../../assets/audio/car.mp3'),
-    CCIR: require('../../assets/audio/ccir.mp3'),
-    ITR: require('../../assets/audio/itr.mp3'),
-};
 
 export default function RoadmapDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const [content, setContent] = useState<ContentRow | null>(null);
     const [sections, setSections] = useState<SectionRow[]>([]);
+    const [audioSource, setAudioSource] = useState<number | undefined>(undefined);
     const [concluido, setConcluido] = useState(false);
 
     useEffect(() => {
         async function carregar() {
             if (!id) return;
             const row = await agricultoresDb?.getFirstAsync<ContentRow>(
-                'SELECT title, category, hero, resumo FROM educational_contents WHERE id = ?',
+                'SELECT title, category, hero, resumo, audio_id FROM educational_contents WHERE id = ?',
                 [id]
             );
             setContent(row ?? null);
@@ -43,6 +40,16 @@ export default function RoadmapDetail() {
                 [id]
             );
             setSections(secoes ?? []);
+
+            if (row?.audio_id) {
+                const audio = await agricultoresDb?.getFirstAsync<{ file_key: string }>(
+                    'SELECT file_key FROM audios WHERE id = ?',
+                    [row.audio_id]
+                );
+                setAudioSource(getAudioSource(audio?.file_key));
+            } else {
+                setAudioSource(undefined);
+            }
 
             setConcluido(await isConcluido(id));
         }
@@ -61,7 +68,6 @@ export default function RoadmapDetail() {
     }
 
     const temConteudo = sections.length > 0;
-    const audioSource = content?.category ? AUDIO_POR_CATEGORIA[content.category] : undefined;
 
     return (
         <ScreenContainer variant="cream">

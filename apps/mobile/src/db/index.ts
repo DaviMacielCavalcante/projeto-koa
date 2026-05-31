@@ -52,7 +52,7 @@ async function initDb() {
     const eduCols = await agricultoresDb.getAllAsync<{ name: string }>(
         `PRAGMA table_info(educational_contents)`
     );
-    if (eduCols.length > 0 && !eduCols.some((c) => c.name === 'chapter')) {
+    if (eduCols.length > 0 && !eduCols.some((c) => c.name === 'audio_id')) {
         await agricultoresDb.execAsync(`DROP TABLE IF EXISTS educational_contents`);
     }
 
@@ -65,6 +65,7 @@ async function initDb() {
         resumo TEXT,
         chapter INTEGER,
         position INTEGER,
+        audio_id TEXT,
         created_at TEXT,
         updated_at TEXT)
     `);
@@ -78,6 +79,17 @@ async function initDb() {
         title TEXT,
         body TEXT,
         position INTEGER,
+        created_at TEXT,
+        updated_at TEXT)
+    `);
+
+    // Áudios narrados, referenciados por educational_contents.audio_id (FK nullable).
+    // file_key é a chave do registro estático de require() (ver src/data/audioRegistry.ts).
+    await agricultoresDb.execAsync(`
+        CREATE TABLE IF NOT EXISTS audios(
+        id TEXT PRIMARY KEY,
+        name TEXT,
+        file_key TEXT,
         created_at TEXT,
         updated_at TEXT)
     `);
