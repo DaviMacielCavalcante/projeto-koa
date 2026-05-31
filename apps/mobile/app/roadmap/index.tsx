@@ -19,6 +19,23 @@ type ContentRow = {
     position: number | null;
 };
 
+type Capitulo = { chapter: number; itens: ContentRow[] };
+
+// Agrupa os tópicos (já ordenados por chapter, position) em capítulos consecutivos.
+function agruparPorCapitulo(itens: ContentRow[]): Capitulo[] {
+    const grupos: Capitulo[] = [];
+    for (const item of itens) {
+        const cap = item.chapter ?? 1;
+        const ultimo = grupos[grupos.length - 1];
+        if (ultimo && ultimo.chapter === cap) {
+            ultimo.itens.push(item);
+        } else {
+            grupos.push({ chapter: cap, itens: [item] });
+        }
+    }
+    return grupos;
+}
+
 export default function Roadmap() {
     const { iniciar: iniciarTutorial } = useTutorial();
     const [topics, setTopics] = useState<ContentRow[]>([]);
@@ -97,63 +114,72 @@ export default function Roadmap() {
                         imageStyle={styles.pathWallpaperImage}
                     >
                     <View style={styles.pathContainer}>
-                        {topics.map((topic, i) => {
-                            const isLeft = i % 2 === 0;
-                            const isRead = readIds.has(topic.id);
-                            const hasNext = i < topics.length - 1;
-                            return (
-                                <View key={topic.id} style={styles.step}>
-                                    {hasNext && (
-                                        <View
-                                            style={[
-                                                styles.connector,
-                                                isLeft
-                                                    ? styles.connectorFromLeft
-                                                    : styles.connectorFromRight,
-                                                isRead && styles.connectorRead,
-                                            ]}
-                                        />
-                                    )}
-                                    <View
-                                        style={[
-                                            styles.nodeAnchor,
-                                            isLeft
-                                                ? styles.nodeAnchorLeft
-                                                : styles.nodeAnchorRight,
-                                        ]}
-                                    >
-                                        <TouchableOpacity
-                                            activeOpacity={0.85}
-                                            onPress={() => router.push(`/roadmap/${topic.id}`)}
-                                        >
+                        {agruparPorCapitulo(topics).map((grupo) => (
+                            <View key={`cap-${grupo.chapter}`}>
+                                <View style={styles.chapterHeader}>
+                                    <Text style={styles.chapterHeaderText}>
+                                        Capítulo {grupo.chapter}
+                                    </Text>
+                                </View>
+                                {grupo.itens.map((topic, i) => {
+                                    const isLeft = i % 2 === 0;
+                                    const isRead = readIds.has(topic.id);
+                                    const hasNext = i < grupo.itens.length - 1;
+                                    return (
+                                        <View key={topic.id} style={styles.step}>
+                                            {hasNext && (
+                                                <View
+                                                    style={[
+                                                        styles.connector,
+                                                        isLeft
+                                                            ? styles.connectorFromLeft
+                                                            : styles.connectorFromRight,
+                                                        isRead && styles.connectorRead,
+                                                    ]}
+                                                />
+                                            )}
                                             <View
                                                 style={[
-                                                    styles.nodeCircle,
-                                                    isRead && styles.nodeCircleRead,
+                                                    styles.nodeAnchor,
+                                                    isLeft
+                                                        ? styles.nodeAnchorLeft
+                                                        : styles.nodeAnchorRight,
                                                 ]}
                                             >
-                                                <Ionicons
-                                                    name={isRead ? 'checkmark' : 'book'}
-                                                    size={28}
-                                                    color={isRead ? colors.white : colors.tealDark}
-                                                />
+                                                <TouchableOpacity
+                                                    activeOpacity={0.85}
+                                                    onPress={() => router.push(`/roadmap/${topic.id}`)}
+                                                >
+                                                    <View
+                                                        style={[
+                                                            styles.nodeCircle,
+                                                            isRead && styles.nodeCircleRead,
+                                                        ]}
+                                                    >
+                                                        <Ionicons
+                                                            name={isRead ? 'checkmark' : 'book'}
+                                                            size={28}
+                                                            color={isRead ? colors.white : colors.tealDark}
+                                                        />
+                                                    </View>
+                                                </TouchableOpacity>
+                                                <View style={styles.nodeTitleWrap}>
+                                                    <Text
+                                                        style={[
+                                                            styles.nodeTitle,
+                                                            isRead && styles.nodeTitleRead,
+                                                        ]}
+                                                        numberOfLines={2}
+                                                    >
+                                                        {topic.title}
+                                                    </Text>
+                                                </View>
                                             </View>
-                                        </TouchableOpacity>
-                                        <View style={styles.nodeTitleWrap}>
-                                            <Text
-                                                style={[
-                                                    styles.nodeTitle,
-                                                    isRead && styles.nodeTitleRead,
-                                                ]}
-                                                numberOfLines={2}
-                                            >
-                                                {topic.title}
-                                            </Text>
                                         </View>
-                                    </View>
-                                </View>
-                            );
-                        })}
+                                    );
+                                })}
+                            </View>
+                        ))}
                     </View>
                     </ImageBackground>
                 </ScrollView>

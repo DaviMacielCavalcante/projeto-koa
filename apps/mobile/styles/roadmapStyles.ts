@@ -75,6 +75,21 @@ export const roadmapStyles = StyleSheet.create({
         paddingTop: 12,
         paddingBottom: 24,
     },
+    chapterHeader: {
+        alignSelf: 'center',
+        marginTop: 8,
+        marginBottom: 18,
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+        backgroundColor: colors.tealDark,
+        borderRadius: 20,
+    },
+    chapterHeaderText: {
+        fontFamily: fonts.monoSemi,
+        fontSize: sizes.body,
+        color: colors.white,
+        letterSpacing: 1,
+    },
     step: {
         height: STEP_HEIGHT,
         position: 'relative',
