@@ -182,7 +182,7 @@ export default function Inicio() {
                         style={styles.educationalCard}
                     >
                         <Image
-                            source={require('../../assets/trilha-icon.png')}
+                            source={require('../../assets/roadmap/image/trilha-icon.png')}
                             style={styles.educationalIcon}
                             resizeMode="contain"
                         />

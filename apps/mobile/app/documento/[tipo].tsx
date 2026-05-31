@@ -21,9 +21,9 @@ const IMAGENS_DOC: Partial<Record<string, any>> = {
 };
 
 const AUDIOS_DOC: Partial<Record<string, any>> = {
-    CAR:  require('../../assets/audio/car.mp3'),
-    CCIR: require('../../assets/audio/ccir.mp3'),
-    ITR:  require('../../assets/audio/itr.mp3'),
+    CAR:  require('../../assets/roadmap/audio/car.mp3'),
+    CCIR: require('../../assets/roadmap/audio/ccir.mp3'),
+    ITR:  require('../../assets/roadmap/audio/itr.mp3'),
 };
 
 type DocumentoStatus = 'active' | 'expiring_soon' | 'expired' | null;

@@ -80,7 +80,7 @@ export default function Roadmap() {
                         </Text>
                     </View>
                     <Image
-                        source={require('../../assets/trophy-icon.png')}
+                        source={require('../../assets/roadmap/image/trophy-icon.png')}
                         style={styles.headerTrofeu}
                         resizeMode="contain"
                     />
@@ -108,7 +108,7 @@ export default function Roadmap() {
                     showsVerticalScrollIndicator={false}
                 >
                     <ImageBackground
-                        source={require('../../assets/images/leaves-roadmap-wallpaper.png')}
+                        source={require('../../assets/roadmap/image/leaves-roadmap-wallpaper.png')}
                         resizeMode="repeat"
                         style={styles.pathWallpaper}
                         imageStyle={styles.pathWallpaperImage}
