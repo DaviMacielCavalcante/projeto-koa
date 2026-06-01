@@ -127,6 +127,53 @@ export const roadmapDetailStyles = StyleSheet.create({
     botao: {
         marginTop: 4,
     },
+    // Botão "Coletar a sua medalha" (um pouco maior que o GradientButton padrão).
+    coletarBtn: {
+        marginTop: 4,
+        borderRadius: 30,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    coletarBtnOff: {
+        opacity: 0.5,
+    },
+    coletarGrad: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
+        paddingVertical: 18,
+        paddingHorizontal: 26,
+    },
+    coletarMedal: {
+        width: 34,
+        height: 34,
+    },
+    coletarLabel: {
+        color: colors.white,
+        fontFamily: fonts.bodyBold,
+        fontSize: sizes.md,
+        letterSpacing: 0.3,
+    },
+    // Estado concluído: medalha grande centralizada (toque pra desfazer).
+    medalhaColetada: {
+        marginTop: 8,
+        alignItems: 'center',
+        gap: 8,
+    },
+    medalhaImg: {
+        width: 96,
+        height: 96,
+    },
+    medalhaLabel: {
+        fontFamily: fonts.monoSemi,
+        fontSize: sizes.md,
+        color: colors.statusGreen,
+    },
     // Trilha fixa no rodapé: estrada ocupa a largura e o fazendeiro caminha sobre ela.
     scroll: {
         flex: 1,

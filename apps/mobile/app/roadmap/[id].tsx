@@ -3,8 +3,9 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
-import { colors } from '../../design/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { ScreenContainer, TopBar } from '../../design/components';
+import { colors, buttonGradients } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { getAudioSource } from '../../src/data/audioRegistry';
 import {
@@ -20,6 +21,7 @@ import AudioBubble from '../../components/AudioBubble';
 
 const ROAD = require('../../assets/roadmap/image/road-roadmap.png');
 const FARMER = require('../../assets/roadmap/image/farmer-roadmap.png');
+const MEDAL = require('../../assets/roadmap/image/medal-roadmap.png');
 // Tamanho FIXO da estrada (não estica): fixo a altura e derivo a largura na mesma
 // proporção da imagem (1536/363) pra não distorcer. Ajuste ROAD_H pra mudar o tamanho.
 const ROAD_RATIO = 1536 / 363;
@@ -216,13 +218,34 @@ export default function RoadmapDetail() {
                     </Text>
                 ) : null}
 
-                <GradientButton
-                    label={concluido ? 'Desmarcar conclusão' : 'Marcar como concluído'}
-                    variant="teal"
-                    onPress={handleToggleConcluido}
-                    disabled={!concluido && !podeConcluir}
-                    style={styles.botao}
-                />
+                {concluido ? (
+                    // Tópico concluído: medalha coletada no centro (toque pra desfazer).
+                    <TouchableOpacity
+                        style={styles.medalhaColetada}
+                        activeOpacity={0.85}
+                        onPress={handleToggleConcluido}
+                    >
+                        <Image source={MEDAL} style={styles.medalhaImg} resizeMode="contain" />
+                        <Text style={styles.medalhaLabel}>Medalha coletada!</Text>
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        activeOpacity={0.85}
+                        onPress={handleToggleConcluido}
+                        disabled={!podeConcluir}
+                        style={[styles.coletarBtn, !podeConcluir && styles.coletarBtnOff]}
+                    >
+                        <LinearGradient
+                            colors={[...buttonGradients.teal]}
+                            start={{ x: 0, y: 0.5 }}
+                            end={{ x: 1, y: 0.5 }}
+                            style={styles.coletarGrad}
+                        >
+                            <Image source={MEDAL} style={styles.coletarMedal} resizeMode="contain" />
+                            <Text style={styles.coletarLabel}>Coletar a sua medalha</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                )}
             </ScrollView>
 
             {temConteudo ? (
