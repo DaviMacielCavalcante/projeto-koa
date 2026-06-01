@@ -24,6 +24,7 @@ export default function RoadmapDetail() {
     const [content, setContent] = useState<ContentRow | null>(null);
     const [sections, setSections] = useState<SectionRow[]>([]);
     const [audioSource, setAudioSource] = useState<number | undefined>(undefined);
+    const [audioNome, setAudioNome] = useState<string | null>(null);
     const [concluido, setConcluido] = useState(false);
 
     useEffect(() => {
@@ -42,13 +43,15 @@ export default function RoadmapDetail() {
             setSections(secoes ?? []);
 
             if (row?.audio_id) {
-                const audio = await agricultoresDb?.getFirstAsync<{ file_key: string }>(
-                    'SELECT file_key FROM audios WHERE id = ?',
+                const audio = await agricultoresDb?.getFirstAsync<{ file_key: string; name: string }>(
+                    'SELECT file_key, name FROM audios WHERE id = ?',
                     [row.audio_id]
                 );
                 setAudioSource(getAudioSource(audio?.file_key));
+                setAudioNome(audio?.name ?? null);
             } else {
                 setAudioSource(undefined);
+                setAudioNome(null);
             }
 
             setConcluido(await isConcluido(id));
@@ -84,7 +87,7 @@ export default function RoadmapDetail() {
                 ) : null}
 
                 {audioSource ? (
-                    <AudioBubble source={audioSource} style={styles.audioBubble} />
+                    <AudioBubble source={audioSource} name={audioNome} style={styles.audioBubble} />
                 ) : null}
 
                 {temConteudo ? (

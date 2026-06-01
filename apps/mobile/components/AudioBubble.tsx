@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, StyleProp, ViewStyle, Image } from 'react-native';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts } from '../design/theme';
+
+const AVATAR_FOTO = require('../assets/roadmap/image/fugaprascolinas.jpg');
 
 const WAVE_BARS = [
     10, 16, 22, 14, 26, 18, 12, 24, 30, 20, 14, 26, 18, 10, 22,
@@ -11,6 +13,7 @@ const WAVE_BARS = [
 
 interface AudioBubbleProps {
     source: number;
+    name?: string | null;
     style?: StyleProp<ViewStyle>;
 }
 
@@ -21,7 +24,7 @@ function formatarTempo(ms: number): string {
     return `${min}:${String(seg).padStart(2, '0')}`;
 }
 
-export default function AudioBubble({ source, style }: AudioBubbleProps) {
+export default function AudioBubble({ source, name, style }: AudioBubbleProps) {
     const soundRef = useRef<Audio.Sound | null>(null);
     const [tocando, setTocando] = useState(false);
     const [posicao, setPosicao] = useState(0);
@@ -82,48 +85,54 @@ export default function AudioBubble({ source, style }: AudioBubbleProps) {
 
     return (
         <View style={[styles.bubble, style]}>
-            <View style={styles.avatar}>
-                <Ionicons name="person" size={24} color={colors.white} />
-                <View style={styles.micBadge}>
-                    <Ionicons name="mic" size={11} color={colors.white} />
+            {name ? <Text style={styles.nome}>{name}</Text> : null}
+            <View style={styles.row}>
+                <View style={styles.avatar}>
+                    <Image source={AVATAR_FOTO} style={styles.avatarFoto} resizeMode="cover" />
+                    <View style={styles.micBadge}>
+                        <Ionicons name="mic" size={11} color={colors.white} />
+                    </View>
                 </View>
-            </View>
 
-            <TouchableOpacity
-                style={styles.playBtn}
-                onPress={alternar}
-                activeOpacity={0.85}
-                accessibilityLabel={tocando ? 'Pausar áudio' : 'Tocar áudio'}
-            >
-                <Ionicons name={tocando ? 'pause' : 'play'} size={22} color={colors.white} />
-            </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.playBtn}
+                    onPress={alternar}
+                    activeOpacity={0.85}
+                    accessibilityLabel={tocando ? 'Pausar áudio' : 'Tocar áudio'}
+                >
+                    <Ionicons name={tocando ? 'pause' : 'play'} size={22} color={colors.white} />
+                </TouchableOpacity>
 
-            <View style={styles.right}>
-                <View style={styles.wave}>
-                    {WAVE_BARS.map((altura, i) => {
-                        const tocada = i / WAVE_BARS.length <= progresso;
-                        return (
-                            <View
-                                key={i}
-                                style={[
-                                    styles.bar,
-                                    { height: altura, backgroundColor: tocada ? colors.tealDark : colors.creamDeep },
-                                ]}
-                            />
-                        );
-                    })}
+                <View style={styles.right}>
+                    <View style={styles.wave}>
+                        {WAVE_BARS.map((altura, i) => {
+                            const tocada = i / WAVE_BARS.length <= progresso;
+                            return (
+                                <View
+                                    key={i}
+                                    style={[
+                                        styles.bar,
+                                        { height: altura, backgroundColor: tocada ? colors.tealDark : colors.creamDeep },
+                                    ]}
+                                />
+                            );
+                        })}
+                    </View>
+                    <Text style={styles.timer}>{tempoLabel}</Text>
                 </View>
-                <Text style={styles.timer}>{tempoLabel}</Text>
             </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    nome: {
+        fontFamily: fonts.bodySemi,
+        fontSize: 13,
+        color: colors.tealDark,
+        marginBottom: 10,
+    },
     bubble: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
         backgroundColor: colors.white,
         borderRadius: 20,
         paddingVertical: 12,
@@ -136,6 +145,11 @@ const styles = StyleSheet.create({
         shadowRadius: 6,
         elevation: 2,
     },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
     avatar: {
         width: 44,
         height: 44,
@@ -143,6 +157,11 @@ const styles = StyleSheet.create({
         backgroundColor: colors.tealDark,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    avatarFoto: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
     },
     micBadge: {
         position: 'absolute',

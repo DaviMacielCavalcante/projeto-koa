@@ -39,7 +39,7 @@ export async function seedEducationalContents(): Promise<void> {
             await agricultoresDb.runAsync(
                 `INSERT OR REPLACE INTO audios (id, name, file_key, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?)`,
-                [audioId, 'nome', audioKey, ts, ts]
+                [audioId, '@fugaprascolinas', audioKey, ts, ts]
             );
         }
 
