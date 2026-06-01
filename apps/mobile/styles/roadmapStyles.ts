@@ -55,9 +55,52 @@ export const roadmapStyles = StyleSheet.create({
         color: colors.inkMute,
         marginTop: 6,
     },
-    tutorialBtnWrap: {
-        paddingHorizontal: 24,
-        paddingBottom: 8,
+    // Estante de estatísticas (substitui o antigo botão de tutorial). Tamanho fixo, centralizada.
+    estanteWrap: {
+        marginBottom: 10,
+        alignItems: 'center',
+    },
+    estanteInner: {
+        position: 'relative',
+    },
+    // Overlay absoluto: 2 células (1 por compartimento). Ajuste os paddings p/ mapear.
+    estanteOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        flexDirection: 'row',
+        paddingTop: '9%',
+        paddingBottom: '4%',
+        paddingHorizontal: '6%',
+    },
+    estanteCell: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    estanteValor: {
+        fontFamily: fonts.monoSemi,
+        fontSize: 26,
+        color: colors.white,
+        textShadowColor: 'rgba(0,0,0,0.45)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
+    },
+    estanteLabel: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.bodySm,
+        color: colors.creamLight,
+        marginTop: 2,
+        textShadowColor: 'rgba(0,0,0,0.45)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
+    },
+    estanteMedalRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    estanteMedalIcon: {
+        width: 30,
+        height: 30,
     },
     scrollContent: {
         paddingBottom: 60,

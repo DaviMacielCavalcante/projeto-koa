@@ -3,13 +3,20 @@ import { useCallback, useState } from 'react';
 import { Image, ImageBackground, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
+import { ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { seedEducationalContents } from '../../src/db/seedEducationalContents';
-import { useTutorial } from '../../src/contexts/TutorialContext';
 import { listarConcluidosDoUsuario } from '../../src/services/progress';
 import { roadmapStyles as styles } from '../../styles/roadmapStyles';
+
+const BOOKCASE = require('../../assets/roadmap/image/bookcase-raodmap.png');
+const MEDAL = require('../../assets/roadmap/image/medal-roadmap.png');
+// Tamanho FIXO da estante (não amarra à largura da tela): fixo a largura e derivo a
+// altura na proporção da imagem (1398/480), sem distorcer. Ajuste ESTANTE_W p/ redimensionar.
+const ESTANTE_RATIO = 1398 / 480;
+const ESTANTE_W = 350;
+const ESTANTE_H = Math.round(ESTANTE_W / ESTANTE_RATIO);
 
 type ContentRow = {
     id: string;
@@ -37,14 +44,8 @@ function agruparPorCapitulo(itens: ContentRow[]): Capitulo[] {
 }
 
 export default function Roadmap() {
-    const { iniciar: iniciarTutorial } = useTutorial();
     const [topics, setTopics] = useState<ContentRow[]>([]);
     const [readIds, setReadIds] = useState<Set<string>>(new Set());
-
-    function abrirTutorial() {
-        router.replace('/(tabs)');
-        iniciarTutorial();
-    }
 
     useFocusEffect(
         useCallback(() => {
@@ -62,6 +63,11 @@ export default function Roadmap() {
             carregar();
         }, [])
     );
+
+    // Estatísticas exibidas na estante (1 por compartimento).
+    const totalTopicos = topics.length;
+    const medalhas = topics.filter((t) => readIds.has(t.id)).length;
+    const percentual = totalTopicos > 0 ? Math.round((medalhas / totalTopicos) * 100) : 0;
 
     return (
         <ScreenContainer variant="cream">
@@ -87,13 +93,6 @@ export default function Roadmap() {
                 </LinearGradient>
             </View>
 
-            <View style={styles.tutorialBtnWrap}>
-                <GradientButton
-                    label="Tutorial do app"
-                    variant="teal"
-                    onPress={abrirTutorial}
-                />
-            </View>
 
             {topics.length === 0 ? (
                 <View style={styles.emptyState}>
@@ -107,6 +106,31 @@ export default function Roadmap() {
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
+                    <View style={styles.estanteWrap}>
+                        <View style={[styles.estanteInner, { width: ESTANTE_W, height: ESTANTE_H }]}>
+                            <Image
+                                source={BOOKCASE}
+                                style={{ width: ESTANTE_W, height: ESTANTE_H }}
+                                resizeMode="contain"
+                            />
+                            {/* Overlay: cada compartimento mostra uma estatística (ajuste os paddings p/ mapear). */}
+                            <View style={styles.estanteOverlay}>
+                                <View style={styles.estanteCell}>
+                                    <Text style={styles.estanteValor}>{percentual}%</Text>
+                                    <Text style={styles.estanteLabel}>completo</Text>
+                                </View>
+                                <View style={styles.estanteCell}>
+                                    <View style={styles.estanteMedalRow}>
+                                        <Image source={MEDAL} style={styles.estanteMedalIcon} resizeMode="contain" />
+                                        <Text style={styles.estanteValor}>
+                                            {medalhas}/{totalTopicos}
+                                        </Text>
+                                    </View>
+                                    <Text style={styles.estanteLabel}>medalhas</Text>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
                     <ImageBackground
                         source={require('../../assets/roadmap/image/leaves-roadmap-wallpaper.png')}
                         resizeMode="repeat"
