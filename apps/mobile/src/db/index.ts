@@ -8,15 +8,41 @@ async function initDb() {
 
     await agricultoresDb.execAsync(`
         CREATE TABLE IF NOT EXISTS users(
-        id TEXT PRIMARY KEY, 
-        name TEXT, 
-        phone TEXT UNIQUE, 
-        municipality TEXT, 
-        consentimento_lgpd INTEGER, 
-        onboarding_concluido INTEGER, 
-        created_at TEXT, 
+        id TEXT PRIMARY KEY,
+        name TEXT,
+        phone TEXT UNIQUE,
+        municipality TEXT,
+        consentimento_lgpd INTEGER,
+        onboarding_concluido INTEGER,
+        created_at TEXT,
         updated_at TEXT)
     `);
+
+    // Dados do emissor exigidos pela API de NFA-e (Focus NFe). Adicionados via ALTER
+    // guardado porque quem já tem o app instalado já tem a tabela `users` criada — o
+    // CREATE IF NOT EXISTS acima não acrescenta colunas novas a quem já existe. Todas
+    // nullable (TEXT): o preenchimento é opcional e feito aos poucos na tela de perfil.
+    const userCols = await agricultoresDb.getAllAsync<{ name: string }>(
+        `PRAGMA table_info(users)`
+    );
+    const colunasExistentes = new Set(userCols.map((c) => c.name));
+    const colunasEmissor = [
+        'cnpj_emitente',
+        'nome_emitente',
+        'logradouro_emitente',
+        'numero_emitente',
+        'bairro_emitente',
+        'municipio_emitente',
+        'uf_emitente',
+        'cep_emitente',
+        'inscricao_estadual_emitente',
+        'regime_tributario_emitente',
+    ];
+    for (const coluna of colunasEmissor) {
+        if (!colunasExistentes.has(coluna)) {
+            await agricultoresDb.execAsync(`ALTER TABLE users ADD COLUMN ${coluna} TEXT`);
+        }
+    }
 
     await agricultoresDb.execAsync(`
         CREATE TABLE IF NOT EXISTS properties(

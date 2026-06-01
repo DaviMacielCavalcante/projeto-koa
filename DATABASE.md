@@ -18,8 +18,20 @@ Armazena os dados de cadastro do agricultor.
 | phone | VARCHAR | Telefone de contato |
 | municipality | VARCHAR | Município (ex: Moju) |
 | plan | ENUM (free/premium) | Plano do usuário |
+| cnpj_emitente | TEXT | Dados do emissor p/ NFA-e — CNPJ (nullable) |
+| nome_emitente | TEXT | Dados do emissor p/ NFA-e — nome/razão social (nullable) |
+| logradouro_emitente | TEXT | Dados do emissor p/ NFA-e — logradouro (nullable) |
+| numero_emitente | TEXT | Dados do emissor p/ NFA-e — número (nullable) |
+| bairro_emitente | TEXT | Dados do emissor p/ NFA-e — bairro (nullable) |
+| municipio_emitente | TEXT | Dados do emissor p/ NFA-e — município (nullable) |
+| uf_emitente | TEXT | Dados do emissor p/ NFA-e — UF (nullable) |
+| cep_emitente | TEXT | Dados do emissor p/ NFA-e — CEP (nullable) |
+| inscricao_estadual_emitente | TEXT | Dados do emissor p/ NFA-e — inscrição estadual (nullable) |
+| regime_tributario_emitente | TEXT | Dados do emissor p/ NFA-e — regime (1/2/3; nullable) |
 | created_at | TIMESTAMP | Data de cadastro |
 | updated_at | TIMESTAMP | Data da última atualização |
+
+> As 10 colunas `*_emitente` são exigidas pela API de NFA-e (Focus NFe). São adicionadas via `ALTER TABLE` guardado em `src/db/index.ts` (todas nullable, preenchidas aos poucos na tela de perfil). Enquanto qualquer uma estiver vazia, o botão "Emitir nova nota" fica bloqueado.
 
 ---
 
