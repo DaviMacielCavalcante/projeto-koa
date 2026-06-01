@@ -160,6 +160,21 @@ Controla quais conteúdos educativos o agricultor já marcou como lido.
 
 ---
 
+### `user_section_progress`
+Controla quais **seções** (subtópicos) de um tópico o agricultor já marcou como concluídas. O tópico só pode ser concluído depois que todas as suas seções estiverem marcadas.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| id | UUID | Chave primária |
+| user_id | UUID | FK → users |
+| content_id | TEXT | FK → educational_contents (tópico ao qual a seção pertence) |
+| section_id | TEXT | FK → content_sections (ex: `CAR-0`); único por usuário |
+| read_at | TIMESTAMP | Data em que a seção foi marcada como concluída |
+| created_at | TIMESTAMP | Data de cadastro |
+| updated_at | TIMESTAMP | Data da última atualização |
+
+---
+
 ## 🔗 Relacionamentos
 
 ```
@@ -169,10 +184,12 @@ users
   ├── documents (user_id)
   ├── sales
   │     └── buyers
-  └── user_content_progress
-        └── educational_contents
-              ├── content_sections (content_id)
-              └── audios (audio_id)
+  ├── user_content_progress
+  │     └── educational_contents
+  │           ├── content_sections (content_id)
+  │           └── audios (audio_id)
+  └── user_section_progress
+        └── content_sections (section_id)
 ```
 
 ---
@@ -189,6 +206,7 @@ Apenas usuários com plano **premium** sincronizam dados com a nuvem. As tabelas
 | buyers | ✅ |
 | sales | ✅ |
 | user_content_progress | ✅ |
+| user_section_progress | ✅ |
 | educational_contents | ❌ (conteúdo fixo, igual pra todos) |
 | content_sections | ❌ (conteúdo fixo, igual pra todos) |
 | audios | ❌ (conteúdo fixo, igual pra todos) |

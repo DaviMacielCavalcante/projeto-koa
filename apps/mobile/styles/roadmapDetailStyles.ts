@@ -82,6 +82,22 @@ export const roadmapDetailStyles = StyleSheet.create({
         color: colors.inkSoft,
         lineHeight: 22,
     },
+    sectionCardFeita: {
+        borderColor: colors.statusGreen,
+        backgroundColor: colors.creamLight,
+    },
+    sectionCheck: {
+        alignSelf: 'center',
+        flexShrink: 0,
+    },
+    contador: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.bodySm,
+        color: colors.inkMute,
+        textAlign: 'center',
+        marginTop: 4,
+        marginBottom: 12,
+    },
     resumoCard: {
         backgroundColor: colors.tealDark,
         borderRadius: 22,

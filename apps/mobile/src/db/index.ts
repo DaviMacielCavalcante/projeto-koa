@@ -105,6 +105,17 @@ async function initDb() {
     `);
 
     await agricultoresDb.execAsync(`
+        CREATE TABLE IF NOT EXISTS user_section_progress(
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        content_id TEXT,
+        section_id TEXT,
+        read_at TEXT,
+        created_at TEXT,
+        updated_at TEXT)
+    `);
+
+    await agricultoresDb.execAsync(`
         CREATE TABLE IF NOT EXISTS sync_queue(
         id TEXT PRIMARY KEY,
         tabela TEXT,

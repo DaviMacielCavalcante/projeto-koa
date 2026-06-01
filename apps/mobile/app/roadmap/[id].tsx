@@ -1,12 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
 import { getAudioSource } from '../../src/data/audioRegistry';
-import { isConcluido, marcarComoConcluido, desmarcarConcluido } from '../../src/services/progress';
+import {
+    isConcluido,
+    marcarComoConcluido,
+    desmarcarConcluido,
+    listarSecoesConcluidas,
+    marcarSecaoConcluida,
+    desmarcarSecao,
+} from '../../src/services/progress';
 import { roadmapDetailStyles as styles } from '../../styles/roadmapDetailStyles';
 import AudioBubble from '../../components/AudioBubble';
 
@@ -17,7 +24,7 @@ type ContentRow = {
     resumo: string | null;
     audio_id: string | null;
 };
-type SectionRow = { icon: string; title: string; body: string };
+type SectionRow = { id: string; icon: string; title: string; body: string };
 
 export default function RoadmapDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -26,6 +33,7 @@ export default function RoadmapDetail() {
     const [audioSource, setAudioSource] = useState<number | undefined>(undefined);
     const [audioNome, setAudioNome] = useState<string | null>(null);
     const [concluido, setConcluido] = useState(false);
+    const [secoesConcluidas, setSecoesConcluidas] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         async function carregar() {
@@ -37,10 +45,11 @@ export default function RoadmapDetail() {
             setContent(row ?? null);
 
             const secoes = await agricultoresDb?.getAllAsync<SectionRow>(
-                'SELECT icon, title, body FROM content_sections WHERE content_id = ? ORDER BY position ASC',
+                'SELECT id, icon, title, body FROM content_sections WHERE content_id = ? ORDER BY position ASC',
                 [id]
             );
             setSections(secoes ?? []);
+            setSecoesConcluidas(await listarSecoesConcluidas(id));
 
             if (row?.audio_id) {
                 const audio = await agricultoresDb?.getFirstAsync<{ file_key: string; name: string }>(
@@ -70,7 +79,25 @@ export default function RoadmapDetail() {
         }
     }
 
+    async function toggleSecao(sectionId: string) {
+        if (!id) return;
+        const jaConcluida = secoesConcluidas.has(sectionId);
+        // Atualiza a UI otimisticamente, depois persiste.
+        setSecoesConcluidas((anterior) => {
+            const proximo = new Set(anterior);
+            if (jaConcluida) proximo.delete(sectionId);
+            else proximo.add(sectionId);
+            return proximo;
+        });
+        if (jaConcluida) await desmarcarSecao(id, sectionId);
+        else await marcarSecaoConcluida(id, sectionId);
+    }
+
     const temConteudo = sections.length > 0;
+    const totalSecoes = sections.length;
+    const secoesOk = secoesConcluidas.size;
+    // Sem seções (ex: CAF) não há o que travar; com seções, exige todas marcadas.
+    const podeConcluir = totalSecoes === 0 || secoesOk >= totalSecoes;
 
     return (
         <ScreenContainer variant="cream">
@@ -94,21 +121,37 @@ export default function RoadmapDetail() {
                     <>
                         {content?.hero ? <Text style={styles.hero}>{content.hero}</Text> : null}
 
-                        {sections.map((section, i) => (
-                            <View key={`${section.title}-${i}`} style={styles.sectionCard}>
-                                <View style={styles.sectionIconWrap}>
+                        {sections.map((section) => {
+                            const feita = secoesConcluidas.has(section.id);
+                            return (
+                                <TouchableOpacity
+                                    key={section.id}
+                                    style={[styles.sectionCard, feita && styles.sectionCardFeita]}
+                                    activeOpacity={0.85}
+                                    onPress={() => toggleSecao(section.id)}
+                                    accessibilityRole="checkbox"
+                                    accessibilityState={{ checked: feita }}
+                                >
+                                    <View style={styles.sectionIconWrap}>
+                                        <Ionicons
+                                            name={section.icon as keyof typeof Ionicons.glyphMap}
+                                            size={22}
+                                            color={colors.tealDark}
+                                        />
+                                    </View>
+                                    <View style={styles.sectionTextWrap}>
+                                        <Text style={styles.sectionTitle}>{section.title}</Text>
+                                        <Text style={styles.sectionBody}>{section.body}</Text>
+                                    </View>
                                     <Ionicons
-                                        name={section.icon as keyof typeof Ionicons.glyphMap}
-                                        size={22}
-                                        color={colors.tealDark}
+                                        name={feita ? 'checkmark-circle' : 'ellipse-outline'}
+                                        size={26}
+                                        color={feita ? colors.statusGreen : colors.creamDeep}
+                                        style={styles.sectionCheck}
                                     />
-                                </View>
-                                <View style={styles.sectionTextWrap}>
-                                    <Text style={styles.sectionTitle}>{section.title}</Text>
-                                    <Text style={styles.sectionBody}>{section.body}</Text>
-                                </View>
-                            </View>
-                        ))}
+                                </TouchableOpacity>
+                            );
+                        })}
 
                         {content?.resumo ? (
                             <View style={styles.resumoCard}>
@@ -127,10 +170,18 @@ export default function RoadmapDetail() {
                     </View>
                 )}
 
+                {temConteudo ? (
+                    <Text style={styles.contador}>
+                        {secoesOk}/{totalSecoes} concluídos
+                        {!concluido && !podeConcluir ? ' — marque todos para concluir o tópico' : ''}
+                    </Text>
+                ) : null}
+
                 <GradientButton
                     label={concluido ? 'Desmarcar conclusão' : 'Marcar como concluído'}
                     variant="teal"
                     onPress={handleToggleConcluido}
+                    disabled={!concluido && !podeConcluir}
                     style={styles.botao}
                 />
             </ScrollView>
