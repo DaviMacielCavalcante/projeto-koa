@@ -23,7 +23,7 @@ const FARMER = require('../../assets/roadmap/image/farmer-roadmap.png');
 // Tamanho FIXO da estrada (não estica): fixo a altura e derivo a largura na mesma
 // proporção da imagem (1536/363) pra não distorcer. Ajuste ROAD_H pra mudar o tamanho.
 const ROAD_RATIO = 1536 / 363;
-const ROAD_H = 64;
+const ROAD_H = 80;
 const ROAD_W = Math.round(ROAD_H * ROAD_RATIO);
 const FARMER_W = 64; // largura/altura do fazendeiro na tela
 

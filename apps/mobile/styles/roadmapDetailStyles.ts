@@ -145,7 +145,7 @@ export const roadmapDetailStyles = StyleSheet.create({
     trilhaFarmer: {
         position: 'absolute',
         left: 0,
-        bottom: 14,
+        bottom: 25,
     },
     placeholder: {
         marginTop: 24,
