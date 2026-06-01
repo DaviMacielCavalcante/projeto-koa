@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GradientButton, ScreenContainer, TopBar } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
@@ -16,6 +17,15 @@ import {
 } from '../../src/services/progress';
 import { roadmapDetailStyles as styles } from '../../styles/roadmapDetailStyles';
 import AudioBubble from '../../components/AudioBubble';
+
+const ROAD = require('../../assets/roadmap/image/road-roadmap.png');
+const FARMER = require('../../assets/roadmap/image/farmer-roadmap.png');
+// Tamanho FIXO da estrada (não estica): fixo a altura e derivo a largura na mesma
+// proporção da imagem (1536/363) pra não distorcer. Ajuste ROAD_H pra mudar o tamanho.
+const ROAD_RATIO = 1536 / 363;
+const ROAD_H = 64;
+const ROAD_W = Math.round(ROAD_H * ROAD_RATIO);
+const FARMER_W = 64; // largura/altura do fazendeiro na tela
 
 type ContentRow = {
     title: string;
@@ -34,6 +44,9 @@ export default function RoadmapDetail() {
     const [audioNome, setAudioNome] = useState<string | null>(null);
     const [concluido, setConcluido] = useState(false);
     const [secoesConcluidas, setSecoesConcluidas] = useState<Set<string>>(new Set());
+    const insets = useSafeAreaInsets();
+    const farmerX = useRef(new Animated.Value(0)).current;
+    const jaPosicionou = useRef(false);
 
     useEffect(() => {
         async function carregar() {
@@ -99,10 +112,36 @@ export default function RoadmapDetail() {
     // Sem seções (ex: CAF) não há o que travar; com seções, exige todas marcadas.
     const podeConcluir = totalSecoes === 0 || secoesOk >= totalSecoes;
 
+    // Move o fazendeiro pela estrada (largura fixa) conforme o progresso das seções.
+    useEffect(() => {
+        if (totalSecoes === 0) return;
+        const p = secoesOk / totalSecoes;
+        const destino = p * Math.max(0, ROAD_W - FARMER_W);
+        if (!jaPosicionou.current) {
+            // Primeira passada: posiciona sem animar (sem "deslizar" ao abrir).
+            farmerX.setValue(destino);
+            jaPosicionou.current = true;
+            return;
+        }
+        Animated.timing(farmerX, {
+            toValue: destino,
+            duration: 450,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+        }).start();
+    }, [secoesOk, totalSecoes, farmerX]);
+
     return (
         <ScreenContainer variant="cream">
             <TopBar leftIcon="arrow-back" dark />
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                style={styles.scroll}
+                contentContainerStyle={[
+                    styles.content,
+                    temConteudo && { paddingBottom: ROAD_H + insets.bottom + 32 },
+                ]}
+                showsVerticalScrollIndicator={false}
+            >
                 <Text style={[styles.titulo, concluido && styles.tituloConcluido]}>
                     {content?.title ?? ''}
                 </Text>
@@ -185,6 +224,26 @@ export default function RoadmapDetail() {
                     style={styles.botao}
                 />
             </ScrollView>
+
+            {temConteudo ? (
+                <View style={[styles.trilhaBar, { bottom: insets.bottom }]} pointerEvents="none">
+                    <View style={[styles.trilhaRoadWrap, { width: ROAD_W, height: ROAD_H }]}>
+                        <Image
+                            source={ROAD}
+                            style={{ width: ROAD_W, height: ROAD_H }}
+                            resizeMode="stretch"
+                        />
+                        <Animated.Image
+                            source={FARMER}
+                            resizeMode="contain"
+                            style={[
+                                styles.trilhaFarmer,
+                                { width: FARMER_W, height: FARMER_W, transform: [{ translateX: farmerX }] },
+                            ]}
+                        />
+                    </View>
+                </View>
+            ) : null}
         </ScreenContainer>
     );
 }

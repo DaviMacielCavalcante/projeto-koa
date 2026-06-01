@@ -127,6 +127,26 @@ export const roadmapDetailStyles = StyleSheet.create({
     botao: {
         marginTop: 4,
     },
+    // Trilha fixa no rodapé: estrada ocupa a largura e o fazendeiro caminha sobre ela.
+    scroll: {
+        flex: 1,
+    },
+    // Barra flutuante no rodapé (acima da navbar): estrada de tamanho fixo, centralizada.
+    trilhaBar: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+    },
+    // Wrapper do tamanho exato da estrada; o fazendeiro é absoluto em relação a ele.
+    trilhaRoadWrap: {
+        justifyContent: 'flex-end',
+    },
+    trilhaFarmer: {
+        position: 'absolute',
+        left: 0,
+        bottom: 14,
+    },
     placeholder: {
         marginTop: 24,
         marginBottom: 24,
