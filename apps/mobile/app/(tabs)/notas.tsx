@@ -6,6 +6,7 @@ import { ScreenContainer } from '../../design/components';
 import { colors } from '../../design/theme';
 import { listarNotas, excluirNota, type NotaFiscal } from '../../src/db/notasFiscais';
 import { obterCertificado, type Certificado } from '../../src/db/certificado';
+import { obterEmissor, emissorCompleto, type DadosEmissor } from '../../src/db/emissor';
 import { notasStyles as styles } from '../../styles/notasStyles';
 
 function formatarData(iso: string): string {
@@ -27,13 +28,19 @@ function resumo(total: number, pendentes: number): string {
 export default function Notas() {
     const [notas, setNotas] = useState<NotaFiscal[]>([]);
     const [certificado, setCertificado] = useState<Certificado | null>(null);
+    const [emissor, setEmissor] = useState<DadosEmissor | null>(null);
 
     useFocusEffect(
         useCallback(() => {
             async function carregar() {
-                const [lista, cert] = await Promise.all([listarNotas(), obterCertificado()]);
+                const [lista, cert, dadosEmissor] = await Promise.all([
+                    listarNotas(),
+                    obterCertificado(),
+                    obterEmissor(),
+                ]);
                 setNotas(lista);
                 setCertificado(cert);
+                setEmissor(dadosEmissor);
             }
             carregar();
         }, [])
@@ -54,6 +61,9 @@ export default function Notas() {
     }
 
     const pendentes = notas.filter((n) => n.status === 'pendente').length;
+    const cadastroCompleto = !!emissor && emissorCompleto(emissor);
+    // Emitir exige certificado A1 enviado E o cadastro do emissor completo.
+    const podeEmitir = !!certificado && cadastroCompleto;
 
     return (
         <ScreenContainer variant="cream">
@@ -101,10 +111,23 @@ export default function Notas() {
                         </Text>
                     </View>
                 )}
+                {certificado && !cadastroCompleto && (
+                    <TouchableOpacity
+                        style={styles.avisoEmissor}
+                        activeOpacity={0.85}
+                        onPress={() => router.push('/perfil')}
+                    >
+                        <Ionicons name="alert-circle" size={16} color={colors.white} />
+                        <Text style={styles.avisoEmissorTexto}>
+                            Cadastro do emissor incompleto. Complete seus dados antes de emitir.
+                        </Text>
+                        <Ionicons name="chevron-forward" size={16} color={colors.white} />
+                    </TouchableOpacity>
+                )}
                 <TouchableOpacity
-                    style={[styles.botaoEmitir, !certificado && styles.botaoEmitirDesabilitado]}
+                    style={[styles.botaoEmitir, !podeEmitir && styles.botaoEmitirDesabilitado]}
                     activeOpacity={0.85}
-                    disabled={!certificado}
+                    disabled={!podeEmitir}
                     onPress={() => router.push('/nfae-form')}
                 >
                     <Ionicons name="add-circle" size={22} color={colors.white} />

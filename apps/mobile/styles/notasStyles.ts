@@ -173,6 +173,23 @@ export const notasStyles = StyleSheet.create({
         fontSize: sizes.caption,
         color: colors.orangeDark,
     },
+    // Aviso vermelho quando o cadastro do emissor está incompleto (toca → tela de perfil).
+    avisoEmissor: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        backgroundColor: colors.statusRed,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        borderRadius: 14,
+    },
+    avisoEmissorTexto: {
+        flex: 1,
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.caption,
+        color: colors.white,
+        lineHeight: 17,
+    },
 
     certCard: {
         marginHorizontal: 16,
