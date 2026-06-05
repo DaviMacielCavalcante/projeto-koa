@@ -10,7 +10,7 @@ import { roadmapContent } from '../data/roadmapContent';
 // O conteúdo rico (hero, seções, resumo) vem de roadmapContent[id]. Ajuste aqui.
 type AudioMeta = { key: string; narrador: string };
 const TOPICOS: { id: string; categoria: string; title: string; chapter: number; audio?: AudioMeta }[] = [
-    { id: 'CAF', categoria: 'CAF', title: 'O que é o CAF', chapter: 1 },
+    { id: 'CAF', categoria: 'CAF', title: 'O que é o CAF', chapter: 1, audio: { key: 'caf', narrador: '@matheus' } },
     { id: 'CAR', categoria: 'CAR', title: 'O que é o CAR', chapter: 1, audio: { key: 'car', narrador: '@fugaprascolinas' } },
     { id: 'CCIR', categoria: 'CCIR', title: 'O que é o CCIR', chapter: 1, audio: { key: 'ccir', narrador: '@fugaprascolinas' } },
     { id: 'ITR', categoria: 'ITR', title: 'O que é o ITR', chapter: 1, audio: { key: 'itr', narrador: '@fugaprascolinas' } },

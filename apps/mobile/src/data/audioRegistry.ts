@@ -3,6 +3,7 @@
 // (resolvido no build), então o banco guarda apenas a CHAVE (audios.file_key) e o
 // código resolve o asset aqui — tanto o mp3 quanto o avatar do narrador.
 const AUDIO_REGISTRY: Record<string, number> = {
+    caf: require('../../assets/roadmap/audio/caf.mp3'),
     car: require('../../assets/roadmap/audio/car.mp3'),
     ccir: require('../../assets/roadmap/audio/ccir.mp3'),
     itr: require('../../assets/roadmap/audio/itr.mp3'),
@@ -18,6 +19,7 @@ const PERFIL_FUGA = require('../../assets/roadmap/image/perfil-fugaprascolinas.j
 const PERFIL_MATHEUS = require('../../assets/roadmap/image/perfil-matheus.jpeg');
 
 const AVATAR_REGISTRY: Record<string, number> = {
+    caf: PERFIL_MATHEUS,
     car: PERFIL_FUGA,
     ccir: PERFIL_FUGA,
     itr: PERFIL_FUGA,

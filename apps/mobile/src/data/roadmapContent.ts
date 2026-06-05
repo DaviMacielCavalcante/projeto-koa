@@ -18,6 +18,38 @@ export type RoadmapTopicContent = {
 // src/db/seedEducationalContents.ts). O título, a categoria (selo), o capítulo e a
 // ordem ficam lá; aqui mora o hero, as seções e o resumo.
 export const roadmapContent: Record<string, RoadmapTopicContent> = {
+    CAF: {
+        hero: 'Cadastro Nacional da Agricultura Familiar',
+        sections: [
+            {
+                icon: 'information-circle',
+                title: 'O que é',
+                body:
+                    'Documento que identifica oficialmente agricultores familiares perante o Governo Federal. '
+            },
+            {
+                icon: 'ribbon',
+                title: 'Para que serve',
+                body:
+                    'Acesso a Pronaf, crédito rural, assistência técnica e programas governamentais.'
+            },
+            {
+                icon: 'location',
+                title: 'Como tirar',
+                body:
+                    'Emitido gratuitamente por sindicatos rurais, EMATER e órgãos credenciados.' + 
+                    'Para emitir é necessário CPF, RG, comprovante de residência, documentos da terra e informações da produção.'
+            },
+            {
+                icon: 'alert-circle',
+                title: 'Observação',
+                body:
+                    'Normalmente válido por 3 anos; na Região Norte pode chegar a 5 anos.' + 
+                    ' Mudanças na renda, área ou composição familiar exigem atualização.',
+            },
+        ],
+        resumo: 'O CAF é o cadastro ambiental da sua terra.',
+    },
     CAR: {
         hero: 'O registro ambiental da sua terra',
         sections: [
