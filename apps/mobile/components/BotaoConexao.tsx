@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
-import { TouchableOpacity, Text, Image } from 'react-native';
+import { TouchableOpacity, Text, Image, StyleProp, ViewStyle } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { verificarConexao } from '../src/services/rede';
 import { botaoConexaoStyles as styles } from '../styles/botaoConexaoStyles';
 
 const ICON_WIFI = require('../assets/icon-wifi.png');
 
-export default function BotaoConexao() {
+export default function BotaoConexao({ style }: { style?: StyleProp<ViewStyle> }) {
     const [conectado, setConectado] = useState(false);
 
     useFocusEffect(
@@ -17,7 +17,7 @@ export default function BotaoConexao() {
 
     return (
         <TouchableOpacity
-            style={[styles.botao, conectado ? styles.botaoConectado : styles.botaoDesconectado]}
+            style={[styles.botao, conectado ? styles.botaoConectado : styles.botaoDesconectado, style]}
             activeOpacity={0.85}
             onPress={() => verificarConexao('toque').then(setConectado)}
         >

@@ -168,6 +168,44 @@ export const inicioStyles = StyleSheet.create({
         bottom: 80,
         right: 24,
     },
+    // Linha de ações: Tutorial (2/3) + Conexão (1/3), abaixo do card do roadmap.
+    acoesRow: {
+        flexDirection: 'row',
+        alignItems: 'stretch',
+        marginHorizontal: 16,
+        marginBottom: 12,
+        gap: 12,
+    },
+    tutorialBtnWrap: {
+        flex: 2,
+        borderRadius: 22,
+        shadowColor: colors.goldDark,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.35,
+        shadowRadius: 10,
+        elevation: 5,
+    },
+    tutorialBtn: {
+        flex: 1,
+        borderRadius: 22,
+        minHeight: 56,
+        paddingVertical: 14,
+        paddingHorizontal: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+    },
+    tutorialBtnTexto: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.md,
+        color: colors.white,
+    },
+    conexaoInline: {
+        flex: 1,
+        marginHorizontal: 0,
+        marginBottom: 0,
+    },
 });
 
 export const inicioModalStyles = StyleSheet.create({

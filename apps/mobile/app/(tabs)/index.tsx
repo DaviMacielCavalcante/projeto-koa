@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { agricultoresDb } from '../../src/db/index';
 import { ScreenContainer } from '../../design/components';
 import { DocStatus } from '../../design/components/DocCircle';
-import { colors } from '../../design/theme';
+import { colors, buttonGradients } from '../../design/theme';
 import AudioPlayer from '../../components/AudioPlayer';
 import TutorialGlow from '../../components/TutorialGlow';
 import BotaoConexao from '../../components/BotaoConexao';
@@ -46,7 +46,7 @@ function calcularStatus(row: DocRow | null): DocStatus {
 }
 
 export default function Inicio() {
-    const { registrarRef, zonaAtiva } = useTutorial();
+    const { registrarRef, zonaAtiva, iniciar: iniciarTutorial } = useTutorial();
     const greetRef = useRef<View>(null);
     const docsRef = useRef<View>(null);
 
@@ -194,7 +194,25 @@ export default function Inicio() {
                     </LinearGradient>
                 </TouchableOpacity>
 
-                <BotaoConexao />
+                <View style={styles.acoesRow}>
+                    <TouchableOpacity
+                        style={styles.tutorialBtnWrap}
+                        activeOpacity={0.88}
+                        onPress={iniciarTutorial}
+                    >
+                        <LinearGradient
+                            colors={[...buttonGradients.gold]}
+                            start={{ x: 0, y: 0.5 }}
+                            end={{ x: 1, y: 0.5 }}
+                            style={styles.tutorialBtn}
+                        >
+                            <Ionicons name="school" size={22} color={colors.white} />
+                            <Text style={styles.tutorialBtnTexto}>Tutorial do app</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+
+                    <BotaoConexao style={styles.conexaoInline} />
+                </View>
             </ScrollView>
 
             <AudioPlayer
