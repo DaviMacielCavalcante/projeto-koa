@@ -7,7 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenContainer, TopBar } from '../../design/components';
 import { colors, buttonGradients } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
-import { getAudioSource } from '../../src/data/audioRegistry';
+import { getAudioSource, getAvatarSource } from '../../src/data/audioRegistry';
 import {
     isConcluido,
     marcarComoConcluido,
@@ -44,6 +44,7 @@ export default function RoadmapDetail() {
     const [sections, setSections] = useState<SectionRow[]>([]);
     const [audioSource, setAudioSource] = useState<number | undefined>(undefined);
     const [audioNome, setAudioNome] = useState<string | null>(null);
+    const [audioAvatar, setAudioAvatar] = useState<number | undefined>(undefined);
     const [concluido, setConcluido] = useState(false);
     const [secoesConcluidas, setSecoesConcluidas] = useState<Set<string>>(new Set());
     const insets = useSafeAreaInsets();
@@ -73,9 +74,11 @@ export default function RoadmapDetail() {
                 );
                 setAudioSource(getAudioSource(audio?.file_key));
                 setAudioNome(audio?.name ?? null);
+                setAudioAvatar(getAvatarSource(audio?.file_key));
             } else {
                 setAudioSource(undefined);
                 setAudioNome(null);
+                setAudioAvatar(undefined);
             }
 
             setConcluido(await isConcluido(id));
@@ -155,7 +158,7 @@ export default function RoadmapDetail() {
                 ) : null}
 
                 {audioSource ? (
-                    <AudioBubble source={audioSource} name={audioNome} style={styles.audioBubble} />
+                    <AudioBubble source={audioSource} name={audioNome} avatar={audioAvatar} style={styles.audioBubble} />
                 ) : null}
 
                 {temConteudo ? (

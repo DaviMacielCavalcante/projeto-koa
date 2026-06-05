@@ -126,13 +126,13 @@ Tópicos educativos da trilha (ex: "O que é o CAR"). O corpo detalhado de cada 
 ---
 
 ### `audios`
-Áudios narrados de cada tópico. O arquivo em si é embutido no app; a coluna `file_key` é a **chave** que o código resolve via registro estático de `require()` (`apps/mobile/src/data/audioRegistry.ts`) — não é um caminho de arquivo real.
+Áudios narrados de cada tópico. O arquivo em si é embutido no app; a coluna `file_key` é a **chave** que o código resolve via registro estático de `require()` (`apps/mobile/src/data/audioRegistry.ts`) — não é um caminho de arquivo real. A mesma chave resolve também a **foto do narrador** (`getAvatarSource`).
 
 | Coluna | Tipo | Descrição |
 |---|---|---|
 | id | TEXT | Chave primária (ex: `audio-CAR`) |
-| name | TEXT | Nome do áudio (default `'nome'` por enquanto) |
-| file_key | TEXT | Chave do asset no registro estático (ex: `car`) |
+| name | TEXT | Nome do narrador exibido na bolha de áudio (ex.: `@fugaprascolinas`, `@matheus`) |
+| file_key | TEXT | Chave do asset no registro estático (ex: `car`, `nf-introducao`) |
 | created_at | TEXT | Data de cadastro |
 | updated_at | TEXT | Data da última atualização |
 

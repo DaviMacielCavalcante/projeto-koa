@@ -4,7 +4,9 @@ import { Audio, AVPlaybackStatus } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts } from '../design/theme';
 
-const AVATAR_FOTO = require('../assets/roadmap/image/fugaprascolinas.jpg');
+// Avatar padrão (caso o áudio não traga um). O avatar real vem por prop, resolvido
+// pelo file_key em src/data/audioRegistry.ts.
+const AVATAR_PADRAO = require('../assets/roadmap/image/perfil-fugaprascolinas.jpg');
 
 const WAVE_BARS = [
     10, 16, 22, 14, 26, 18, 12, 24, 30, 20, 14, 26, 18, 10, 22,
@@ -14,6 +16,7 @@ const WAVE_BARS = [
 interface AudioBubbleProps {
     source: number;
     name?: string | null;
+    avatar?: number;
     style?: StyleProp<ViewStyle>;
 }
 
@@ -24,7 +27,7 @@ function formatarTempo(ms: number): string {
     return `${min}:${String(seg).padStart(2, '0')}`;
 }
 
-export default function AudioBubble({ source, name, style }: AudioBubbleProps) {
+export default function AudioBubble({ source, name, avatar, style }: AudioBubbleProps) {
     const soundRef = useRef<Audio.Sound | null>(null);
     const [tocando, setTocando] = useState(false);
     const [posicao, setPosicao] = useState(0);
@@ -88,7 +91,7 @@ export default function AudioBubble({ source, name, style }: AudioBubbleProps) {
             {name ? <Text style={styles.nome}>{name}</Text> : null}
             <View style={styles.row}>
                 <View style={styles.avatar}>
-                    <Image source={AVATAR_FOTO} style={styles.avatarFoto} resizeMode="cover" />
+                    <Image source={avatar ?? AVATAR_PADRAO} style={styles.avatarFoto} resizeMode="cover" />
                     <View style={styles.micBadge}>
                         <Ionicons name="mic" size={11} color={colors.white} />
                     </View>
