@@ -8,6 +8,10 @@ import { getCurrentUserId, getTelefoneLocal } from '../src/auth/currentUser';
 import { ScreenContainer, GradientButton, TopBar, AudioCircle } from '../design/components';
 import { colors } from '../design/theme';
 import { agricultoresDb } from '../src/db/index';
+import AudioPlayer from '../components/AudioPlayer';
+
+const AUDIO_APRESENTACAO_1 = require('../assets/audio/apresentacao-1.mp3');
+const AUDIO_APRESENTACAO_2 = require('../assets/audio/apresentacao-2.mp3');
 
 // ─── ILUSTRAÇÕES ──────────────────────────────────────────────────────────────
 
@@ -19,7 +23,7 @@ function IlustracaoBemVindo() {
             <View style={il.bemVindoSol}>
                 <Ionicons name="sunny" size={28} color={colors.goldLight} />
             </View>
-            <AudioCircle icon="volume-high" iconColor={colors.tealDark} size={100} />
+            <AudioCircle icon="volume-high" iconColor={colors.tealDark} size={100} source={AUDIO_APRESENTACAO_1} />
             <View style={il.bemVindoFolha}>
                 <Ionicons name="leaf" size={22} color={colors.tealLight} />
             </View>
@@ -134,6 +138,14 @@ async function concluirOnboarding(nome: string, lgpdConsentido: boolean) {
     if (uid) {
         const agora = new Date().toISOString();
         const telefone = getTelefoneLocal() ?? '';
+        // Remove um cadastro órfão com o mesmo telefone porém id diferente (sobra de um
+        // "apagar dados"/reset incompleto). Sem isso o INSERT abaixo viola o UNIQUE de
+        // users.phone e o onboarding trava sem conseguir avançar.
+        if (telefone) {
+            await agricultoresDb?.runAsync(
+                'DELETE FROM users WHERE phone = ? AND id != ?', [telefone, uid]
+            );
+        }
         const existente = await agricultoresDb?.getFirstAsync<{ id: string }>(
             'SELECT id FROM users WHERE id = ?', [uid]
         );
@@ -162,6 +174,10 @@ export default function Onboarding() {
 
     useEffect(() => {
         async function restaurarProgresso() {
+            // "Rever apresentação": quem já concluiu o onboarding recomeça do início,
+            // ignorando qualquer progresso salvo de uma sessão anterior.
+            const concluido = await SecureStore.getItemAsync('onboarding_done');
+            if (concluido === '1') return;
             const salvo = await SecureStore.getItemAsync('onboarding_progress');
             if (salvo) {
                 const { etapa: e, nome: n } = JSON.parse(salvo);
@@ -177,7 +193,12 @@ export default function Onboarding() {
     }, [etapa, nome]);
 
     async function irParaTabs() {
-        await concluirOnboarding(nome, lgpdConsentido);
+        // Nunca prender o usuário no onboarding: se a gravação falhar, segue mesmo assim.
+        try {
+            await concluirOnboarding(nome, lgpdConsentido);
+        } catch (e) {
+            console.warn('Falha ao concluir onboarding:', e);
+        }
         router.replace('/(tabs)');
     }
 
@@ -226,6 +247,7 @@ export default function Onboarding() {
                             {'\n\n'}
                             Toca no alto-falante pra ouvir essa explicação.
                         </Text>
+                        <AudioPlayer source={AUDIO_APRESENTACAO_2} />
                         <View style={styles.lgpdAcoes}>
                             <GradientButton
                                 label="Sim, eu concordo"

@@ -8,6 +8,7 @@ import { listarNotas, excluirNota, type NotaFiscal } from '../../src/db/notasFis
 import { obterCertificado, type Certificado } from '../../src/db/certificado';
 import { obterEmissor, emissorCompleto, type DadosEmissor } from '../../src/db/emissor';
 import { notasStyles as styles } from '../../styles/notasStyles';
+import AudioPlayer from '../../components/AudioPlayer';
 
 function formatarData(iso: string): string {
     return new Date(iso).toLocaleDateString('pt-BR', {
@@ -134,6 +135,12 @@ export default function Notas() {
                     <Text style={styles.botaoEmitirTexto}>Emitir nova nota</Text>
                 </TouchableOpacity>
             </View>
+
+            <AudioPlayer
+                source={require('../../assets/audio/nota-fisca.mp3')}
+                autoPlay={false}
+                style={{ position: 'absolute', right: 24, bottom: 150 }}
+            />
         </ScreenContainer>
     );
 }

@@ -198,7 +198,7 @@ export default function Inicio() {
             </ScrollView>
 
             <AudioPlayer
-                source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
+                source={require('../../assets/audio/home.mp3')}
                 autoPlay={false}
                 style={styles.playerFixed}
             />

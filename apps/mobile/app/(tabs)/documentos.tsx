@@ -163,7 +163,7 @@ export default function Outros() {
             </Modal>
 
             <AudioPlayer
-                source={require('../../assets/audio/829108__jamm__notification-sound-4-hopeful.mp3')}
+                source={require('../../assets/audio/outros-documentos.mp3')}
                 autoPlay={false}
                 style={{ position: 'absolute', right: 24, bottom: Math.max(insets.bottom + 86, 98) }}
             />
