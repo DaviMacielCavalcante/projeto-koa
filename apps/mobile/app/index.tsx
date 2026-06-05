@@ -2,7 +2,6 @@ import { View, Text, TextInput, KeyboardAvoidingView, Platform } from "react-nat
 import { loginStyles as styles } from '../styles/authStyles';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import auth from '@react-native-firebase/auth';
 import { ScreenContainer, GradientButton, AudioCircle } from '../design/components';
 import { colors } from '../design/theme';
 
@@ -10,17 +9,9 @@ export default function PhoneScreen() {
     const [inputState, setInputState] = useState('+5591900000001');
     const router = useRouter();
 
-    async function handleSendCode() {
-        try {
-            const observer = auth().verifyPhoneNumber(inputState);
-            observer.on('state_changed', (snapshot) => {
-                if (snapshot.state === auth.PhoneAuthState.CODE_SENT) {
-                    router.push({ pathname: '/otp', params: { verificationId: snapshot.verificationId } });
-                }
-            });
-        } catch {
-            // Alert já tratado na versão anterior
-        }
+    // Login fake: não chama o Firebase, só leva o telefone digitado pra tela do código.
+    function handleSendCode() {
+        router.push({ pathname: '/otp', params: { telefone: inputState.trim() } });
     }
 
     return (
@@ -57,4 +48,3 @@ export default function PhoneScreen() {
         </ScreenContainer>
     );
 }
-

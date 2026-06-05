@@ -5,7 +5,7 @@ import { ajudaStyles as styles } from '../../styles/ajudaStyles';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import * as FileSystem from 'expo-file-system/legacy';
-import auth from '@react-native-firebase/auth';
+import { sairLocal } from '../../src/auth/currentUser';
 import { ScreenContainer, GradientButton, AudioCircle } from '../../design/components';
 import { colors } from '../../design/theme';
 import { agricultoresDb } from '../../src/db/index';
@@ -36,11 +36,11 @@ export default function Ajuda() {
                 await agricultoresDb?.runAsync(`DELETE FROM ${tabela}`).catch(() => {});
             }
 
-            for (const chave of ['last_active', 'onboarding_done', 'onboarding_progress', 'certificado_senha']) {
+            for (const chave of ['onboarding_done', 'onboarding_progress', 'certificado_senha']) {
                 await SecureStore.deleteItemAsync(chave).catch(() => {});
             }
 
-            await auth().signOut().catch(() => {});
+            await sairLocal().catch(() => {});
 
             fecharModal();
             router.replace('/');

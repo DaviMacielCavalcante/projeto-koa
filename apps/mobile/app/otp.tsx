@@ -1,27 +1,22 @@
-import { View, Text, TextInput, Alert, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, KeyboardAvoidingView, Platform } from "react-native";
 import { otpStyles as styles } from '../styles/authStyles';
 import { useState } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import auth from '@react-native-firebase/auth';
+import { entrarLocal } from '../src/auth/currentUser';
 import { ScreenContainer, GradientButton, AudioCircle } from '../design/components';
 import { colors } from '../design/theme';
 
 export default function OtpScreen() {
     const [inputState, setInputState] = useState('123456');
-    const { verificationId } = useLocalSearchParams();
+    const { telefone } = useLocalSearchParams();
     const router = useRouter();
 
+    // Login fake: não valida o código no Firebase, só registra a sessão local e segue.
     async function handleConfirm() {
-        try {
-            const cred = auth.PhoneAuthProvider.credential(verificationId as string, inputState);
-            await auth().signInWithCredential(cred);
-            await SecureStore.setItemAsync('last_active', Date.now().toString());
-            const onboardingDone = await SecureStore.getItemAsync('onboarding_done');
-            router.replace(onboardingDone === '1' ? '/(tabs)' : '/onboarding');
-        } catch {
-            Alert.alert('Erro', 'Não foi possível autenticar!');
-        }
+        await entrarLocal(typeof telefone === 'string' ? telefone : '');
+        const onboardingDone = await SecureStore.getItemAsync('onboarding_done');
+        router.replace(onboardingDone === '1' ? '/(tabs)' : '/onboarding');
     }
 
     return (
@@ -59,4 +54,3 @@ export default function OtpScreen() {
         </ScreenContainer>
     );
 }
-

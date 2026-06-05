@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import auth from '@react-native-firebase/auth';
+import { getTelefoneLocal } from '../src/auth/currentUser';
 import { ScreenContainer, GradientButton, TopBar } from '../design/components';
 import { onboardingStyles as styles } from '../styles/onboardingStyles';
 import { emissorStyles as e } from '../styles/emissorStyles';
@@ -62,7 +62,7 @@ export default function Perfil() {
         router.back();
     }
 
-    const telefone = auth().currentUser?.phoneNumber ?? '—';
+    const telefone = getTelefoneLocal() ?? '—';
     const cadastroCompleto = emissorCompleto(emissor);
 
     return (

@@ -4,7 +4,7 @@ import { onboardingStyles as styles, onboardingIlStyles as il } from '../styles/
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import auth from '@react-native-firebase/auth';
+import { getCurrentUserId, getTelefoneLocal } from '../src/auth/currentUser';
 import { ScreenContainer, GradientButton, TopBar, AudioCircle } from '../design/components';
 import { colors } from '../design/theme';
 import { agricultoresDb } from '../src/db/index';
@@ -130,22 +130,23 @@ async function salvarProgresso(etapa: Etapa, nome: string) {
 }
 
 async function concluirOnboarding(nome: string, lgpdConsentido: boolean) {
-    const user = auth().currentUser;
-    if (user) {
+    const uid = getCurrentUserId();
+    if (uid) {
         const agora = new Date().toISOString();
+        const telefone = getTelefoneLocal() ?? '';
         const existente = await agricultoresDb?.getFirstAsync<{ id: string }>(
-            'SELECT id FROM users WHERE id = ?', [user.uid]
+            'SELECT id FROM users WHERE id = ?', [uid]
         );
         if (!existente) {
             await agricultoresDb?.runAsync(
                 `INSERT INTO users (id, name, phone, consentimento_lgpd, onboarding_concluido, created_at, updated_at)
                  VALUES (?, ?, ?, ?, 1, ?, ?)`,
-                [user.uid, nome || 'Agricultor', user.phoneNumber ?? '', lgpdConsentido ? 1 : 0, agora, agora]
+                [uid, nome || 'Agricultor', telefone, lgpdConsentido ? 1 : 0, agora, agora]
             );
         } else {
             await agricultoresDb?.runAsync(
                 `UPDATE users SET name = ?, consentimento_lgpd = ?, onboarding_concluido = 1, updated_at = ? WHERE id = ?`,
-                [nome || 'Agricultor', lgpdConsentido ? 1 : 0, agora, user.uid]
+                [nome || 'Agricultor', lgpdConsentido ? 1 : 0, agora, uid]
             );
         }
     }
@@ -279,7 +280,7 @@ export default function Onboarding() {
                             </View>
                             <View style={{ flex: 1 }}>
                                 <Text style={styles.perfilRowLabel}>Telefone</Text>
-                                <Text style={styles.perfilRowValor}>{auth().currentUser?.phoneNumber ?? '—'}</Text>
+                                <Text style={styles.perfilRowValor}>{getTelefoneLocal() ?? '—'}</Text>
                             </View>
                         </View>
                         <View style={styles.perfilRow}>

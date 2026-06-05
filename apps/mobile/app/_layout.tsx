@@ -1,13 +1,18 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState} from 'react';
-import { ActivityIndicator, BackHandler } from 'react-native';
+import { ActivityIndicator, AppState, BackHandler } from 'react-native';
 import { useFonts } from '@expo-google-fonts/inter';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Inconsolata_400Regular, Inconsolata_600SemiBold } from '@expo-google-fonts/inconsolata';
 import * as SecureStore from 'expo-secure-store';
 import * as Notifications from 'expo-notifications';
 import { initDb } from '../src/db/index'
-import auth from '@react-native-firebase/auth';
+import {
+    carregarSessaoLocal,
+    getCurrentUserId,
+    sessaoExpirada,
+    marcarAtividade,
+} from '../src/auth/currentUser';
 import { syncQueue } from '../src/services/sync';
 import { processarFilaEmissao } from '../src/services/emissaoNfae';
 import { configurarNotificacoes, agendarAlertas } from '../src/services/notificacoes';
@@ -55,19 +60,33 @@ export default function RootLayout() {
 
     useEffect(() => {
         initDb().then(async () => {
+            await carregarSessaoLocal();
             setDbReady(true);
 
-            const lastActive = await SecureStore.getItemAsync('last_active');
-            const time_diff = Date.now() - Number(lastActive);
-            if (lastActive && time_diff > (30 * 60 * 1000)) {
-                await auth().signOut();
-                router.replace('/');
-                return;
+            // Sessão local válida (logado E dentro da janela de auto-lock) pula o login.
+            if (getCurrentUserId() && !(await sessaoExpirada())) {
+                const onboardingDone = await SecureStore.getItemAsync('onboarding_done');
+                router.replace(onboardingDone === '1' ? '/(tabs)' : '/onboarding');
             }
+            // Senão: permanece em '/' (primeira vez ou sessão travada por inatividade).
 
             const permitido = await configurarNotificacoes();
             if (permitido) await agendarAlertas();
         });
+    }, []);
+
+    // Auto-lock (RNF18): marca atividade ao sair e, ao voltar, trava se passou de 30 min.
+    useEffect(() => {
+        const sub = AppState.addEventListener('change', async (state) => {
+            if (!getCurrentUserId()) return;
+            if (state === 'active') {
+                if (await sessaoExpirada()) router.replace('/');
+                else await marcarAtividade();
+            } else if (state === 'background' || state === 'inactive') {
+                await marcarAtividade();
+            }
+        });
+        return () => sub.remove();
     }, []);
 
     useEffect(() => {
