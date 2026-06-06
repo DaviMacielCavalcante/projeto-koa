@@ -1,0 +1,155 @@
+import { StyleSheet } from 'react-native';
+import { colors, fonts, sizes } from '../design/theme';
+
+export const detalheDocumentoStyles = StyleSheet.create({
+    top: { paddingHorizontal: 22, alignItems: 'center', paddingTop: 4, paddingBottom: 12 },
+    heroIconWrap: {
+        padding: 10,
+        borderRadius: 32,
+        backgroundColor: 'rgba(255,255,255,0.18)',
+        marginBottom: 12,
+    },
+    titulo: {
+        fontFamily: fonts.monoSemi,
+        fontSize: sizes.xl,
+        color: colors.white,
+        letterSpacing: 0.5,
+    },
+    subtitulo: {
+        fontFamily: fonts.body,
+        fontSize: sizes.caption,
+        color: 'rgba(255,255,255,0.85)',
+        marginTop: 4,
+        textAlign: 'center',
+    },
+    statusCircle: {
+        width: 120, height: 120, borderRadius: 60,
+        alignItems: 'center', justifyContent: 'center',
+        marginVertical: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.2,
+        shadowRadius: 12,
+        elevation: 6,
+    },
+    statusBig: { fontFamily: fonts.monoSemi, fontSize: sizes.lg, color: colors.white },
+    statusSub: {
+        fontFamily: fonts.bodyMedium,
+        fontSize: sizes.tiny,
+        color: colors.white,
+        opacity: 0.95,
+        marginTop: 4,
+        letterSpacing: 0.5,
+    },
+    descricao: {
+        fontFamily: fonts.body,
+        fontSize: sizes.bodySm,
+        color: 'rgba(255,255,255,0.9)',
+        textAlign: 'center',
+        paddingHorizontal: 12,
+        lineHeight: 20,
+    },
+    validade: { fontFamily: fonts.bodyMedium, fontSize: sizes.caption, color: 'rgba(255,255,255,0.8)', marginTop: 8 },
+    acoes: {
+        paddingHorizontal: 16,
+        paddingBottom: 24,
+        paddingTop: 18,
+        gap: 10,
+        marginTop: 'auto' as const,
+    },
+    player: { position: 'absolute', bottom: 24, right: 24 },
+    avisoFundo: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.65)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
+    },
+    imagemHero: {
+        width: '100%',
+        height: 160,
+        borderRadius: 16,
+        marginVertical: 8,
+    },
+    statusBadgeSmall: {
+        borderRadius: 20,
+        paddingHorizontal: 16,
+        paddingVertical: 6,
+        marginTop: 8,
+    },
+    statusBadgeTexto: {
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.bodySm,
+        color: colors.white,
+        letterSpacing: 0.3,
+    },
+    imagemWrap: {
+        flex: 1,
+        marginHorizontal: 16,
+        marginBottom: 4,
+    },
+    imagemHeroFull: {
+        width: '100%',
+        height: '100%',
+    },
+    semImagemWrap: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    descricaoWrap: {
+        paddingHorizontal: 22,
+        alignItems: 'center',
+        gap: 4,
+        paddingBottom: 4,
+    },
+    botao: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        backgroundColor: colors.creamLight,
+        borderRadius: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        minHeight: 56,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.06,
+        shadowRadius: 4,
+        elevation: 1,
+    },
+    botaoDesabilitado: {
+        opacity: 0.5,
+    },
+    botaoIcone: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    botaoLabel: {
+        flex: 1,
+        fontFamily: fonts.bodySemi,
+        fontSize: sizes.body,
+        color: colors.ink,
+    },
+});
+
+export const docImagemModalStyles = StyleSheet.create({
+    fundo: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.92)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    imagem: {
+        width: '90%',
+        height: '75%',
+    },
+    fechar: {
+        position: 'absolute',
+        top: 48,
+        right: 20,
+    },
+});

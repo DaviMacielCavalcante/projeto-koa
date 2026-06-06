@@ -40,6 +40,6 @@ yarn-error.*
 /ios
 /android
 
-# Drizzle migrations
-drizzle/
-/migrations
+# Claude Code local state
+memory/
+.claude/settings.local.json

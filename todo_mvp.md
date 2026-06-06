@@ -26,6 +26,38 @@
 
 ---
 
+## Status atual da auditoria (varredura no código)
+
+**Pronto e funcionando** (núcleo navegável):
+- Auth phone OTP + timeout de sessão (30 min idle)
+- SQLite com 8 tabelas (users, properties, documents, educational_contents, user_content_progress, sync_queue, notas_fiscais, certificado_digital). A antiga `nfae_rascunhos` é dropada no init (`src/db/index.ts:80`)
+- Pipeline de fotos (resize 800px + JPEG compress 0.75 + sync queue → Storage)
+- Notificações locais com deep linking pro detalhe do documento
+- Tabs (Início, Outros, Avisos, Ajuda) + telas de detalhe, guia, FAQ, câmera, perfil, roadmap, NFA-e
+- Onboarding com auto-save por etapa em SecureStore
+- Modo prática isolado em memória
+- Trilha do agricultor com progresso por usuário (`user_content_progress` + sync queue)
+- Tutorial guiado (TutorialOverlay + TutorialGlow com efeito de brilho teal pulsante)
+- Sync queue processada via NetInfo ao reconectar
+- **Emissão de NFA-e (mock)**: form em 4 etapas (`app/nfae-form.tsx`) → `criarNotaPendente` insere em `notas_fiscais` com status `pendente` → `processarFilaEmissao` (`src/services/emissaoNfae.ts`) emite com delay simulado 1.5s, gera número 6 dígitos + chave de acesso 44 dígitos. Reprocessa pendentes no NetInfo reconnect (mesma trigger do `syncQueue`)
+- **Certificado Digital A1 (mock)**: tela `/certificado` cadastra arquivo (nome simulado) + senha. Senha em `expo-secure-store` (`certificado_senha`), metadata em `certificado_digital`. Card fixo na aba Notas mostra status (pendente/ativo); botão "Emitir nova nota" desabilitado sem certificado
+- **Padronização de fontes** (maio/2026): Playfair Display removido. App usa Inter (corpo) + Inconsolata (mono/títulos). Pitfall conhecido: nunca combinar `fontFamily` com `fontWeight` (ver CLAUDE.md → Typography)
+
+**Bloqueios críticos pré-entrega**:
+1. **Bug na exclusão LGPD** (`app/(tabs)/ajuda.tsx:149`) — o botão "Apagar tudo" do modal de confirmação chama `fecharModal` em vez de `apagarTodosDados`. Função existe, está desconectada. UC10 é requisito de compliance.
+2. **Exclusão LGPD incompleta** — mesmo se conectada, a função só limpa SQLite + SecureStore. Falta Firestore (batch delete), Storage (fotos), `auth().currentUser.delete()`.
+3. **Consentimento LGPD não persiste no SQLite** — `consentimento_lgpd` da tabela `users` nunca é preenchido; hoje só existe a flag `onboarding_done` no SecureStore.
+4. **Áudios narrados não existem** — só há 1 MP3 placeholder de notificação (`829108__jamm__...mp3`). Toda a UX de narração em paraense (RNF16) está pendente: onboarding, LGPD, 5 documentos, 5 guias, 5 confirmações, alertas, modo prática, exclusão, auth.
+5. **Telefones placeholder** — `EMATER_TEL = 'tel:+5591XXXXXXXX'` e `INCRA_TEL = 'tel:+5500XXXXXXXX'` em `app/guia/[tipo].tsx`. RF15 quebra ao clicar.
+6. **Educational contents sem `body`** — o seed só insere título; o conteúdo rico vive em `src/data/roadmapContent.ts` (objeto JS), não migrado pra coluna `body`.
+
+**Pontos de atenção (não bloqueiam, mas precisam decisão)**:
+- Inserts em `camera/[tipo].tsx:78` e no botão de teste em `ajuda.tsx` criam linhas em `documents` direto via `runAsync` sem passar por `saveAndEnqueue` — escapam da sync_queue. Considerar refatorar.
+- Reagendamento de notificações vencidas usa `TIME_INTERVAL` de 10 segundos (`repeats: true`) — útil pra desenvolvimento, mas em produção vira spam. Trocar pra DATE diário.
+- Regras de segurança do Firestore/Storage não foram revisadas neste audit (estão fora do código fonte mobile).
+
+---
+
 ## Fase 0 — Preparação (27/04 – 29/04)
 
 - [x] Definir stack tecnológica com a equipe
@@ -70,40 +102,40 @@
 
 ### SQLite e armazenamento
 
-- [ ] Inicializar banco SQLite com expo-sqlite (SQLite.openDatabaseAsync('agricultores.db'))
-- [ ] Criar e migrar tabelas SQLite:
+- [x] Inicializar banco SQLite com expo-sqlite (SQLite.openDatabaseAsync('agricultores.db'))
+- [x] Criar e migrar tabelas SQLite:
   - Tabela "users": id (UUID PK), name, phone (único), municipality, consentimento_lgpd (integer 0/1), onboarding_concluido (integer 0/1), created_at, updated_at
   - Tabela "properties": id (UUID PK), user_id (FK → users), name, area_hectares, location, created_at, updated_at
   - Tabela "documents": id (UUID PK), user_id (FK → users), property_id (FK → properties, nullable), type (ENUM: CAF/CAR/CCIR/ITR/NFA-e), number, issue_date, expiration_date, file_url (URI local), storage_url (URL Firebase Storage, nullable), status (active/expiring_soon/expired — renderizado como verde/amarelo/vermelho; cinza quando nulo), sincronizado (integer 0/1), created_at, updated_at
   - Tabela "educational_contents": id (UUID PK), title, body (texto narrado), category (ex: documentos, onboarding), created_at, updated_at
   - Tabela "user_content_progress": id (UUID PK), user_id (FK → users), content_id (FK → educational_contents), read_at, created_at, updated_at
   - Tabela "sync_queue": id (UUID PK), tabela, operacao (insert/update/delete), payload (JSON), created_at
-- [ ] Configurar regras de segurança do Firestore (agricultor só acessa seus próprios dados — ainda usado para auth e storage)
-- [ ] Configurar Firebase Storage com regras de segurança (agricultor só acessa suas próprias fotos)
-- [ ] Implementar pipeline de foto:
+- [x] Configurar regras de segurança do Firestore (agricultor só acessa seus próprios dados — ainda usado para auth e storage)
+- [x] Configurar Firebase Storage com regras de segurança (agricultor só acessa suas próprias fotos)
+- [x] Implementar pipeline de foto:
   - Captura via expo-camera
-  - Compressão via expo-image-manipulator (resize + compress)
-  - Remoção de metadados de localização via expo-image-manipulator
-  - Salvamento do URI local na coluna file_url da tabela "documents" do SQLite com sincronizado = 0
-  - Upload ao Firebase Storage quando houver conexão; atualizar storage_url e sincronizado = 1
-- [ ] Implementar auto-salvamento de progresso parcial via SQLite (RF14)
+  - Compressão via expo-image-manipulator (resize + compress) ✓ (serviço criado em src/services/photo.ts)
+  - Remoção de metadados de localização via expo-image-manipulator ✓ (serviço criado em src/services/photo.ts)
+  - Salvamento do URI local na coluna file_url da tabela "documents" do SQLite com sincronizado = 0 ✓ (serviço criado em src/services/photo.ts)
+  - Upload ao Firebase Storage quando houver conexão; atualizar storage_url e sincronizado = 1 ✓ (implementado em src/services/sync.ts)
+- [ ] Implementar auto-salvamento de progresso parcial via SQLite (RF14) — onboarding salva em SecureStore (não SQLite); câmera não tem auto-save durante captura
 
 ### Autenticação (Firebase Auth — SMS OTP)
 
-- [ ] Implementar tela de autenticação por número de telefone (campo numérico grande, máscara de telefone BR)
-- [ ] Implementar envio de código OTP via SMS (@react-native-firebase/auth verifyPhoneNumber)
-- [ ] Implementar tela de inserção do código recebido (campo numérico grande, 6 dígitos)
-- [ ] Implementar confirmação e criação de sessão
-- [ ] Implementar tratamento de erros com áudio (número inválido, código expirado, sem sinal para receber SMS)
-- [ ] Implementar timeout de sessão com auto-lock usando expo-secure-store para armazenar token (RNF18)
+- [x] Implementar tela de autenticação por número de telefone (campo numérico grande, máscara de telefone BR)
+- [x] Implementar envio de código OTP via SMS (@react-native-firebase/auth verifyPhoneNumber)
+- [x] Implementar tela de inserção do código recebido (campo numérico grande, 6 dígitos)
+- [x] Implementar confirmação e criação de sessão
+- [ ] Implementar tratamento de erros com áudio (número inválido, código expirado, sem sinal para receber SMS) — Alert implementado, falta áudio
+- [x] Implementar timeout de sessão com auto-lock usando expo-secure-store para armazenar token (RNF18) — 30 min idle em `app/_layout.tsx`
 - [ ] Testar fluxo completo de auth em dispositivo real via development build
 
 ### Sincronização (SQLite local + Firestore remoto)
 
-- [ ] Implementar SyncService: ao reconectar, percorrer sync_queue do SQLite e aplicar operações no Firestore
-- [ ] Implementar listener de estado de conexão (NetInfo ou firebase.database().ref('.info/connected'))
-- [ ] Garantir que todas as escritas gravam no SQLite primeiro e enfileiram na sync_queue com sincronizado = 0
-- [ ] Implementar lógica de retry com backoff exponencial para itens da sync_queue que falharem
+- [x] Implementar SyncService: ao reconectar, percorrer sync_queue do SQLite e aplicar operações no Firestore — `src/services/sync.ts`
+- [x] Implementar listener de estado de conexão (NetInfo ou firebase.database().ref('.info/connected')) — NetInfo subscriber em `app/_layout.tsx`
+- [ ] Garantir que todas as escritas gravam no SQLite primeiro e enfileiram na sync_queue com sincronizado = 0 — `saveAndEnqueue` existe em `src/db/operations.ts`, mas inserts diretos em `camera/[tipo].tsx` (linha 78) e em `ajuda.tsx` (CAF de teste) ainda não passam pelo helper
+- [ ] Implementar lógica de retry com backoff exponencial para itens da sync_queue que falharem — retry passivo implementado (itens ficam na fila), sem backoff real
 - [ ] Implementar indicador visual discreto de status de conexão (opcional para o MVP)
 - [ ] Testar cenário: criar dados offline → reconectar → verificar sync no console Firebase
 
@@ -113,18 +145,18 @@
 
 ### Navegação geral
 
-- [ ] Instalar e configurar navegação (opções: React Navigation ou Expo Router)
+- [x] Instalar e configurar navegação (opções: React Navigation ou Expo Router)
   - Se React Navigation: npx expo install @react-navigation/native @react-navigation/bottom-tabs @react-navigation/stack react-native-screens react-native-safe-area-context
   - Se Expo Router: já incluído no Expo, configurar app directory
-- [ ] Implementar barra de navegação inferior fixa (4 ícones: início, documentos, avisos, ajuda)
-- [ ] Implementar botão "Voltar" fixo no canto superior esquerdo em todas as telas
-- [ ] Garantir que todos os alvos de toque tenham no mínimo 56dp (RNF05)
-- [ ] Garantir que nenhuma tela exija gestos além de toque simples (RNF06) — desativar swipe-back: screenOptions={{ gestureEnabled: false }}
-- [ ] Implementar navegação wizard (uma ação por tela → próximo)
+- [x] Implementar barra de navegação inferior fixa (4 ícones: início, documentos, avisos, ajuda)
+- [x] Implementar botão "Voltar" fixo no canto superior esquerdo em todas as telas — componente BackButton com router.back() padrão
+- [x] Garantir que todos os alvos de toque tenham no mínimo 56dp (RNF05)
+- [x] Garantir que nenhuma tela exija gestos além de toque simples (RNF06) — desativar swipe-back: screenOptions={{ gestureEnabled: false }}
+- [x] Implementar navegação wizard (uma ação por tela → próximo) — onboarding e câmera usam etapas sequenciais
 
 ### Componente reutilizável de áudio (usado em todas as telas)
 
-- [ ] Criar componente AudioPlayer com expo-av:
+- [x] Criar componente AudioPlayer com expo-av:
   - Props: source (arquivo de áudio), autoPlay (boolean), onFinish (callback)
   - Estado: playing, paused, stopped
   - Botão de play (alto-falante) — posição fixa na tela, mesmo lugar em todas as telas
@@ -135,77 +167,78 @@
 
 ### UC07 — Onboarding inicial (RF13, RF13.1, RF13.2, RF12)
 
-- [ ] Implementar tela de boas-vindas com narração via componente AudioPlayer (autoPlay: true)
-- [ ] Implementar criação de avatar/identificação (nome por voz ou digitação)
-- [ ] Implementar apresentação de funcionalidades uma a uma com narração e ilustrações
-- [ ] Implementar convite para modo prática ao final do onboarding
-- [ ] Implementar solicitação de consentimento LGPD em áudio (RNF08)
-- [ ] Implementar botão "Avançar" para pular etapa individual (RF13.1)
-- [ ] Implementar botão "Pular tudo" para encerrar onboarding (RF13.1)
-- [ ] Implementar auto-salvamento se o agricultor for interrompido durante o onboarding (RF14)
-- [ ] Implementar re-acesso ao onboarding via botão de ajuda na tela inicial (RF13.2)
+- [x] Implementar tela de boas-vindas com narração via componente AudioPlayer (autoPlay: true) — AudioCircle animado com placeholder de áudio
+- [x] Implementar criação de avatar/identificação (nome por voz ou digitação) — etapa de perfil com TextInput
+- [x] Implementar apresentação de funcionalidades uma a uma com narração e ilustrações — 4 slides com ilustrações visuais compostas
+- [x] Implementar convite para modo prática ao final do onboarding
+- [x] Implementar solicitação de consentimento LGPD em áudio (RNF08) — etapa LGPD com card de consentimento
+- [x] Implementar botão "Avançar" para pular etapa individual (RF13.1)
+- [x] Implementar botão "Pular tudo" para encerrar onboarding (RF13.1)
+- [x] Implementar auto-salvamento se o agricultor for interrompido durante o onboarding (RF14) — progresso salvo em SecureStore a cada etapa
+- [x] Implementar re-acesso ao onboarding via botão de ajuda na tela inicial (RF13.2)
 - [ ] Implementar seleção de etapa específica para re-assistir (RF13.2)
-- [ ] Salvar flag de onboarding concluído na coluna onboarding_concluido da tabela "users" no SQLite
+- [x] Salvar flag de onboarding concluído na coluna onboarding_concluido da tabela "users" no SQLite
 
 ### UC08 parcial — Modo prática (RF12)
 
-- [ ] Implementar modo prática com dados fictícios (estado em memória via React state, sem tocar no Firestore)
-- [ ] Implementar identidade visual diferenciada (borda ou fundo indicando modo prática)
-- [ ] Implementar áudio explicando que nada será salvo de verdade
-- [ ] Implementar botão "Voltar pro app de verdade"
-- [ ] Garantir que nenhum dado real é afetado pelo modo prática
+- [x] Implementar modo prática com dados fictícios (estado em memória via React state, sem tocar no Firestore)
+- [x] Implementar identidade visual diferenciada (banner dourado no topo indicando modo prática)
+- [ ] Implementar áudio explicando que nada será salvo de verdade — `src/services/practiceAudio.ts` é placeholder com `console.log`, sem áudio real
+- [x] Implementar botão "Voltar pro app de verdade" — botão "Sair" no banner
+- [x] Garantir que nenhum dado real é afetado pelo modo prática — mockDocuments em memória, SQLite não é tocado
 
 ### UC01 — Painel de regularização (RF01, RF02, RF02.1, RF02.2)
 
-- [ ] Implementar tela inicial com saudação e avatar do agricultor (dados da tabela "users" no SQLite)
-- [ ] Implementar cinco indicadores visuais (círculos) para CAF, CAR, CCIR, ITR, NFA-e
-- [ ] Implementar lógica de cores dos indicadores baseada em documents.status e documents.expiration_date do SQLite (active→verde, expiring_soon→amarelo, expired→vermelho, nulo→cinza)
-- [ ] Implementar navegação do indicador para tela de detalhe do documento ao toque
-- [ ] Implementar tela de detalhe do documento com ilustração e status
-- [ ] Implementar AudioPlayer para explicação em áudio (RF02)
+- [x] Implementar tela inicial com saudação e avatar do agricultor (dados da tabela "users" no SQLite)
+- [x] Implementar cinco indicadores visuais (círculos) para CAF, CAR, CCIR, ITR, NFA-e
+- [x] Implementar lógica de cores dos indicadores baseada em documents.status e documents.expiration_date do SQLite (active→verde, expiring_soon→amarelo, expired→vermelho, nulo→cinza)
+- [x] Implementar navegação do indicador para tela de detalhe do documento ao toque
+- [x] Implementar tela de detalhe do documento com ilustração e status
+- [x] Implementar AudioPlayer para explicação em áudio (RF02)
 - [ ] Implementar reprodução automática do áudio apenas na primeira visita — registrar em user_content_progress (RF02)
-- [ ] Implementar botão de pular/interromper áudio via AudioPlayer (RF02.1)
-- [ ] Implementar botão de play permanente e na mesma posição via AudioPlayer (RF02.2)
-- [ ] Implementar três botões na tela de detalhe: "Como consigo?", "Tenho dúvida", "Já tenho, quero guardar"
+- [x] Implementar botão de pular/interromper áudio via AudioPlayer (RF02.1)
+- [x] Implementar botão de play permanente e na mesma posição via AudioPlayer (RF02.2)
+- [x] Implementar três botões na tela de detalhe: "Como consigo?", "Tenho dúvida", "Já tenho, quero guardar"
 
 ### UC02 — Guia passo a passo (RF03, RF15)
 
 - [ ] Implementar tela do guia com imagem estática do escritório da EMATER em Moju
-- [ ] Implementar exibição de horário de funcionamento
-- [ ] Implementar lista visual do que levar (ícones + rótulo curto para RG, CPF, conta de luz)
-- [ ] Implementar botão "Ligar pra EMATER" com Linking.openURL('tel:NUMERO') via expo-linking (RF15)
-- [ ] Implementar AudioPlayer para instruções narradas
+- [x] Implementar exibição de horário de funcionamento — `HORARIO_PADRAO` ('Segunda a sexta, das 8h às 14h') em `app/guia/[tipo].tsx`
+- [x] Implementar lista visual do que levar (ícones + rótulo curto para RG, CPF, conta de luz) — objeto `GUIAS` em `app/guia/[tipo].tsx`
+- [x] Implementar botão "Ligar pra EMATER" com Linking.openURL('tel:NUMERO') via expo-linking (RF15) — número pendente de confirmação (placeholders `+5591XXXXXXXX` / `+5500XXXXXXXX`)
+- [ ] Implementar AudioPlayer para instruções narradas — `app/guia/[tipo].tsx` não importa nem renderiza AudioPlayer
 
 ### UC03 — Fotografar e armazenar documento (RF04, RF05, RF14)
 
-- [ ] Implementar botão "Já tenho, quero guardar" na tela de detalhe do documento
-- [ ] Implementar abertura da câmera via expo-camera com instrução simples no topo ("Tire uma foto do seu documento")
-- [ ] Implementar botão de captura grande e circular (CameraCapturedPicture via takePictureAsync())
-- [ ] Implementar tela de pré-visualização com botões "Ficou bom" e "Tirar de novo"
-- [ ] Implementar pipeline pós-captura:
+- [x] Implementar botão "Já tenho, quero guardar" na tela de detalhe do documento
+- [x] Implementar abertura da câmera via expo-camera com instrução simples no topo ("Tire uma foto do seu documento")
+- [x] Implementar botão de captura grande e circular (CameraCapturedPicture via takePictureAsync())
+- [x] Implementar tela de pré-visualização com botões "Ficou bom" e "Tirar de novo"
+- [x] Implementar pipeline pós-captura:
   - Compressão via ImageManipulator.manipulateAsync() (resize + compress 0.75)
   - Remoção de EXIF/GPS via ImageManipulator
   - Salvamento local do URI na coluna file_url da tabela "documents" no SQLite
   - Upload ao Firebase Storage quando houver conexão (reference.putFile()); atualizar storage_url e sincronizado = 1
-- [ ] Implementar atualização do status do documento no Firestore para "verde" após salvar
+- [x] Implementar atualização do status do documento no Firestore para "verde" após salvar
 - [ ] Implementar confirmação em áudio via AudioPlayer ("Pronto, seu [documento] tá guardado")
-- [ ] Implementar organização por categoria: agricultor acessa documento em no máximo 2 toques (RF05)
+- [x] Implementar organização por categoria: agricultor acessa documento em no máximo 2 toques (RF05)
 - [ ] Implementar auto-salvamento se interrompido durante captura (RF14)
 - [ ] Implementar aviso em áudio se armazenamento estiver cheio (FileSystem.getFreeDiskStorageAsync() via expo-file-system)
 
 ### UC05 — Alertas de prazo (RF06)
 
-- [ ] Configurar expo-notifications:
+- [x] Configurar expo-notifications:
   - Solicitar permissão: Notifications.requestPermissionsAsync()
   - Configurar canal de notificação Android: Notifications.setNotificationChannelAsync()
-- [ ] Implementar agendamento de notificações locais baseado em documents.expiration_date do SQLite:
+- [x] Implementar agendamento de notificações locais baseado em documents.expiration_date do SQLite:
   - Notifications.scheduleNotificationAsync() com trigger de data
   - Reagendar quando o agricultor abrir o app (recalcular prazos)
-- [ ] Implementar mudança automática de cor do indicador (verde → amarelo → vermelho) baseada na data atual vs. data de vencimento
-- [ ] Implementar conteúdo da notificação com nome do agricultor + nome do documento
-- [ ] Implementar deep linking: toque na notificação abre tela de detalhe do documento correspondente
-- [ ] Implementar reemissão diária do alerta enquanto o documento permanecer vencido
-- [ ] Implementar antecedência padrão de 30 dias
+  - Reagendar ao salvar foto (câmera chama agendarAlertas após confirmar)
+- [x] Implementar mudança automática de cor do indicador (verde → amarelo → vermelho) baseada na data atual vs. data de vencimento
+- [x] Implementar conteúdo da notificação com nome do agricultor + nome do documento
+- [x] Implementar deep linking: toque na notificação abre tela de detalhe do documento correspondente
+- [x] Implementar reemissão diária do alerta enquanto o documento permanecer vencido
+- [x] Implementar antecedência padrão de 30 dias
 
 ---
 
@@ -213,25 +246,26 @@
 
 ### UC10 — Excluir dados pessoais (RNF08)
 
-- [ ] Implementar botão "Apagar meus dados" na tela de ajuda (ícone de lixeira)
-- [ ] Implementar explicação em áudio via AudioPlayer sobre o que será apagado
-- [ ] Implementar confirmação com botões "Sim, apagar tudo" e "Não, voltar"
-- [ ] Implementar exclusão de dados no Firestore (document delete por batch)
-- [ ] Implementar exclusão de fotos no Firebase Storage
-- [ ] Implementar exclusão de conta no Firebase Auth (user.delete())
-- [ ] Implementar exclusão do banco SQLite local (SQLite.deleteDatabaseAsync('agricultores.db'))
-- [ ] Implementar cancelamento de todas as notificações agendadas (Notifications.cancelAllScheduledNotificationsAsync())
-- [ ] Implementar limpeza de dados locais no expo-secure-store
-- [ ] Implementar retorno ao estado inicial (tela de autenticação) após exclusão
+- [x] Implementar botão "Apagar meus dados" na tela de ajuda (ícone de lixeira) — botão "Apagar todos os meus dados" em `app/(tabs)/ajuda.tsx`
+- [ ] Implementar explicação em áudio via AudioPlayer sobre o que será apagado — modal só tem texto + ícone, sem áudio
+- [x] Implementar confirmação com botões "Sim, apagar tudo" e "Não, voltar" — modal com countdown de 5s
+- [ ] **BUG**: botão "Apagar tudo" do modal chama `fecharModal` em vez de `apagarTodosDados` (`app/(tabs)/ajuda.tsx:149`) — a função existe mas está desconectada
+- [ ] Implementar exclusão de dados no Firestore (document delete por batch) — `apagarTodosDados` só deleta SQLite + SecureStore, não toca em Firestore
+- [ ] Implementar exclusão de fotos no Firebase Storage — não implementado
+- [ ] Implementar exclusão de conta no Firebase Auth (user.delete()) — apenas `signOut()`, sem `delete()`
+- [x] Implementar exclusão do banco SQLite local — `DELETE FROM` para cada tabela (`ajuda.tsx:29-31`); não usa `SQLite.deleteDatabaseAsync` mas o efeito é equivalente
+- [x] Implementar cancelamento de todas as notificações agendadas (Notifications.cancelAllScheduledNotificationsAsync())
+- [x] Implementar limpeza de dados locais no expo-secure-store — `last_active`, `onboarding_done`, `onboarding_progress`
+- [x] Implementar retorno ao estado inicial (tela de autenticação) após exclusão — `router.replace('/')`
 
 ### Revisão de segurança
 
 - [ ] Revisar regras de segurança do Firestore (agricultor só lê/escreve seus próprios dados)
 - [ ] Revisar regras de segurança do Firebase Storage (agricultor só acessa suas próprias fotos)
-- [ ] Verificar que toda comunicação usa HTTPS (Firebase SDK faz isso por padrão) (RNF09)
-- [ ] Verificar que metadados GPS são removidos de todas as fotos via expo-image-manipulator (RNF08)
-- [ ] Verificar que o consentimento LGPD é solicitado em áudio e registrado na coluna consentimento_lgpd da tabela "users" no SQLite
-- [ ] Verificar que o timeout de sessão está funcionando via expo-secure-store (RNF18)
+- [x] Verificar que toda comunicação usa HTTPS (Firebase SDK faz isso por padrão) (RNF09)
+- [ ] Verificar que metadados GPS são removidos de todas as fotos via expo-image-manipulator (RNF08) — re-encode JPEG remove EXIF na prática, mas falta teste explícito
+- [ ] Verificar que o consentimento LGPD é solicitado em áudio e registrado na coluna consentimento_lgpd da tabela "users" no SQLite — hoje a flag só é salva como `onboarding_done='1'` no SecureStore; a coluna `consentimento_lgpd` da tabela `users` nunca é preenchida
+- [x] Verificar que o timeout de sessão está funcionando via expo-secure-store (RNF18) — 30 min idle implementado em `app/_layout.tsx:44-50`
 
 ---
 
@@ -252,8 +286,8 @@
 - [ ] Comprimir áudios para formato leve (MP3 64kbps, ~240 KB por áudio de 30s)
 - [ ] Colocar áudios na pasta assets/ do projeto (embutidos no bundle)
 - [ ] Testar carregamento e reprodução via expo-av em dispositivo de entrada
-- [ ] Popular tabela "educational_contents" no SQLite com os roteiros de cada áudio (title, body, category)
-- [ ] Garantir que user_content_progress é registrado ao concluir cada conteúdo (read_at preenchido no SQLite)
+- [ ] Popular tabela "educational_contents" no SQLite com os roteiros de cada áudio (title, body, category) — `src/db/seedEducationalContents.ts` semeia 5 títulos (CAF/CAR/CCIR/ITR/NFA-e) com `body` vazio; o conteúdo rico vive em `src/data/roadmapContent.ts` e ainda não foi migrado pra `body`
+- [x] Garantir que user_content_progress é registrado ao concluir cada conteúdo (read_at preenchido no SQLite) — `src/services/progress.ts:marcarComoConcluido` insere com `read_at` e enfileira em `sync_queue`
 
 ### Conteúdo dos guias
 
@@ -265,10 +299,10 @@
 
 ### Ícones e ilustrações
 
-- [ ] Criar ou selecionar ícones semi-realistas para os 5 documentos
-- [ ] Criar ou selecionar ícones de navegação (casa, caderno, sino, interrogação)
-- [ ] Criar ou selecionar ilustrações para as telas de detalhe de cada documento
-- [ ] Criar ou selecionar ícones para a lista do que levar (RG, CPF, conta de luz)
+- [x] Criar ou selecionar ícones semi-realistas para os 5 documentos — `assets/docs/CAF.png`, `car.png`, `CCIR.png`, `ITR.png` (NFA-e ainda pendente)
+- [x] Criar ou selecionar ícones de navegação (casa, caderno, sino, interrogação) — Ionicons (`home-outline`, `book-outline`, `notifications-outline`, `help-circle-outline`) em `app/(tabs)/_layout.tsx`
+- [x] Criar ou selecionar ilustrações para as telas de detalhe de cada documento — reutiliza os PNGs de `assets/docs/` na hero da tela de detalhe
+- [x] Criar ou selecionar ícones para a lista do que levar (RG, CPF, conta de luz) — Ionicons mapeados no objeto `GUIAS` (`card`, `id-card`, `document`, `home`, `map`, `cash`, `storefront`, `navigate`, `people`)
 - [ ] Validar ícones com pelo menos 2-3 pessoas fora da equipe para testar compreensão
 
 ---

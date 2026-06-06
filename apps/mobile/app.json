@@ -1,10 +1,11 @@
 {
   "expo": {
     "name": "Facilitador Jutaí",
+    "scheme": "agri-docs",
     "slug": "facilitador-jutai",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon.jpeg",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -14,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "br.com.teste_ah"
+      "bundleIdentifier": "br.com.agridocs"
     },
     "android": {
       "package": "br.com.teste_ah",
@@ -40,7 +41,8 @@
           }
         }
       ],
-      "@react-native-firebase/auth"
+      "@react-native-firebase/auth",
+      "expo-router"
     ],
     "extra": {
       "eas": {

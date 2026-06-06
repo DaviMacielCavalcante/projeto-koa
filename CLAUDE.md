@@ -8,25 +8,20 @@ Mobile app to assist family farmers in Jutaí with document regularization (CAF,
 
 ## Repo Layout
 
-pnpm monorepo (workspaces in `pnpm-workspace.yaml`). Don't look elsewhere — every source file lives in one of these:
+pnpm monorepo (workspaces in `pnpm-workspace.yaml`). The only workspace is the mobile app:
 
 - `apps/mobile/` — **the deliverable**. React Native + Expo app. Contains `App.tsx`, `index.ts` (Expo entry), `app.json`, `eas.json`, `google-services.json`, `assets/`, ESLint + Prettier config. Run all `expo`/`eas` commands from here (or via `pnpm --filter mobile`).
-- `apps/backend/` — Bun HTTP server scaffold. `Bun.serve` on port `3000` in `index.ts`. Not deployed yet; placeholder for future API needs beyond Firebase.
-- `packages/shared/` — `@agri-docs/shared`. Cross-workspace TypeScript types (e.g. `Farmer`). Source-only, no build step — consumed directly via `src/index.ts`.
 
-Root-only files: `todo_mvp.md` (phased task list), `conventions.md` (full coding/branch/PR rules), `CLAUDE.md`, `README.md`, `LICENSE`, `.gitmessage`, `.github/`.
+Root-only files: `todo_mvp.md` (phased task list), `conventions.md` (full coding/branch/PR rules), `DATABASE.md` (local SQLite schema), `CLAUDE.md`, `README.md`, `LICENSE`, `.gitmessage`, `.github/`.
 
 ## Package Manager
 
-**pnpm only** — never npm or yarn. `apps/backend` uses `bun` as its runtime, but dependencies are still installed via pnpm at the root.
-
-Internal packages are referenced as `"@agri-docs/shared": "workspace:*"` and already wired into both `apps/mobile` and `apps/backend`.
+**pnpm only** — never npm or yarn. All dependencies are installed via pnpm at the root.
 
 ## Stack
 
 - **Mobile**: React Native + TypeScript + Expo (managed workflow with development builds)
 - **Cloud services (Firebase)**: Firestore (remote sync target), Auth (phone OTP via SMS), Storage, Crashlytics
-- **API server**: Bun (`apps/backend`) — initial scaffold only
 - **Local DB**: expo-sqlite (no pending-op limit; custom sync layer pushes to Firestore on reconnect)
 - **Navigation**: React Navigation or Expo Router (decision pending in Phase 1)
 - **Camera/Audio/Notifications**: expo-camera, expo-av, expo-notifications, expo-image-manipulator
@@ -57,18 +52,15 @@ pnpm --filter mobile exec eas build --profile production --platform android
 # Mobile lint / format
 pnpm --filter mobile lint
 pnpm --filter mobile format
-
-# Backend dev server (Bun, hot reload, http://localhost:3000)
-pnpm --filter backend dev
 ```
 
 ## Key Architectural Decisions
 
 **Authentication**: Firebase Auth with phone number OTP (SMS). Session tokens stored via `expo-secure-store`. Auto-lock timeout required (RNF18).
 
-**Offline-first**: SQLite (`expo-sqlite`) is the source of truth for all local data. Every write goes to SQLite first and is also appended to a `sync_queue` table (with `sincronizado = 0`). A `SyncService` processes the queue against Firestore whenever connectivity is restored. Firestore is only used as the remote backend (auth, storage, and sync target) — not as the local cache.
+**Offline-first**: SQLite (`expo-sqlite`) is the source of truth for all local data. Writes should go through `saveAndEnqueue` in `src/db/operations.ts`, which writes to the target table and appends to `sync_queue`. `src/services/sync.ts` consumes the queue on reconnect (NetInfo subscriber wired in `app/_layout.tsx`). Firestore is only the remote backend (auth, storage, sync target) — not a local cache. Heads-up: a couple of call sites (e.g. `app/camera/[tipo].tsx:78`) still insert directly without enqueueing — refactor through `saveAndEnqueue` when touching them.
 
-**Photo pipeline**: expo-camera → expo-image-manipulator (resize + compress to 0.75, strip EXIF/GPS) → URI saved in SQLite `documentos` table with `sincronizado = 0` → upload to Firebase Storage on reconnect, then update `foto_storage_url` and `sincronizado = 1`. Always strip GPS metadata (LGPD/privacy requirement).
+**Photo pipeline**: expo-camera → expo-image-manipulator (resize to 800px width + JPEG compress 0.75; re-encode strips EXIF/GPS) → URI saved in SQLite `documents.file_url` with `sincronizado = 0` and an `update` row in `sync_queue` → on reconnect, `sync.ts` runs `storage().ref('documents/<id>').putFile(uri)`, then updates `documents.storage_url` and sets `sincronizado = 1`. Always strip GPS metadata (LGPD/privacy requirement).
 
 **Audio**: All instructions are narrated in Portuguese with a Paraense regional accent. Every screen has an `AudioPlayer` component (expo-av) in a fixed position, with autoPlay only on first visit (flag tracked in SQLite). Audio files are MP3 64kbps, bundled in `apps/mobile/assets/`.
 
@@ -78,9 +70,17 @@ pnpm --filter backend dev
 
 **Practice mode**: Uses in-memory React state only — never touches SQLite or Firestore. Visually differentiated with a border/background indicator.
 
-**LGPD compliance**: Consent requested via audio during onboarding and recorded in SQLite. Full data deletion (SQLite DB, Storage files, Firestore docs, Auth account, secure store, scheduled notifications) available from the help screen.
+**LGPD compliance**: Consent requested via audio during onboarding and recorded in SQLite. Full data deletion (SQLite DB, Storage files, Firestore docs, Auth account, secure store, scheduled notifications) available from the help screen. Current state of this flow (audit 2026-05-19): the help-screen button exists and `apagarTodosDados` covers SQLite + SecureStore + signOut + cancel notifications, but (a) the modal confirm button at `app/(tabs)/ajuda.tsx:149` is wired to `fecharModal` instead of `apagarTodosDados`, and (b) Firestore docs, Storage files, and `auth().currentUser.delete()` are not yet covered. Consent itself is only persisted as `onboarding_done='1'` in SecureStore — the `users.consentimento_lgpd` column is currently never set.
 
-**Shared types**: Domain types reused between mobile and backend (e.g. `Farmer`) live in `packages/shared/src/index.ts`. Import as `import type { Farmer } from '@agri-docs/shared'`. Add new shared types here instead of redefining per workspace.
+**Tutorial system**: `src/contexts/TutorialContext.tsx` drives a guided overlay (`components/TutorialOverlay.tsx`) that walks the user through home → tabs → document detail. Each highlighted region uses `<TutorialGlow>` (`components/TutorialGlow.tsx`) — a pulsing teal halo backed by `src/hooks/useGlowPulse.ts`. Entry points: onboarding final step, Ajuda tab ("Tutorial do app"), and the trilha ("Tutorial do app" button below the subtitle).
+
+**Roadmap / Trilha do agricultor**: `app/roadmap/index.tsx` renders the path of 5 educational topics. Content is normalized across two tables: `educational_contents` (one row per topic — `title`, `category`, `hero`, `resumo`, `chapter`, `position`; id is deterministic = category, e.g. `'CAR'`; topics are grouped into chapters and ordered by `chapter` then `position`) and `content_sections` (1→N rows per topic — `icon`, `title`, `body`, `position`). `src/db/seedEducationalContents` populates both tables idempotently from the authoring source `src/data/roadmapContent.ts` (runs every launch, reflects content edits). `app/roadmap/[id].tsx` reads the topic + its sections from the DB. Narrated audio is normalized into the `audios` table (`file_key`, `name`); `educational_contents.audio_id` is a nullable FK to it. Since RN `require()` must be a static literal, the DB stores a `file_key` resolved via the static registry `src/data/audioRegistry.ts` (audios are bundled in `assets/audio/`); only CAR/CCIR/ITR have audio today. Per-user completion lives in `user_content_progress`, keyed by `content_id` (= the deterministic topic id) and filtered by `auth().currentUser.uid` (`src/services/progress.ts`); practice mode keeps a parallel in-memory `Set` via `PracticeModeContext`. CAF has a topic row but no sections yet (shows "Conteúdo em breve").
+
+**NFA-e (electronic invoice) flow**: emission service in `src/services/emissaoNfae.ts` is currently a mock — `emitirNotaFiscal` has a 1.5s simulated delay and generates a 6-digit number + 44-digit access key. Replace the body of that function with the real HTTP call when the API exists; the rest of the app doesn't need to change. Notes are persisted in `notas_fiscais` (status `pendente` until emitted, `emitida` after). Pending notes are processed by `processarFilaEmissao`, triggered on NetInfo reconnect in `app/_layout.tsx` (same listener that calls `syncQueue`). The "Emitir nova nota" button on the Notas tab is **gated by `certificado_digital`** — without a registered A1 certificate the button is disabled. Certificate password is stored in `expo-secure-store` (key `certificado_senha`); the rest of the cert metadata (filename, validity) lives in the `certificado_digital` SQLite table (single-row: existing rows are deleted before insert). The cert itself is mocked today — there's no actual `.pfx` upload or NFA-e signing yet.
+
+**Typography**: Two font families bundled via `@expo-google-fonts`: `Inter` (`fonts.body`, `bodyMedium`, `bodySemi`, `bodyBold`) for body/UI text, and `Inconsolata` (`fonts.mono`, `monoSemi`) for headings and emphasis. Defined in `apps/mobile/design/theme/typography.ts`, loaded in `app/_layout.tsx`. **Pitfall**: never combine `fontFamily` with `fontWeight` in styles — RN Google Fonts loads each weight as a separate font file (e.g. `Inter_700Bold`), so adding `fontWeight: '700'` to a style that already uses `fontFamily: fonts.mono` makes the OS look for a bold variant of *that exact filename*, fail, and silently fall back to the system default (Roboto on Android, SF on iOS). Pick the right named font instead (e.g. `fonts.monoSemi`, `fonts.bodyBold`). Playfair Display was removed in May 2026 — don't reintroduce serif fonts without a discussion.
+
+**Local SQLite schema**: All app data lives in `expo-sqlite`, with tables created as raw SQL in `apps/mobile/src/db/index.ts`. See `DATABASE.md` for the documented table reference (users, properties, documents, buyers, sales, educational_contents, user_content_progress).
 
 ## Firebase Setup
 
